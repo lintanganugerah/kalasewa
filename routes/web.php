@@ -20,3 +20,6 @@ Route::get('/daftar/informasiseller', function () {
 Route::get('/test', function () {
     return view('test');
 });
+Route::get('/beranda', function () {
+    return view('beranda');
+});
