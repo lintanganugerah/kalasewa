@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark" aria-label="Fifth navbar example">
+<nav class="navbar sticky-top navbar-expand-lg shadow-sm navbar-light bg-white">
     <div class="container-fluid">
         <a class="navbar-brand" href="#"><img src="" alt="Logo" width="40px"></a>
         <a class="nav-link fs-4" href="#"
@@ -20,7 +20,8 @@
                     <a class="nav-link" href="#">Jadi Seller</a>
                 </li>
             </ul>
-            <a class="me-5" type="submit" style="color: #EE1B2F; text-decoration:none">Sign in</a>
+            <a class="me-5" href="{{ route('seller.loginView') }}" style="color: #EE1B2F; text-decoration:none">Sign
+                in</a>
         </div>
     </div>
 </nav>

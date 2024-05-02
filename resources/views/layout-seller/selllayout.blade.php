@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>BRIMEN - ADMIN</title>
+    <title>Kalasewa Seller</title>
 
     <!-- Custom fonts for this template-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -98,10 +98,10 @@
 </body>
 
 <!-- Bootstrap core JavaScript-->
-<script src="{{ asset('adminStyle/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('Style/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
 <!-- Custom scripts for all pages-->
-<script src="{{ asset('adminStyle/js/sb-admin-2.min.js') }}"></script>
+<script src="{{ asset('Style/js/sb-admin-2.min.js') }}"></script>
 
 <script>
     // Definisikan fungsi untuk mengatur visibilitas navbar berdasarkan lebar layar

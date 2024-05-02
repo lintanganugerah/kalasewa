@@ -182,13 +182,13 @@ top: -.5em;
 }
 
 a {
-color: #4e73df;
+color: #EE1B2F;
 text-decoration: none;
 background-color: transparent;
 }
 
 a:hover {
-color: #224abe;
+color: #D44E4E;
 text-decoration: underline;
 }
 
@@ -5245,10 +5245,7 @@ margin-bottom: -1px;
 .breadcrumb {
 display: flex;
 flex-wrap: wrap;
-padding: 0.75rem 1rem;
-margin-bottom: 1rem;
 list-style: none;
-background-color: #eaecf4;
 border-radius: 0.35rem;
 }
 
@@ -5272,7 +5269,8 @@ text-decoration: none;
 }
 
 .breadcrumb-item.active {
-color: #858796;
+color: #EE1B2F;
+font-weight: bold;
 }
 
 .pagination {
@@ -10994,7 +10992,6 @@ display: flex;
 }
 
 #wrapper #content-wrapper {
-background-color: #f8f9fc;
 width: 100%;
 overflow-x: hidden;
 }
@@ -11598,7 +11595,7 @@ color: #b7b9cc;
 padding: 0.5rem 1rem;
 margin: 0 0.5rem;
 display: block;
-color: #3a3b45;
+color: #dbdbdb;
 text-decoration: none;
 border-radius: 0.35rem;
 white-space: nowrap;
@@ -11606,7 +11603,7 @@ white-space: nowrap;
 
 .sidebar .nav-item .collapse .collapse-inner .collapse-item:hover,
 .sidebar .nav-item .collapsing .collapse-inner .collapse-item:hover {
-background-color: #eaecf4;
+background-color: #d44e4e;
 }
 
 .sidebar .nav-item .collapse .collapse-inner .collapse-item:active,
