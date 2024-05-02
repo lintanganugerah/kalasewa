@@ -71,6 +71,29 @@
                                             pattern="[0-9]*" minlength="5" maxlength="6" required />
                                     </div>
                                 </div>
+                                <div class="mb-5">
+                                    <label class="form-label">Metode Pengiriman</label><br>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="grab" value="Grab"
+                                            name="metode_kirim[]">
+                                        <label class="form-check-label" for="grab">Grab</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="gojekInstant"
+                                            value="Gojek Instant" name="metode_kirim[]">
+                                        <label class="form-check-label" for="gojekInstant">Gojek Instant</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="jne" value="JNE"
+                                            name="metode_kirim[]">
+                                        <label class="form-check-label" for="jne">JNE</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="jnt" value="JNT"
+                                            name="metode_kirim[]">
+                                        <label class="form-check-label" for="jnt">JNT</label>
+                                    </div>
+                                </div>
 
                                 <div class="d-grid mb-5">
                                     <div class="mb-4">

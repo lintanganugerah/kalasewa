@@ -50,6 +50,11 @@
     background-color: #F4F4F4;
 }
 
+.btn-kalasewa {
+    background-color: #EE1B2F;
+    color: white;
+}
+
 *,
 *::before,
 *::after {

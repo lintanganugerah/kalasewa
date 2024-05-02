@@ -25,6 +25,8 @@ Route::group(['middleware' => 'pemilik_sewa'], function () {
 
     Route::get('/beranda', [SellerController::class, 'sellerBerandaView'])->name('seller.berandaView');
     
+    Route::get('/profil/toko', [SellerController::class, 'profilTokoView'])->name('seller.profilTokoView');
+    
     Route::get('/pesanan/perluproses', function () {
         return view('pesanan.perluproses');
     });

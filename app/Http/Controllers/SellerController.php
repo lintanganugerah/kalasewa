@@ -20,4 +20,8 @@ class SellerController extends Controller
         }
         return view('beranda');
     }
+    public function profilTokoView(Request $request) {
+         $user = Auth::user();
+        return view('profiltoko', compact('user'));
+    }
 }

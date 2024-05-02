@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('rating_toko')->nullable();
             $table->string('no_rek')->nullable();
             $table->string('bank')->nullable();
+            $table->json('metode_kirim')->default(json_encode([]));
             $table->unsignedInteger('saldo_penghasilan')->nullable();
             $table->bigInteger('ID_user')->unsigned();
             $table->timestamps();

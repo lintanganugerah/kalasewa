@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Toko;
 
@@ -61,7 +63,9 @@ class AutentikasiSellerController extends Controller
                 return redirect()->back()->withErrors(['msg' => 'Nama Toko telah ada, coba nama toko lain']);
             }
             
-            $photoPath = $request->file('identitas')->store('photos');
+            $photoPath = $request->file('identitas')->store('public/data');
+            $photoPath = Str::replaceFirst('data/', 'storage/', $photoPath);
+            dd($photoPath);
 
             $toko = new Toko;
             $user->nama = $request->nama;
@@ -70,7 +74,6 @@ class AutentikasiSellerController extends Controller
             $user->provinsi = $request->provinsi;
             $user->kota = $request->kota;
             $user->kode_pos = $request->kodePos;
-            $user->role = "pemilik_sewa";
             $user->identitas = $photoPath;
             $toko->nama_toko = $request->namaToko;
             $toko->ID_user = $user->id;
@@ -94,6 +97,7 @@ class AutentikasiSellerController extends Controller
         $user = new User;
         $user->email = $email;
         $user->password = Hash::make($request->password);
+        $user->role = "pemilik_sewa";
         $user->save();
         $user->sendEmailVerificationNotification();
         session(['regis' => TRUE]);
@@ -122,10 +126,12 @@ class AutentikasiSellerController extends Controller
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
+            $toko = Toko::where('ID_User', $user->id)->first();
 
             session(['loggedin' => TRUE]);
             session(['uid' => $user->id]);
-            session(['role' => $user->role]);
+            session(['profilpath' => $user->foto_profil]);
+            session(['namatoko' => $toko->nama_toko]);
 
             if ($user->role == "pemilik_sewa") {
                 return redirect()->route('seller.berandaView');
