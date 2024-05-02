@@ -11,8 +11,9 @@
                             Lakukan Verifikasi Email
                         </h1>
                         <h4 class="ls-tight text-secondary">
-                            Link verifikasi telah dikirimkan ke email anda di <p class="fw-bold kalasewa-color">
+                            Link verifikasi telah dikirimkan ke email anda di <div class="fw-bold kalasewa-color">
                                 {{ session('emailRegis') }}</p>
+                                <p class="fw-bold text-danger"> Mohon cek pada bagiam SPAM </p>
                         </h4>
                     </div>
                 </div>

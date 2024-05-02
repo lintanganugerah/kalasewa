@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 use App\Models\Toko;
 
@@ -33,15 +34,19 @@ class AutentikasiSellerController extends Controller
         $user = Auth::user();
         $id = $user->id;
         if (!isset($user->nama)) {
-            // $request->validate([
-            //     'nama' => 'required|string',
-            //     'namaToko' => 'required|string',
-            //     'noTelp' => 'required|string',
-            //     'AlamatToko' => 'required|string',
-            //     'provinsi' => 'required|string',
-            //     'kota' => 'required|In:Kota Bandung,Kabupaten Bandung',
-            //     'kodePos' => 'required|string',
-            // ]);
+            $validator = Validator::make($request->all(), [
+            'nama' => 'required|string',
+            'namaToko' => 'required|string',
+            'noTelp' => 'required|numeric',
+            'AlamatToko' => 'required|string',
+            'provinsi' => 'required|string',
+            'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
+            'kodePos' => 'required|numeric',
+            ]);
+
+            if ($validator->fails()) {
+                return redirect()->back()->withErrors($validator)->withInput();
+            }
             
             $cekToko = DB::table('tokos')->where('nama_toko',$request->namaToko)->first();
             if ($cekToko !== null) {
@@ -100,7 +105,7 @@ class AutentikasiSellerController extends Controller
             return redirect()->route('seller.registerView')->with("error", "User Telah terverifikasi, Silahkan Login");
         }
     
-        return view('autentikasi-seller.daftar-informasi-seller');
+        return redirect()->route('seller.registerInformationView');
     }
 
     public function loginAction(Request $request)

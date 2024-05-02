@@ -29,6 +29,9 @@
                         <div class="card">
                             <div class="card-body py-5 px-md-5">
                                 <form action="{{ route('seller.loginAction') }}" method="POST">
+                                    <h1 class="mb-5 fw-bold ls-tight">
+                                        Login
+                                    </h1>
                                     @csrf
                                     @if (session('success'))
                                         <div class="alert alert-success">
@@ -40,9 +43,6 @@
                                             {{ session('error') }}
                                         </div>
                                     @endif
-                                    <h1 class="mb-5 fw-bold ls-tight">
-                                        Login
-                                    </h1>
 
                                     <!-- Email input -->
                                     <div class="mb-3">
@@ -53,7 +53,8 @@
                                     <!-- Password input -->
                                     <div class="mb-3">
                                         <label for="pass" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="pass" name="password">
+                                        <input type="password" class="form-control" id="pass" name="password"
+                                            minlength="8">
                                     </div>
 
                                     <div class="form-check d-flex justify-content-end mb-4">

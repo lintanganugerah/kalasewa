@@ -1,6 +1,7 @@
 <nav class="navbar sticky-top navbar-expand-lg shadow-sm navbar-light bg-white">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#"><img src="" alt="Logo" width="40px"></a>
+        <a class="navbar-brand" href="#"><img src="{{ asset('img/kalasewa_logo.png') }}" alt="Logo"
+                width="40px"></a>
         <a class="nav-link fs-4" href="#"
             style="font-weight: bold;color:#EE1B2F; padding-right:25px; margin-left:-10px">Kalasewa</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#collapse"

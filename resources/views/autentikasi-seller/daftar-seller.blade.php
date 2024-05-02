@@ -39,7 +39,7 @@
                                     <div data-mdb-input-init class="form-outline mb-4">
                                         <label class="form-label" for="form3Example3">Password</label>
                                         <input type="password" id="form3Example3" name="password" class="form-control"
-                                            required>
+                                            minlength="8" required>
                                     </div>
 
                                     <!-- Submit button -->
