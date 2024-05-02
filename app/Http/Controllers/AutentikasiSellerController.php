@@ -19,20 +19,28 @@ class AutentikasiSellerController extends Controller
     }
 
     public function registerInformationView(Request $request) {
+        if (session('role') === "pemilik_sewa") {
+            return redirect()->route('seller.berandaView');
+        }
         return view('autentikasi-seller.daftar-informasi-seller');
     }
 
     public function loginView(Request $request) {
+        if (session('role') === "pemilik_sewa") {
+            return redirect()->route('seller.berandaView');
+        }
         return view('autentikasi-seller.login-seller');
     }
 
     public function verifikasiView(Request $request) {
+        if (!session()->has('regis')) {
+            return redirect()->back();
+        }
         return view('autentikasi-seller.daftar-kode-verifikasi');
     }
 
     public function registerInformationAction(Request $request) {
         $user = Auth::user();
-        $id = $user->id;
         if (!isset($user->nama)) {
             $validator = Validator::make($request->all(), [
             'nama' => 'required|string',
@@ -88,6 +96,7 @@ class AutentikasiSellerController extends Controller
         $user->password = Hash::make($request->password);
         $user->save();
         $user->sendEmailVerificationNotification();
+        session(['regis' => TRUE]);
         return redirect()->route('seller.verifikasiView')->with('emailRegis', $email);
     }
 
@@ -116,16 +125,23 @@ class AutentikasiSellerController extends Controller
 
             session(['loggedin' => TRUE]);
             session(['uid' => $user->id]);
-
-            if (!isset($user->nama)) {
-                return redirect()->route('seller.registerInformationView');
-            }
+            session(['role' => $user->role]);
 
             if ($user->role == "pemilik_sewa") {
                 return redirect()->route('seller.berandaView');
             }
         } else {
             return redirect()->route('seller.loginView')->with(['error' => 'Email atau password salah!']);
+        }
+    }
+
+    public function logout()
+    {
+        if (Auth::user()) {
+            Auth::logout();
+            Session::flush();
+            Session::regenerate(true);
+            return redirect()->route('seller.loginView');
         }
     }
 }

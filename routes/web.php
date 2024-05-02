@@ -17,21 +17,19 @@ Route::get('/daftar/verifikasi', [AutentikasiSellerController::class, 'verifikas
 
 Route::get('/email/verify/{id}/{hash}', [AutentikasiSellerController::class, 'verify'])->name('verification.verify');
 
-Route::get('/daftar/informasi', [AutentikasiSellerController::class, 'registerInformationView'])->name('seller.registerInformationView');
 
-Route::post('/daftar/informasi/act', [AutentikasiSellerController::class, 'registerInformationAction'])->name('seller.registerInformationAction');
+Route::group(['middleware' => 'pemilik_sewa'], function () {
+    Route::get('/daftar/informasi', [AutentikasiSellerController::class, 'registerInformationView'])->name('seller.registerInformationView');
+    
+    Route::post('/daftar/informasi/act', [AutentikasiSellerController::class, 'registerInformationAction'])->name('seller.registerInformationAction');
 
-Route::get('/daftar/informasiseller', function () {
-    return view('daftar-informasi-seller');
+    Route::get('/beranda', [SellerController::class, 'sellerBerandaView'])->name('seller.berandaView');
+    
+    Route::get('/pesanan/perluproses', function () {
+        return view('pesanan.perluproses');
+    });
+
+    Route::get('/produk/tambahproduk', [ProdukSellerController::class, 'viewTambahProduk'])->name('viewTambahProduk');
+
+    Route::get('/logout', [AutentikasiSellerController::class, 'logout'])->name('seller.logout');
 });
-Route::get('/test', function () {
-    return view('test');
-});
-
-Route::get('/beranda', [SellerController::class, 'sellerBerandaView'])->name('seller.berandaView');
-
-Route::get('/pesanan/perluproses', function () {
-    return view('pesanan.perluproses');
-});
-
-Route::get('/produk/tambahproduk', [ProdukSellerController::class, 'viewTambahProduk'])->name('viewTambahProduk');

@@ -11,7 +11,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->alias([
+            'pemilik_sewa' => \App\Http\Middleware\pemilik_sewa::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
