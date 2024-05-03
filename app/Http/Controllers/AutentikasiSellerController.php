@@ -47,11 +47,13 @@ class AutentikasiSellerController extends Controller
             $validator = Validator::make($request->all(), [
             'nama' => 'required|string',
             'namaToko' => 'required|string',
-            'noTelp' => 'required|numeric',
+            'noTelp' => 'required|numeric|digits_between:10,14',
             'AlamatToko' => 'required|string',
             'provinsi' => 'required|string',
             'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
-            'kodePos' => 'required|numeric',
+            'kodePos' => 'required|numeric|digits_between:5,6',
+            'metode_kirim' => 'required|array',
+            'photo' => 'required|file|mimes:jpeg,png|max:512',
             ]);
 
             if ($validator->fails()) {
@@ -65,7 +67,6 @@ class AutentikasiSellerController extends Controller
             
             $photoPath = $request->file('identitas')->store('public/data');
             $photoPath = Str::replaceFirst('data/', 'storage/', $photoPath);
-            dd($photoPath);
 
             $toko = new Toko;
             $user->nama = $request->nama;
@@ -77,8 +78,14 @@ class AutentikasiSellerController extends Controller
             $user->identitas = $photoPath;
             $toko->nama_toko = $request->namaToko;
             $toko->ID_user = $user->id;
+            $toko->metode_kirim = json_encode($request->metode_kirim);
             $user->save();
             $toko->save();
+
+            session(['loggedin' => TRUE]);
+            session(['uid' => $user->id]);
+            session(['profilpath' => $user->foto_profil]);
+            session(['namatoko' => $toko->nama_toko]);
 
             return redirect()->route('seller.berandaView');
         }

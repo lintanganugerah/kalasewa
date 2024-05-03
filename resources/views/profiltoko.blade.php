@@ -36,9 +36,22 @@
                             <div class="tab-pane fade show active" id="profil" role="tabpanel"
                                 aria-labelledby="profil-tab">
                                 <h5 class="card-title">Profil</h5>
-                                <form>
+                                @if ($errors->any())
+                                    <div class="alert alert-danger">
+                                        {{ $errors->first() }}
+                                    </div>
+                                @endif
+                                @if (session('success'))
+                                    <div class="alert alert-success">
+                                        {{ session('success') }}
+                                    </div>
+                                @endif
+                                <form action="{{ route('seller.profilTokoAction') }}" method="POST"
+                                    enctype="multipart/form-data">
+                                    @csrf
                                     <div class="mb-3">
-                                        <label for="userPhoto" class="form-label">User Photo</label>
+                                        <label for="userPhoto" class="form-label">User Photo
+                                            {{ session('success') }}</label>
                                         <div class="d-flex align-items-start">
                                             <div id="userPhotoContainer" class="me-3">
                                                 <img id="userPhotoPreview" src="{{ asset(session('profilpath')) }}"
@@ -47,13 +60,13 @@
                                             <div class="flex-grow-1">
                                                 <small class="form-text text-muted">
                                                     <ul>
-                                                        <li>Rasio foto 1:1</li>
+                                                        <li>Disarankan Rasio foto 1:1</li>
                                                         <li>Ukuran max 5MB</li>
                                                         <li>JPG, JPEG, PNG</li>
                                                     </ul>
                                                 </small>
-                                                <input type="file" class="form-control mb-2" id="userPhoto"
-                                                    accept="image/*">
+                                                <input type="file" name="foto" class="form-control mb-2"
+                                                    id="userPhoto" accept=".jpg,.png">
                                             </div>
                                         </div>
                                     </div>
@@ -70,14 +83,14 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="exampleFormControlTextarea1" class="form-label">Alamat Toko</label>
-                                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="alamat" required>asdas</textarea>
+                                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="AlamatToko" required>asdas</textarea>
                                     </div>
                                     <div class="mb-3">
                                         <div data-mdb-input-init class="form-outline">
                                             <label class="form-label" for="kodePos">Kode Pos</label>
                                             <input type="text" id="kodePos" class="form-control" name="kodePos"
-                                                pattern="[0-9]*" minlength="5" maxlength="6" value="{{ $user->kode_pos }}"
-                                                required />
+                                                pattern="[0-9]*" minlength="5" maxlength="6"
+                                                value="{{ $user->kode_pos }}" required />
                                         </div>
                                     </div>
                                     <div class="form-floating mb-3">
@@ -96,22 +109,26 @@
                                         <label class="form-label">Metode Pengiriman</label><br>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" id="grab"
-                                                value="Grab" name="metode_kirim[]">
+                                                value="Grab" name="metode_kirim[]"
+                                                {{ in_array('Grab', $decodeToko) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="grab">Grab</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" id="gojekInstant"
-                                                value="Gojek Instant" name="metode_kirim[]">
-                                            <label class="form-check-label" for="gojekInstant">Gojek Instant</label>
+                                            <input class="form-check-input" type="checkbox" id="goSend"
+                                                value="GoSend" name="metode_kirim[]"
+                                                {{ in_array('GoSend', $decodeToko) ? 'checked' : '' }}>
+                                            <label class="form-check-label" for="goSend">GoSend</label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" id="jne"
-                                                value="JNE" name="metode_kirim[]">
+                                                value="JNE" name="metode_kirim[]"
+                                                {{ in_array('JNE', $decodeToko) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="jne">JNE</label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" id="jnt"
-                                                value="JNT" name="metode_kirim[]">
+                                                value="JNT" name="metode_kirim[]"
+                                                {{ in_array('JNT', $decodeToko) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="jnt">JNT</label>
                                         </div>
                                     </div>

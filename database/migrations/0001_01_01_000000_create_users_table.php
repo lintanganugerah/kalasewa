@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('kota')->nullable();
             $table->string('provinsi')->nullable();
             $table->string('identitas')->nullable();
-            $table->string('foto_profil')->nullable()->default('storage/profiles/profil_default.png');
+            $table->string('foto_profil')->nullable()->default('storage/profiles/profil_default.jpg');
             $table->enum('role',['penyewa','pemilik_sewa', 'admin']);
             $table->enum('verifyIdentitas',['TRUE','FALSE'])->default('FALSE');
             $table->rememberToken();

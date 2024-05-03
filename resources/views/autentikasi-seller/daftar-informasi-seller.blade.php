@@ -79,9 +79,9 @@
                                         <label class="form-check-label" for="grab">Grab</label>
                                     </div>
                                     <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="checkbox" id="gojekInstant"
-                                            value="Gojek Instant" name="metode_kirim[]">
-                                        <label class="form-check-label" for="gojekInstant">Gojek Instant</label>
+                                        <input class="form-check-input" type="checkbox" id="GoSend" value="GoSend"
+                                            name="metode_kirim[]">
+                                        <label class="form-check-label" for="GoSend">GoSend</label>
                                     </div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="checkbox" id="jne" value="JNE"
