@@ -12,6 +12,7 @@ Route::post('/login/act', [AutentikasiSellerController::class, 'loginAction'])->
 Route::get('/daftar', [AutentikasiSellerController::class, 'registerView'])->name('seller.registerView');
 
 Route::post('/daftar/act', [AutentikasiSellerController::class, 'registerFirstStage'])->name('seller.registerAction');
+Route::get('/resend/verify', [AutentikasiSellerController::class, 'resendVerify'])->name('seller.resendVerify');
 
 Route::get('/daftar/verifikasi', [AutentikasiSellerController::class, 'verifikasiView'])->name('seller.verifikasiView');
 
@@ -31,9 +32,11 @@ Route::group(['middleware' => 'pemilik_sewa'], function () {
     
     Route::get('/pesanan/perluproses', function () {
         return view('pesanan.perluproses');
-    });
+    });  
 
-    Route::get('/produk/tambahproduk', [ProdukSellerController::class, 'viewTambahProduk'])->name('viewTambahProduk');
+    Route::get('/produk/tambahproduk', [ProdukSellerController::class, 'viewTambahProduk'])->name('seller.viewTambahProduk');
+
+    Route::post('/produk/tambahproduk/act', [ProdukSellerController::class, 'tambahProdukAction'])->name('seller.tambahProdukAction');
 
     Route::get('/logout', [AutentikasiSellerController::class, 'logout'])->name('seller.logout');
 });

@@ -51,9 +51,8 @@ class SellerController extends Controller
 
         $fotoPath = $user->foto_profil;
         $namaFile = basename($fotoPath);
-
-        // Periksa apakah nama file bukan "foto_profil.jpg"
-        if ($namaFile !== 'foto_profil.jpg') {
+        
+        if ($namaFile !== 'profil_default.jpg') {
             Storage::delete(str_replace('storage/', 'public/', $fotoPath));
         }
         

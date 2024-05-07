@@ -52,6 +52,9 @@
                                         <option value="Jawa Barat">Jawa Barat</option>
                                     </select>
                                     <label for="floatingSelect">Provinsi</label>
+                                    <div id="provinsi" class="form-text">Mohon maaf saat ini kami hanya melayani wilayah
+                                        bandung saja
+                                    </div>
                                 </div>
 
                                 <div class="form-floating mb-4">

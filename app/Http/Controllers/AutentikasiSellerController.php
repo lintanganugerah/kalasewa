@@ -21,15 +21,21 @@ class AutentikasiSellerController extends Controller
     }
 
     public function registerInformationView(Request $request) {
-        if (session('role') === "pemilik_sewa") {
-            return redirect()->route('seller.berandaView');
+        if (Auth::check()) {
+            $user = Auth::user();
+            if (isset($user->nama)) {
+                return redirect()->route('seller.berandaView');
+            }
         }
         return view('autentikasi-seller.daftar-informasi-seller');
     }
 
     public function loginView(Request $request) {
-        if (session('role') === "pemilik_sewa") {
-            return redirect()->route('seller.berandaView');
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->role === "pemilik_sewa") {
+                return redirect()->route('seller.berandaView');
+            }
         }
         return view('autentikasi-seller.login-seller');
     }
@@ -52,8 +58,8 @@ class AutentikasiSellerController extends Controller
             'provinsi' => 'required|string',
             'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
             'kodePos' => 'required|numeric|digits_between:5,6',
-            'metode_kirim' => 'required|array',
-            'photo' => 'required|file|mimes:jpeg,png|max:512',
+            'metode_kirim' => 'required',
+            'photo' => 'mimes:jpg,png,jpeg|max:512',
             ]);
 
             if ($validator->fails()) {
@@ -99,7 +105,7 @@ class AutentikasiSellerController extends Controller
         $email = strtolower($request->email);
         $u = DB::table('users')->where('email',$email)->first();
         if($u){
-            return redirect()->route('seller.registerView')->with('error', 'Alamat Email sudah terdaftar, coba alamat email lain!');
+            return redirect()->route('seller.registerView')->with('error', 'Alamat Email sudah terdaftar, silahkan login!');
         }
         $user = new User;
         $user->email = $email;
@@ -116,7 +122,13 @@ class AutentikasiSellerController extends Controller
             return response()->json(["msg" => "Invalid/Expired url provided."], 401);
         }
 
-        $user = User::findOrFail($user_id);
+        if(!Auth::check()) {
+            $user = User::findOrFail($user_id);
+        } else {
+            $user = Auth::user();
+        }
+
+        Session::forget('regis');
     
         if (!$user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
@@ -128,6 +140,17 @@ class AutentikasiSellerController extends Controller
         return redirect()->route('seller.registerInformationView');
     }
 
+    public function resendVerify(Request $request) {
+        $user = Auth::user();
+        if(session()->has('resendVerify')) {
+            $user->sendEmailVerificationNotification();
+            session(['regis' => TRUE]);
+            Session::forget('resendVerify');
+
+            return redirect()->route('seller.verifikasiView')->with('emailRegis', $user->email);;
+        }
+    }
+
     public function loginAction(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -135,10 +158,18 @@ class AutentikasiSellerController extends Controller
             $user = Auth::user();
             $toko = Toko::where('ID_User', $user->id)->first();
 
+            if (!isset($user->email_verified_at)) {
+                session(['resendVerify' => TRUE]);
+                return redirect()->route('seller.resendVerify');
+            } else if(!isset($user->nama)) {
+                return redirect()->route('seller.registerInformationView');
+            }
+            
             session(['loggedin' => TRUE]);
             session(['uid' => $user->id]);
             session(['profilpath' => $user->foto_profil]);
             session(['namatoko' => $toko->nama_toko]);
+
 
             if ($user->role == "pemilik_sewa") {
                 return redirect()->route('seller.berandaView');

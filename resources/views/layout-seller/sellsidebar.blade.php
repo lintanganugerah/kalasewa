@@ -1,9 +1,10 @@
 <ul class="navbar-nav sidebar sidebar-dark accordion kalasewa-color" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('seller.profilTokoView') }}">
         <div class="sidebar-brand-icon">
-            <img src="{{ asset(session('profilpath')) }}" width="40px" height="40px" class="rounded-circle">
+            <img src="{{ asset(session('profilpath')) }}" width="40px" height="40px" style="object-fit: cover;"
+                class="rounded-circle">
         </div>
         <div class="sidebar-brand-text mx-2">{{ session('namatoko') }}</div>
     </a>
@@ -37,15 +38,15 @@
 
     <!-- Nav Item - Utilities Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-            aria-expanded="true" aria-controls="collapseUtilities">
+        <a class="nav-link collapsed" href="{{ route('seller.viewTambahProduk') }}" data-toggle="collapse"
+            data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
             <i class="fas fa-solid fa-boxes-stacked"></i>
             <span>Produk</span>
         </a>
         <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
             <div class="kalasewa-color py-2 collapse-inner rounded">
                 <a class="collapse-item" href="utilities-color.html">Produk Anda</a>
-                <a class="collapse-item" href="{{ route('viewTambahProduk') }}">Tambah Produk</a>
+                <a class="collapse-item" href="{{ route('seller.viewTambahProduk') }}">Tambah Produk</a>
             </div>
         </div>
     </li>

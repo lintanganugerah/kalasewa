@@ -50,12 +50,12 @@
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="mb-3">
-                                        <label for="userPhoto" class="form-label">User Photo
-                                            {{ session('success') }}</label>
+                                        <label for="userPhoto" class="form-label">User Photo</label>
                                         <div class="d-flex align-items-start">
                                             <div id="userPhotoContainer" class="me-3">
                                                 <img id="userPhotoPreview" src="{{ asset(session('profilpath')) }}"
-                                                    width="150px" alt="User Photo" class="img-thumbnail">
+                                                    style="width:150px; height:150px; object-fit: cover;" alt="User Photo"
+                                                    class="img-thumbnail">
                                             </div>
                                             <div class="flex-grow-1">
                                                 <small class="form-text text-muted">
