@@ -17,6 +17,12 @@ class AutentikasiSellerController extends Controller
 {
 
     public function registerView(Request $request) {
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->role === "pemilik_sewa") {
+                return redirect()->route('seller.berandaView');
+            }
+        }
         return view('autentikasi-seller.daftar-seller');
     }
 

@@ -9,7 +9,7 @@ document.getElementById('addPhotoBtn').addEventListener('click', function() {
             </div>
         </div>
         <div class="flex-grow-1">
-            <input type="file" name="fotos[]" class="form-control userPhoto" accept=".jpg,.png">
+            <input type="file" name="foto_produk[]" class="form-control userPhoto" accept=".jpg,.png">
         </div>`;
                 photoInputs.appendChild(newPhotoInput);
 

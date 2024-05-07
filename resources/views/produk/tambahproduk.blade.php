@@ -43,13 +43,17 @@
                                         {{ session('success') }}
                                     </div>
                                 @endif
+                                @if (session('error'))
+                                    <div class="alert alert-danger">
+                                        {{ session('error') }}
+                                    </div>
+                                @endif
                                 <form action="{{ route('seller.tambahProdukAction') }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="mb-3">
                                         <label for="userPhoto" class="form-label">Foto Produk</label>
                                         <div id="photoInputs">
-                                            <!-- Input pertama -->
                                             <div class="photo-input mb-2">
                                                 <div class="d-flex align-items-start">
                                                     <div class="me-3">
@@ -140,6 +144,8 @@
                                         <label for="exampleFormControlInput1" class="form-label">Berat Produk</label>
                                         <input type="text" class="form-control" id="exampleFormControlInput1"
                                             name="beratProduk" required>
+                                        <div id="namaProduk" class="form-text" style="opacity: 50%;">Masukan dalam satuan
+                                            gram. 1000g = 1kg</div>
                                     </div>
                                     <div class="mb-5">
                                         <label class="form-label">Metode Pengiriman</label><br>

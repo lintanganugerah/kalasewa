@@ -11,11 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('fotoProduk', function (Blueprint $table) {
+        Schema::create('foto_produks', function (Blueprint $table) {
             $table->id();
             $table->string('path');
             $table->bigInteger('ID_produk')->unsigned();
             $table->timestamps();
+
+            $table->foreign('ID_produk')->references('id')->on('produks')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 
@@ -24,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('fotoProduk');
+        Schema::dropIfExists('foto_produks');
     }
 };

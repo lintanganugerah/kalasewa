@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('produk', function (Blueprint $table) {
-            $table->id();
+        Schema::create('produks', function (Blueprint $table) {
+            $table->id()->index();
             $table->bigInteger('ID_toko')->unsigned();
             $table->string('nama_produk');
             $table->string('kategori');
             $table->string('deskripsi_produk');
+            $table->unsignedInteger('berat_produk');
             $table->json('ukuran_produk');
-            $table->enum('status_produk',['proses','pengiriman', 'berlangsung', 'selesai', 'cancel'])->default('proses');
+            $table->json('metode_kirim')->default(json_encode([]));
+            $table->enum('status_produk',['unverified','aktif', 'arsip',]);
             $table->timestamps();
         });
     }
@@ -28,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('produk');
+        Schema::dropIfExists('produks');
     }
 };

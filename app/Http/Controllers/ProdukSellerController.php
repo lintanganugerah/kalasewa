@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Toko;
 use App\Models\Produk;
+use App\Models\FotoProduk;
 
 class ProdukSellerController extends Controller
 {
@@ -21,7 +22,7 @@ class ProdukSellerController extends Controller
         return view('produk.tambahproduk');
     }
 
-    public function tambahProdukAction()
+    public function tambahProdukAction(Request $request)
     {
         $user = Auth::user();
         $toko = Toko::where('ID_user', $user->id)->first();
@@ -29,18 +30,22 @@ class ProdukSellerController extends Controller
         $validator = Validator::make( $request->all (), [
             'namaProduk' => 'required|string',
             'deskripsiProduk' => 'required|string',
-            'kategori' => 'required|in:Fullset,Bahawan saja, Aksesoris, Properti',
-            'ukuran_produk' => 'required',
-            'foto_produk' => 'required|mimes:jpeg,png|max:5120',
+            'kategori' => 'required|in:Fullset,Bawahan saja, Aksesoris, Properti',
+            'ukuran' => 'required',
+            'foto_produk' => 'required|max:5120',
             'beratProduk' => 'required|numeric',
             'metode_kirim' => 'required',
         ]);
 
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         $ukuranData = [];
-        $ukuran = ['S', 'M', 'L', 'XL'];
+        $ukuranSize = ['S', 'M', 'L', 'XL'];
 
         // Loop untuk setiap ukuran
-        foreach ($ukuran as $size) {
+        foreach ($ukuranSize as $size) {
             // Memeriksa apakah input untuk harga dan stok dari ukuran tersebut ada dalam request
             if ($request->has("harga_$size") && $request->has("stok_$size")) {
                 // Jika ada, tambahkan data untuk ukuran tersebut ke dalam array $ukuranData
@@ -50,17 +55,28 @@ class ProdukSellerController extends Controller
                 ];
             }
         }
-
+        
         $produk = new Produk;
-        $produk->nama = $request->nama;
+        $produk->nama_produk = $request->namaProduk;
         $produk->deskripsi_produk = $request->deskripsiProduk;
         $produk->kategori = $request->kategori;
+        $produk->berat_produk = $request->beratProduk;
         $produk->metode_kirim = json_encode($request->metode_kirim);
         $produk->ukuran_produk = $ukuranData;
+        $produk->ID_toko = $toko->id;
         $produk->save();
+        $id_produk = $produk->getKey();
 
-        if ($validator->fails()) {
-        return redirect()->back()->withErrors($validator)->withInput();
+        foreach ($request->foto_produk as $foto) {
+            $path = $foto->store('public/produk/foto_produk');
+
+            // Buat instance model FotoProduk
+            $fotoProduk = new FotoProduk();
+            $fotoProduk->ID_produk = $id_produk;
+            $fotoProduk->path = $path;
+            $fotoProduk->save();
         }
+
+        return redirect()->route('seller.viewTambahProduk')->with('success', 'Produk Berhasil Ditambahkan');
     }
 }

@@ -15,11 +15,16 @@ class Produk extends Model
 
     public function setUkuranProdukAttribute($value)
     {
-    $this->attributes['ukuran_produk'] = json_encode($value);
+        $this->attributes['ukuran_produk'] = json_encode($value);
     }
 
     public function getUkuranProdukAttribute($value)
     {
-    return json_decode($value, true);
+        return json_decode($value, true);
+    }
+
+    public function FotoProduk()
+    {
+        return $this->hasOne(FotoProduk::class, 'ID_produk')->withDefault();
     }
 }
