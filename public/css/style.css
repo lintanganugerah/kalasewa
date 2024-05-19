@@ -1,0 +1,176 @@
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #212631; /* Set the background color to black */
+    color: #fff;
+    overflow-x: hidden; /* Prevent horizontal overflow */
+}
+
+.main-container {
+    margin: 20px;
+}
+
+.row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    margin: 10px;
+    max-width: 1200px;
+    height: 80px;
+}
+
+.carousel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    margin: 10px;
+    max-width: 1200px;
+    height: 300px;
+}
+
+.carousel-inner img {
+    height: 100%;
+    object-fit: cover;
+}
+
+.searchbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    flex: 1;
+    
+    max-width: 1200px;
+    height: 100px; /* Adjust this value to set the desired height */
+}
+
+.custom-search-bar {
+    background-color: #343a40; /* Same as the background color */
+    color: white;
+    border: 1px solid #495057; /* Optional: match border color with the background */
+    height: 50px; /* Adjust the height to fill the search bar container */
+}
+
+.custom-search-bar::placeholder {
+    color: #afafaf;
+}
+
+.custom-search-bar:focus {
+    background-color: #343a40;
+    color: white;
+    border-color: #6c757d;
+    box-shadow: none;
+}
+
+.custom-search-button {
+    background-color: #343a40; /* Same as search bar background */
+    color: #afafaf; /* Same as search bar text color */
+    border: none;
+    height: 50px;
+}
+
+.custom-search-button:hover {
+    background-color: #343a40; /* Same as search bar background */
+    color: white; /* Same as search bar text color */
+}
+
+.custom-search-button:focus {
+    background-color: #343a40; /* Same as search bar background */
+    color: white; /* Same as search bar text color */
+    box-shadow: none;
+}
+
+.sidebar {
+    display: flex;
+    justify-content: space-around;
+    align-items: space-around;
+    background: #212631;
+    position: relative;
+    flex: 1;
+    margin: 10px;
+    max-width: 200px;
+    max-height: fit-content;
+}
+
+.list-group-item {
+    background-color: #343a40; /* Same as search bar background */
+    color: darkgrey; /* Same as search bar text color */
+    border-radius: 0%;
+    width: 200px;
+}
+
+.list-group-item:hover {
+    background-color: #343a40; /* Same as search bar background */
+    color: white; /* Same as search bar text color */
+}
+
+.list-group-item:focus {
+    background-color: #343a40; /* Same as search bar background */
+    color: white; /* Same as search bar text color */
+    box-shadow: none;
+}
+
+.content {
+    display: flex;
+    justify-content: space-around;
+    align-items: space-around;
+    background: #1f242e;
+    position: relative;
+    flex: 2;
+    margin: 10px;
+    max-width: 980px;
+    /* height: 900px; */
+}
+
+.card-row {
+    margin: 20px;
+    display: flex;
+
+}
+
+.avatar-img {
+    width: 25px;
+    margin-bottom: 5px;
+}
+
+.card-body p {
+    margin-bottom: 3px; /* Adjust this value as needed */
+}
+
+.card-link {
+    display: block;
+    text-decoration: none;
+    color: inherit; /* Ensures the text inside the card keeps its original color */
+}
+
+.custom-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.custom-card:hover {
+    transform: translateY(-10px); /* Moves the card up by 10px */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Adds a shadow for a more pronounced effect */
+    cursor: pointer; /* Changes the cursor to indicate the card is clickable */
+}
+
+.footer {
+    display: flex;
+    justify-content: center;
+    position: relative;
+    flex: 1;
+    margin: 10px;
+    max-width: 1200px;
+}
