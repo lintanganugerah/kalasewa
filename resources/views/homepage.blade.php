@@ -3,6 +3,8 @@
 
 @section('content')
 
+<link rel="stylesheet" type="text/css" href="{{ asset('css/homepage.css') }}">
+
 <div class="main-container">
     <div class="row">
         <div class="header">

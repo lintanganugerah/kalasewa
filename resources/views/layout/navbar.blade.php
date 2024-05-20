@@ -33,6 +33,8 @@
                 <li><h4 class="dropdown-header dropdown-header-bold">Akun</h4></li>
                 <li><hr class="dropdown-divider"></li> 
                 <li><a class="dropdown-item" href="#">Login</a></li>
+                <li><a class="dropdown-item" href="#">Logout</a></li>
+                <li><a class="dropdown-item" href="#">Edit Profil</a></li>
                 <!-- <li><a class="dropdown-item" href="#">Register</a></li>
                 <li><a class="dropdown-item" href="#">Logout</a></li> -->
               </ul>

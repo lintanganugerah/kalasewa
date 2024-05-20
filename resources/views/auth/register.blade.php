@@ -1,6 +1,8 @@
 @extends('layout.template')
 @section('content')
 
+<link rel="stylesheet" type="text/css" href="{{ asset('css/authentication.css') }}">
+
 <div class="container mt-5 pt-5">
     <div class="row">
         <div class="col-12 col-sm-8 col-md-6 m-auto">
@@ -26,7 +28,7 @@
                         @enderror
 
                         <p>Ayo bergabung bersama Kalasewa!</p>
-                        <input type="text" name="username" id="username" class="email form-control my-4 py-2" placeholder="Username" required>
+                        <input type="text" name="username" id="username" class="username form-control my-4 py-2" placeholder="Username" required>
                         <input type="email" name="email" id="email" class="email form-control my-4 py-2" placeholder="Email" required>
                         <input type="password" name="password" id="password" class="password form-control my-4 py-2" placeholder="Password" minlength="8" required>
                         <input type="password" name="confPassword" id="confPassword" class="password form-control my-4 py-2" placeholder="Confirm Password" minlength="8" required>

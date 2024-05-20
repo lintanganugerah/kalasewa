@@ -17,10 +17,18 @@ Route::get('/', function () {
     return view('homepage');
 });
 
-Route::get('/login', function () {
+Route::get('/auth/login', function () {
     return view('auth/login');
 });
 
-Route::get('/register', function () {
+Route::get('/auth/register', function () {
     return view('auth/register');
+});
+
+Route::get('/user/profile', function () {
+    return view('user/profile');
+});
+
+Route::get('/user/password', function () {
+    return view('user/changepassword');
 });
