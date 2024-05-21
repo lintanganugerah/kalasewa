@@ -8,9 +8,9 @@
                 <div class="row gx-lg-5 align-items-center">
                     <div class="col-lg-6 mb-5 mb-lg-0">
                         <h1 class="my-5 display-3 fw-bold ls-tight">
-                            Mari mulai berjualan di Kalasewa!
+                            Mari bergabung di Kalasewa!
                         </h1>
-                        <p style="color: hsl(217, 10%, 50.8%)">Daftar dengan email toko atau pribadi, lalu
+                        <p style="color: hsl(217, 10%, 50.8%)">Daftar dengan email pribadi, lalu
                             lakukan registrasi! Mudah hanya dengan beberapa langkah saja.
                         </p>
                     </div>
@@ -18,26 +18,27 @@
                     <div class="col-lg-6 mb-5 mb-lg-0">
                         <!-- NAVTABS -->
                         <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link active" id="pemilik-sewa-tab" href="{{ route('seller.registerView') }}"
-                                    role="tab" aria-controls="pemilik-sewa" aria-selected="true">Pemilik Sewa</a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link" id="penyewa-tab" href="{{ route('buyer.registerViewBuyer') }}"
-                                    role="tab" aria-controls="penyewa" aria-selected="false">Penyewa</a>
-                            </li>
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link" id="pemilik-sewa-tab" href="{{ route('seller.registerView') }}"
+                                        role="tab" aria-controls="pemilik-sewa" aria-selected="true">Pemilik Sewa</a>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <a class="nav-link active" id="penyewa-tab"
+                                        href="{{ route('buyer.registerViewBuyer') }}" role="tab" aria-controls="penyewa"
+                                        aria-selected="false">Penyewa</a>
+                                </li>
+                            </ul>
                         </ul>
-
                         <div class="tab-content" id="myTabContent">
-                            <div class="tab-pane fade show active" id="pemilik-sewa" role="tabpanel"
-                                aria-labelledby="pemilik-sewa-tab">
-                                <!-- FORM PEMILIK SEWA -->
+                            <div class="tab-pane show active" id="penyewa" role="tabpanel" aria-labelledby="penyewa-tab">
+                                <!-- FORM PENYEWA -->
                                 <div class="card">
                                     <div class="card-body py-5 px-md-5">
                                         <h3 class="mb-5 fw-bold ls-tight">
-                                            Daftar Sebagai Penjual (Pemilik Sewa)
+                                            Daftar Sebagai Penyewa
                                         </h3>
-                                        <form action="{{ route('seller.registerAction') }}" method="POST">
+                                        <form id="formRegister" action="{{ route('buyer.registerAction') }}" method="POST">
                                             @csrf
                                             @if (session('error'))
                                                 <div class="alert alert-danger">
@@ -46,14 +47,14 @@
                                             @endif
                                             <!-- Form -->
                                             <div data-mdb-input-init class="form-outline mb-4">
-                                                <label class="form-label" for="formPemilikEmail">Email address</label>
-                                                <input type="email" id="formPemilikEmail" name="email"
+                                                <label class="form-label" for="formPenyewaEmail">Email address</label>
+                                                <input type="email" id="formPenyewaEmail" name="email"
                                                     class="form-control" required>
                                             </div>
 
                                             <div data-mdb-input-init class="form-outline mb-4">
-                                                <label class="form-label" for="formPemilikPassword">Password</label>
-                                                <input type="password" id="formPemilikPassword" name="password"
+                                                <label class="form-label" for="formPenyewaPassword">Password</label>
+                                                <input type="password" id="formPenyewaPassword" name="password"
                                                     class="form-control" minlength="8" required>
                                             </div>
 
@@ -68,6 +69,7 @@
                                                 <p>Sudah memiliki akun? <a href="{{ route('seller.loginView') }}"
                                                         class="fw-bold text-dark">Klik untuk Login</a></p>
                                             </div>
+
                                             <div class="modal fade" id="syaratdanKetentuan" tabindex="-1"
                                                 aria-labelledby="syaratdanKetentuanLabel" aria-hidden="true">
                                                 <div class="modal-dialog">
@@ -91,11 +93,11 @@
                                         </form>
                                     </div>
                                 </div>
-                                <!-- END FORM PEMILIK SEWA -->
+                                <!-- END FORM PENYEWA -->
                             </div>
                         </div>
-                        <!-- END NAVTABS -->
                     </div>
+                    <!-- END NAVTABS -->
                 </div>
             </div>
         </div>

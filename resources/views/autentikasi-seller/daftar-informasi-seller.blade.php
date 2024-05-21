@@ -19,6 +19,27 @@
                                         {{ $errors->first() }}
                                     </div>
                                 @endif
+                                <div class="mb-3">
+                                    <label for="userPhoto" class="form-label">Foto Profil</label>
+                                    <div class="d-flex align-items-start">
+                                        <div id="userPhotoContainer" class="me-3">
+                                            <img id="userPhotoPreview" src="{{ asset(session('profilpath')) }}"
+                                                style="width:150px; height:150px; object-fit: cover;" alt="User Photo"
+                                                class="img-thumbnail">
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <small class="form-text text-muted">
+                                                <ul>
+                                                    <li>Disarankan Rasio foto 1:1</li>
+                                                    <li>Ukuran max 5MB</li>
+                                                    <li>JPG, JPEG, PNG</li>
+                                                </ul>
+                                            </small>
+                                            <input type="file" name="foto" class="form-control mb-2" id="userPhoto"
+                                                accept=".jpg,.png">
+                                        </div>
+                                    </div>
+                                </div>
                                 <h5 class="fw-bold mb-3 pb-3" style="letter-spacing: 1px;">Informasi Akun dan Toko
                                 </h5>
 
@@ -26,6 +47,9 @@
                                     <label class="form-label" for="form2Example17">Nama Lengkap Pribadi</label>
                                     <input type="text" id="form2Example17" class="form-control form-control-lg"
                                         name="nama" required />
+                                    <div id="provinsi" class="form-text">Mohon masukkan nama lengkap asli anda untuk
+                                        keperluan verifikasi
+                                    </div>
                                 </div>
 
                                 <div data-mdb-input-init class="form-outline mb-4">
@@ -75,7 +99,7 @@
                                     </div>
                                 </div>
                                 <div class="mb-5">
-                                    <label class="form-label">Metode Pengiriman</label><br>
+                                    <label class="form-label">Metode Pengiriman yang anda terima</label><br>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="checkbox" id="grab" value="Grab"
                                             name="metode_kirim[]">
@@ -96,13 +120,15 @@
                                             name="metode_kirim[]">
                                         <label class="form-check-label" for="jnt">JNT</label>
                                     </div>
-                                </div>
-
-                                <div class="d-grid mb-5">
-                                    <div class="mb-4">
-                                        <label for="formFile" class="form-label">Unggah Identias (KTP/SIM)</label>
-                                        <input class="form-control" type="file" id="formFile" name="identitas"
-                                            accept=".jpg,.png" required>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="paxel" value="Paxel"
+                                            name="metode_kirim[]">
+                                        <label class="form-check-label" for="paxel">Paxel</label>
+                                    </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="siCepat" value="siCepat"
+                                            name="metode_kirim[]">
+                                        <label class="form-check-label" for="siCepat">Si Cepat</label>
                                     </div>
                                 </div>
 

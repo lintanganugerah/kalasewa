@@ -8,12 +8,10 @@
                 <div class="row gx-lg-5 align-items-center">
                     <div class="col-lg-6 mb-5 mb-lg-0">
                         <h1 class="my-5 display-3 fw-bold ls-tight">
-                            Lakukan Verifikasi Email
+                            Email Telah Terverifikasi
                         </h1>
                         <h4 class="ls-tight text-secondary">
-                            Link verifikasi telah dikirimkan ke email anda di <div class="fw-bold kalasewa-color">
-                                {{ session('emailRegis') }}</p>
-                                <p class="fw-bold text-danger"> Mohon cek pada bagiam SPAM atau tunggu beberapa saat</p>
+                            Silahkan login!
                         </h4>
                     </div>
                 </div>

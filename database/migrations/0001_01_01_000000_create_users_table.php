@@ -24,9 +24,10 @@ return new class extends Migration
             $table->string('kota')->nullable();
             $table->string('provinsi')->nullable();
             $table->string('identitas')->nullable();
-            $table->string('foto_profil')->nullable()->default('storage/profiles/profil_default.jpg');
+            $table->string('NIK')->nullable()->unique();
+            $table->string('foto_profil')->default('storage/profiles/profil_default.jpg');
             $table->enum('role',['penyewa','pemilik_sewa', 'admin']);
-            $table->enum('verifyIdentitas',['TRUE','FALSE'])->default('FALSE');
+            $table->enum('verifyIdentitas',['Sudah','Tidak', 'Ditolak'])->default('Tidak');
             $table->rememberToken();
             $table->timestamps();   
         });

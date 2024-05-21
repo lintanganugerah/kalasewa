@@ -94,19 +94,19 @@
                                         <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="deskripsiProduk" required></textarea>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <select class="form-select" id="floatingSelect" name="kategori"
+                                        <select class="form-select" id="floatingSelect" name="series"
                                             aria-label="Floating label select example" required>
-                                            <option value="Fullset">Fullset</option>
-                                            <option value="Atasan saja">Atasan saja
+                                            <option value="Genshin">Genshin Impact</option>
+                                            <option value="Blue Archive">Blue Archive
                                             </option>
-                                            <option value="Bawahan saja">Bawahan saja
+                                            <option value="Honkai Star Rail">Honkai Star Rail
                                             </option>
-                                            <option value="Aksesoris">Aksesoris
+                                            <option value="Wuthering Waves">Wuthering Waves
                                             </option>
-                                            <option value="Properti">Properti
+                                            <option value="Attack on Titan">Attack on Titan
                                             </option>
                                         </select>
-                                        <label for="floatingSelect">Kategori Produk</label>
+                                        <label for="floatingSelect">Series</label>
                                     </div>
                                     <hr class="border border-secondary border-3 my-5">
                                     <!-- Informasi Pengiriman -->

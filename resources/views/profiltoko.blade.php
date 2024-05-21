@@ -50,7 +50,7 @@
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="mb-3">
-                                        <label for="userPhoto" class="form-label">User Photo</label>
+                                        <label for="userPhoto" class="form-label">Foto Profil</label>
                                         <div class="d-flex align-items-start">
                                             <div id="userPhotoContainer" class="me-3">
                                                 <img id="userPhotoPreview" src="{{ asset(session('profilpath')) }}"
@@ -69,6 +69,12 @@
                                                     id="userPhoto" accept=".jpg,.png">
                                             </div>
                                         </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exampleFormControlInput1" class="form-label">Nama Lengkap
+                                            Pribadi</label>
+                                        <input type="text" class="form-control" id="exampleFormControlInput1"
+                                            value="{{ $user->nama }}" name="nama" required>
                                     </div>
                                     <div class="mb-3">
                                         <label for="exampleFormControlInput1" class="form-label">Nama Toko</label>
@@ -99,7 +105,8 @@
                                             <option value="Kota Bandung"
                                                 {{ $user->kota == 'Kota Bandung' ? 'selected' : '' }}>Kota Bandung</option>
                                             <option value="Kabupaten Bandung"
-                                                {{ $user->kota == 'Kabupaten Bandung' ? 'selected' : '' }}>Kabupaten Bandung
+                                                {{ $user->kota == 'Kabupaten Bandung' ? 'selected' : '' }}>Kabupaten
+                                                Bandung
                                             </option>
                                         </select>
                                         <label for="floatingSelect">Kota/Kabupaten</label>
