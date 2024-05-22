@@ -24,7 +24,7 @@
                     <input type="email" name="email" id="email" class="userform form-control" placeholder="Email">
                     <p>Nomor HP</p>
                     <input type="number" name="phonenumber" id="phonenumber" class="userform form-control" placeholder="Nomor HP" required>
-                    <p>NIK</p>
+                    <p>NIK (akan diverifikasi)</p>
                     <input type="number" name="address" id="address" class="userform form-control" placeholder="Nomor Induk Kependudukan (NIK)" required>
                     <p>Alamat</p>
                     <input type="text" name="address" id="address" class="userform form-control" placeholder="Alamat Lengkap" required>
@@ -44,3 +44,5 @@
 </div>
 
 @endsection
+
+

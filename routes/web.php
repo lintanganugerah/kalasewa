@@ -32,3 +32,7 @@ Route::get('/user/profile', function () {
 Route::get('/user/password', function () {
     return view('user/changepassword');
 });
+
+Route::get('/catalog/detail', function () {
+    return view('user/detail');
+});
