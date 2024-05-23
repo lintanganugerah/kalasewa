@@ -52,12 +52,6 @@
                                                     class="form-control" required>
                                             </div>
 
-                                            <div data-mdb-input-init class="form-outline mb-4">
-                                                <label class="form-label" for="formPenyewaPassword">Password</label>
-                                                <input type="password" id="formPenyewaPassword" name="password"
-                                                    class="form-control" minlength="8" required>
-                                            </div>
-
                                             <!-- Submit -->
                                             <div class="d-grid mb-5">
                                                 <button type="button" class="btn btn-kalasewa"

@@ -12,8 +12,14 @@ Route::post('/login/act', [AutentikasiSellerController::class, 'loginAction'])->
 Route::get('/daftar/seller', [AutentikasiSellerController::class, 'registerView'])->name('seller.registerView');
 Route::get('/daftar/buyer', [AutentikasiSellerController::class, 'registerViewBuyer'])->name('buyer.registerViewBuyer');
 
-Route::post('/daftar/act', [AutentikasiSellerController::class, 'registerFirstStage'])->name('seller.registerAction');
-Route::post('/daftar/act/buyer', [AutentikasiSellerController::class, 'registerActionBuyer'])->name('buyer.registerAction');
+Route::post('/daftar/act/seller', [AutentikasiSellerController::class, 'checkEmailSeller'])->name('seller.registerAction');
+
+Route::post('/daftar/act/buyer', [AutentikasiSellerController::class, 'checkEmailBuyer'])->name('buyer.registerAction');
+
+Route::get('/daftar/seller/informasi', [AutentikasiSellerController::class,'registerInformationView'])->name('seller.registerInformationView');
+
+Route::post('/daftar/seller/informasi/act', [AutentikasiSellerController::class,'registerInformationActionSeller'])->name('seller.registerInformationActionSeller');
+Route::post('/daftar/seller/resend/informasi/act', [AutentikasiSellerController::class,'uploadUlangRegisterInformationSeller'])->name('seller.uploadUlangRegisterInformation');
 
 Route::get('/resend/verify', [AutentikasiSellerController::class, 'resendVerify'])->name('seller.resendVerify');
 
@@ -24,9 +30,6 @@ Route::get('/email/verify/{id}/{hash}', [AutentikasiSellerController::class, 've
 
 
 Route::group(['middleware' => 'pemilik_sewa'], function () {
-    Route::get('/daftar/informasi', [AutentikasiSellerController::class, 'registerInformationView'])->name('seller.registerInformationView');
-    
-    Route::post('/daftar/informasi/act', [AutentikasiSellerController::class, 'registerInformationAction'])->name('seller.registerInformationAction');
 
     Route::get('/daftar/identitas', [SellerController::class,'regisIdentitasView'])->name('seller.regisIdentitasView');
     

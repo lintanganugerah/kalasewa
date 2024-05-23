@@ -40,15 +40,26 @@ class AutentikasiSellerController extends Controller
         return view('autentikasi-seller.daftar-buyer');
     }
 
-    public function registerInformationView(Request $request) {
+    public function registerInformationView(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
+
             if (isset($user->nama)) {
                 return redirect()->route('seller.berandaView');
             }
             session(['profilpath' => $user->foto_profil]);
+        } else if (session()->has('regis')) {
+            return view('autentikasi-seller.daftar-informasi-seller');
+        } else if (session('Invalid_Identitas') === TRUE) {
+            $user = User::where('id', session('user_ID'))->first();
+            $toko = Toko::where('ID_user', session('user_ID'))->first();
+
+            // Perbaikan: Mengubah compact() agar nama variabel diberikan sebagai string
+            return view('autentikasi-seller.daftar-informasi-seller', compact('user', 'toko'));
+        } else {
+            return redirect()->back();
         }
-        return view('autentikasi-seller.daftar-informasi-seller');
     }
 
     public function loginView(Request $request) {
@@ -63,7 +74,7 @@ class AutentikasiSellerController extends Controller
 
     public function verifikasiView(Request $request) {
         if (!session()->has('verify')) {
-            return redirect()->back();
+            return redirect()->route('seller.loginView');
         } elseif (session()->has('verified')) {
             return redirect()->route('seller.verifiedView');
         }
@@ -78,83 +89,135 @@ class AutentikasiSellerController extends Controller
         return view('autentikasi-seller.daftar-verified-view');
     }
 
-    public function registerInformationAction(Request $request) {
-        $user = Auth::user();
-        if (!isset($user->nama)) {
-            $validator = Validator::make($request->all(), [
-                'nama' => 'required|string',
-                'namaToko' => 'required|string',
-                'noTelp' => 'required|numeric|digits_between:10,14',
-                'AlamatToko' => 'required|string',
-                'provinsi' => 'required|string',
-                'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
-                'kodePos' => 'required|numeric|digits_between:5,6',
-                'metode_kirim' => 'required',
-                'foto' => 'nullable|file|mimes:jpeg,png|max:5120',
-            ]);
+    public function registerInformationActionSeller(Request $request) {
+        //SIMPAN INFORMASI AKUN BARU SAAT REGISTER
+        $validator = Validator::make($request->all(), [
+            'password' => 'required|string',
+            'nama' => 'required|string',
+            'namaToko' => 'required|string',
+            'noTelp' => 'required|numeric|digits_between:10,14|unique:users,no_telp',
+            'AlamatToko' => 'required|string',
+            'provinsi' => 'required|string',
+            'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
+            'kodePos' => 'required|numeric|digits_between:5,6',
+            'metode_kirim' => 'required',
+            'identitas' => 'mimes:jpg,png,jpeg|max:5120',
+            'NIK' => 'required|numeric|digits_between:16,16|unique:users,NIK',
+        ]);
 
-            if ($validator->fails()) {
-                return redirect()->back()->withErrors($validator)->withInput();
-            }
-            
-            $cekToko = DB::table('tokos')->where('nama_toko',$request->namaToko)->first();
-            if ($cekToko !== null) {
-                return redirect()->back()->withErrors(['msg' => 'Nama Toko telah ada, coba nama toko lain']);
-            }
-
-            $fotoPath = $user->foto_profil;
-            $namaFile = basename($fotoPath);
-
-            if ($namaFile !== 'profil_default.jpg') {
-                Storage::delete(str_replace('storage/', 'public/', $fotoPath));
-            }
-
-            if ($request->has('foto')) {
-                $photoPath = $request->file('foto')->store('public/profiles');
-                $photoPath = Str::replaceFirst('public/', 'storage/', $photoPath);
-                $user->foto_profil = $photoPath;
-                $user->save();
-            }
-
-            $toko = new Toko;
-            $user->nama = $request->nama;
-            $user->no_telp = $request->noTelp;
-            $user->alamat = $request->AlamatToko;
-            $user->provinsi = $request->provinsi;
-            $user->kota = $request->kota;
-            $user->kode_pos = $request->kodePos;
-            $toko->nama_toko = $request->namaToko;
-            $toko->ID_user = $user->id;
-            $toko->metode_kirim = json_encode($request->metode_kirim);
-            $user->save();
-            $toko->save();
-
-            session(['uid' => $user->id]);
-            session(['profilpath' => $user->foto_profil]);
-            session(['namatoko' => $toko->nama_toko]);
-
-            return redirect()->route('seller.berandaView');
+        if (session()->has('emailRegis')) {
+            $email = Session::get('emailRegis');
+        } else {
+             return redirect()->route('seller.registerView')->withErrors(['msg' => 'Silahkan coba daftar ulang']);
         }
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $cekToko = DB::table('tokos')->where('nama_toko',$request->namaToko)->first();
+        if ($cekToko !== null) {
+            return redirect()->back()->withErrors(['msg' => 'Nama Toko telah ada, coba nama toko lain']);
+        }
+
+        $photoPath = $request->file('identitas')->store('public/data');
+        $photoPath = Str::replaceFirst('data/', 'storage/', $photoPath);
+
+        $user = new User;
+        $toko = new Toko;
+        $user->email = $email;
+        $user->nama = $request->nama;
+        $user->password = Hash::make($request->password);
+        $user->no_telp = $request->noTelp;
+        $user->alamat = $request->AlamatToko;
+        $user->provinsi = $request->provinsi;
+        $user->kota = $request->kota;
+        $user->kode_pos = $request->kodePos;
+        $user->nik = $request->NIK;
+        $user->identitas = $photoPath;
+        $user->role = "pemilik_sewa";
+        $user->save();
+        $toko->nama_toko = $request->namaToko;
+        $toko->ID_user = $user->id;
+        $toko->metode_kirim = json_encode($request->metode_kirim);
+        $toko->save();
+        $user->sendEmailVerificationNotification();
+        session(['verify' => TRUE]);
+
+        return redirect()->route('seller.verifikasiView');
     }
 
-    public function registerFirstStage(Request $request) {
+    public function uploadUlangRegisterInformationSeller(Request $request) {
+        //BUAT UPDATE INFORMASI DARI UPLOAD ULANG DATA YANG DITOLAK ADMIN
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|string',
+            'AlamatToko' => 'required|string',
+            'provinsi' => 'required|string',
+            'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
+            'kodePos' => 'required|numeric|digits_between:5,6',
+            'identitas' => 'mimes:jpg,png,jpeg|max:5120',
+            'NIK' => 'required|numeric|digits_between:16,16',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+        
+        $user = User::where('id', session('user_ID'))->first();
+        $cekNIK = User::where('NIK',$request->NIK)->first();
+
+        if ($cekNIK->id != $user->id) {
+            return redirect()->back()->with("error", "NIK Telah Digunakan Pada akun lain");
+        }
+
+        $identitasSebelum = $user->identitas;
+        $identitasSebelum = str_replace('storage/', 'data/', $identitasSebelum);
+        $identitasSebelum = str_replace('public/', 'storage/', $identitasSebelum);
+
+        Storage::delete($identitasSebelum);
+        $photoPath = $request->file('identitas')->store('public/data');
+        $photoPath = Str::replaceFirst('data/', 'storage/', $photoPath);
+        $user->identitas = $photoPath;
+        $user->save();
+
+        $user->nama = $request->nama;
+        $user->alamat = $request->AlamatToko;
+        $user->provinsi = $request->provinsi;
+        $user->kota = $request->kota;
+        $user->kode_pos = $request->kodePos;
+        $user->nik = $request->NIK;
+        $user->verifyIdentitas = "Tidak";
+        $user->save();
+
+        return redirect()->route('seller.loginView')->with('success', 'Mohon Tunggu Konfirmasi Admin 1x24 Jam');
+    }
+
+    public function checkEmailSeller(Request $request) {
         $request->validate([
             'email' => 'required|email',
-            'password' => 'required'
         ]);
         $email = strtolower($request->email);
         $u = DB::table('users')->where('email',$email)->first();
         if($u){
-            return redirect()->route('seller.registerView')->with('error', 'Alamat Email sudah terdaftar, silahkan login atau gunakan email lain!');
+            return redirect()->back()->with('error', 'Alamat Email sudah terdaftar, silahkan login atau gunakan email lain!');
         }
-        $user = new User;
-        $user->email = $email;
-        $user->password = Hash::make($request->password);
-        $user->role = "pemilik_sewa";
-        $user->save();
-        $user->sendEmailVerificationNotification();
-        session(['verify' => TRUE]);
+
         session(['emailRegis' => $email]);
+        session(['regis' => TRUE]);
+        
+        return redirect()->route('seller.registerInformationView');
+    }
+
+    public function checkEmailBuyer(Request $request) {
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+        $email = strtolower($request->email);
+        $u = DB::table('users')->where('email',$email)->first();
+        if($u){
+            return redirect()->back()->with('error', 'Alamat Email sudah terdaftar, silahkan login atau gunakan email lain!');
+        }
+
         return redirect()->route('seller.verifikasiView');
     }
 
@@ -166,6 +229,7 @@ class AutentikasiSellerController extends Controller
         Session::forget('verify');
         session(['verified' => TRUE]);
         Session::forget('emailRegis');
+        Session::forget('regis');
 
         if(!Auth::check()) {
             $user = User::findOrFail($user_id);
@@ -187,20 +251,32 @@ class AutentikasiSellerController extends Controller
     public function loginAction(Request $request)
     {
         $credentials = $request->only('email', 'password');
+        Session::forget('Invalid_Identitas');
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
+            $user_id = $user->id;
             $toko = Toko::where('ID_User', $user->id)->first();
 
             if (!isset($user->email_verified_at)) {
                 session(['verify' => TRUE]);
-                session(['emailRegis' => $user->email]);
+                session(['email' => $user->email]);
                 $user->sendEmailVerificationNotification();
                 Auth::logout();
                 return redirect()->route('seller.verifikasiView');
-            } else if(!isset($user->nama)) {
-                return redirect()->route('seller.registerInformationView');
+            } else if($user->verifyIdentitas === "Tidak") {
+                Auth::logout();
+                Session::flush();
+                Session::regenerate(true);
+                return redirect()->route('seller.loginView')->with('error', 'Mohon Tunggu Konfirmasi admin 1x24 jam');
+            } else if($user->verifyIdentitas === "Ditolak") {
+                Auth::logout();
+                Session::flush();
+                Session::regenerate(true);
+                session(['user_ID' => $user_id]);
+                session(['Invalid_Identitas' => TRUE]);
+                return redirect()->route('seller.loginView')->with('error', 'Informasi anda ditolak oleh admin');
             }
-            
+
             session(['uid' => $user->id]);
             session(['profilpath' => $user->foto_profil]);
             session(['namatoko' => $toko->nama_toko]);
@@ -208,6 +284,8 @@ class AutentikasiSellerController extends Controller
 
             if ($user->role == "pemilik_sewa") {
                 return redirect()->route('seller.berandaView');
+            } else if ($user->role == "pemilik_sewa") {
+                return redirect()->route('');
             }
         } else {
             return redirect()->route('seller.loginView')->with(['error' => 'Email atau password salah!']);

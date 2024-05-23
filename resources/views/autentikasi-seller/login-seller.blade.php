@@ -40,7 +40,13 @@
                                     @endif
                                     @if (session('error'))
                                         <div class="alert alert-danger">
-                                            {{ session('error') }}
+                                            {{ session('error') }} @if (session('Invalid_Identitas'))
+                                                <a class="fw-bold text-danger"
+                                                    href="{{ route('seller.registerInformationView') }}"> Klik disini untuk
+                                                    upload
+                                                    ulang
+                                                    <a>
+                                            @endif
                                         </div>
                                     @endif
 

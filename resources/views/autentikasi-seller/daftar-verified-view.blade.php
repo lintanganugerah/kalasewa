@@ -11,7 +11,7 @@
                             Email Telah Terverifikasi
                         </h1>
                         <h4 class="ls-tight text-secondary">
-                            Silahkan login!
+                            Mohon Tunggu Konfirmasi Verifikasi Identitas oleh Admin 1x24 Jam
                         </h4>
                     </div>
                 </div>
