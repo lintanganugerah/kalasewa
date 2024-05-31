@@ -108,7 +108,7 @@ class AutentikasiSellerController extends Controller
         if (session()->has('emailRegis')) {
             $email = Session::get('emailRegis');
         } else {
-             return redirect()->route('seller.registerView')->withErrors(['msg' => 'Silahkan coba daftar ulang']);
+             return redirect()->route('seller.registerView')->with('error', 'Silahkan coba daftar ulang');
         }
 
         if ($validator->fails()) {

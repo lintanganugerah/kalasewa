@@ -22,6 +22,34 @@ class ProdukSellerController extends Controller
         return view('produk.tambahproduk');
     }
 
+    public function viewProdukAnda()
+    {
+        $user = Auth::user();
+        $toko = Toko::where('ID_user', $user->id)->first();
+        $produk = Produk::where('ID_toko', $toko->id)->get();
+        $produkIds = $produk->pluck('id');
+        $fotoProduk = FotoProduk::whereIn('ID_produk', $produkIds)->get();
+        return view('produk.produkanda', compact('produk', 'fotoProduk'));
+    }
+
+    public function viewEditProduk($id)
+    {
+        $user = Auth::user();
+        $toko = Toko::where('ID_user', $user->id)->first();
+        $produk = Produk::find($id);
+        $produkIds = $produk->pluck('id');
+        $decodeKirim = json_decode($produk->metode_kirim);
+        $fotoProduk = FotoProduk::whereIn('ID_produk', $produkIds)->get();
+        $ukuranKey = array_keys($produk->ukuran_produk);
+        session(['id_produk' => $produk->id]);
+
+        if ($toko->id == $produk->ID_toko) {
+            return view('produk.editproduk', compact('produk', 'fotoProduk', 'decodeKirim', 'ukuranKey'));
+        } else {
+            return redirect()->back()->with('error', 'Produk Invalid');
+        }
+    }
+
     public function tambahProdukAction(Request $request)
     {
         $user = Auth::user();
@@ -30,7 +58,7 @@ class ProdukSellerController extends Controller
         $validator = Validator::make( $request->all (), [
             'namaProduk' => 'required|string',
             'deskripsiProduk' => 'required|string',
-            'kategori' => 'required|in:Fullset,Bawahan saja, Aksesoris, Properti',
+            'kategori' => 'required',
             'ukuran' => 'required',
             'foto_produk' => 'required|max:5120',
             'beratProduk' => 'required|numeric',
@@ -68,7 +96,8 @@ class ProdukSellerController extends Controller
         $id_produk = $produk->getKey();
 
         foreach ($request->foto_produk as $foto) {
-            $path = $foto->store('public/produk/foto_produk');
+            $pathSebelum = $foto->store('public/produk/foto_produk');
+            $path = str_replace('public/', 'storage/', $pathSebelum);
 
             // Buat instance model FotoProduk
             $fotoProduk = new FotoProduk();
@@ -77,6 +106,81 @@ class ProdukSellerController extends Controller
             $fotoProduk->save();
         }
 
-        return redirect()->route('seller.viewTambahProduk')->with('success', 'Produk Berhasil Ditambahkan');
+        return redirect()->route('seller.viewProdukAnda')->with('success', 'Produk Berhasil Ditambahkan');
+    }
+
+    public function arsipProduk($id)
+    {
+        $user = Auth::user();
+        $toko = Toko::where('ID_user', $user->id)->first();
+        $produk = Produk::find($id);
+        if (!$produk) {
+            return redirect()->back()->with('error', 'Produk Invalid');
+        }
+        if ($toko->id == $produk->ID_toko) {
+            $produk->update(['status_produk' => 'arsip']);
+            return redirect()->back()->with('success', 'Produk berhasil diarsipkan.');
+        } else {
+             return redirect()->back()->with('error', 'Produk Invalid');
+        }
+    }
+
+    public function aktifkanProduk($id)
+    {
+        $user = Auth::user();
+        $toko = Toko::where('ID_user', $user->id)->first();
+        $produk = Produk::find($id);
+        if (!$produk) {
+            return redirect()->back()->with('error', 'Produk Invalid');
+        }
+        if ($toko->id == $produk->ID_toko) {
+            $produk->update(['status_produk' => 'aktif']);
+            return redirect()->back()->with('success', 'Produk berhasil diaktifkan untuk ditampilkan pada marketplace.');
+        } else {
+            return redirect()->back()->with('error', 'Produk Invalid');
+        }
+    }
+
+    public function hapusProduk($id)
+    {
+        $user = Auth::user();
+        $toko = Toko::where('ID_user', $user->id)->first();
+        $produk = Produk::find($id);
+        if (!$produk) {
+            return redirect()->back()->with('error', 'Produk Invalid');
+        }
+        if ($toko->id == $produk->ID_toko) {
+            $fotoProduk = FotoProduk::where('ID_produk', $produk->id)->get();
+            if ($fotoProduk) {
+                foreach ($fotoProduk as $foto) {
+                    $path = $foto->path; // Path foto di storage
+                    Storage::delete(str_replace('storage/', 'public/', $path));
+                    $foto->delete(); // Hapus entri foto dari database
+                }
+            }
+            $produk->delete();
+            return redirect()->back()->with('success', 'Produk berhasil dihapus');
+        } else {
+            return redirect()->back()->with('error', 'Produk Invalid');
+        }
+    }
+
+    public function hapusFoto($id)
+    {
+        $user = Auth::user();
+        $toko = Toko::where('ID_user', $user->id)->first();
+        $foto = FotoProduk::find($id);
+        if (!$foto) {
+            return redirect()->back()->with('error', 'Foto Invalid');
+        }
+        $produk = Produk::where('id', session('id_produk'))->first();
+        if ($foto->ID_produk == $produk->id) {
+            $path = $foto->path;
+            Storage::delete(str_replace('storage/', 'public/', $path));
+            $foto->delete();
+            return redirect()->back()->with('success', 'Foto berhasil dihapus');
+        } else {
+            return redirect()->back()->with('error', 'Terjadi kesalahan, silahkan refresh browser anda');
+        }
     }
 }

@@ -56,6 +56,10 @@ class SellerController extends Controller
         return view('autentikasi-seller.regisIdentitas')->with('nama', $user->nama);
     }
 
+    public function testView() {
+        return view('tes');
+    }
+
     public function profilTokoView(Request $request) {
         $user = Auth::user();
         $toko = Toko::where('ID_user', $user->id)->first();

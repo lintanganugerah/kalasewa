@@ -4,29 +4,12 @@
         <div class="col">
             <div class="text-left mb-5 mt-3">
                 <h1 class="fw-bold text-secondary">Produk</h1>
-                <h4 class="fw-semibold text-secondary">Manajemen Produk Anda disini</h4>
+                <h4 class="fw-semibold text-secondary">Edit Produk Anda</h4>
             </div>
 
             <div class="row gx-5">
 
                 <div class="card">
-                    <div class="card-header">
-                        <!-- Nav tabs -->
-                        <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="Produkanda-tab" data-bs-toggle="tab"
-                                    onclick="window.location.href='/produk/produkanda'" type="button" role="tab"
-                                    aria-controls="Produkanda" aria-selected="true">Produk
-                                    Anda</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="tambahProduk-tab"
-                                    onclick="window.location.href='/produk/tambahproduk'" type="button" role="tab"
-                                    aria-controls="tambahProduk" aria-selected="false">Tambah
-                                    Produk</button>
-                            </li>
-                        </ul>
-                    </div>
                     <div class="card-body">
                         <!-- Tab panes -->
                         <div class="tab-content">
@@ -48,26 +31,29 @@
                                         {{ session('error') }}
                                     </div>
                                 @endif
+
+                                <label for="userPhoto" class="form-label">Foto Produk</label>
+                                <div id="photoInputs">
+                                    @foreach ($fotoProduk->where('ID_produk', $produk->id) as $fp)
+                                        <div class="photo-input mb-2">
+                                            <div class="d-flex align-items-start">
+                                                <img class="img-thumbnail" src="{{ asset($fp->path) }}"
+                                                    style="width: 150px; height: 150px; object-fit: cover;"
+                                                    alt="Foto Produk">
+                                                <form action="{{ route('seller.hapusFoto', $fp->id) }}" method="POST">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-danger ml-2"
+                                                        onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?')"><i
+                                                            class="fa-solid fa-trash"></i></button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
                                 <form action="{{ route('seller.tambahProdukAction') }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="mb-3">
-                                        <label for="userPhoto" class="form-label">Foto Produk</label>
-                                        <div id="photoInputs">
-                                            <div class="photo-input mb-2">
-                                                <div class="d-flex align-items-start">
-                                                    <div class="me-3">
-                                                        <img class="img-thumbnail" src=""
-                                                            style="width: 150px; height: 150px; object-fit: cover;"
-                                                            alt="Foto Produk">
-                                                    </div>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <input type="file" name="foto_produk[]"
-                                                        class="form-control userPhoto" accept=".jpg,.png,.jpeg" required>
-                                                </div>
-                                            </div>
-                                        </div>
                                         <div class="flex-grow-1">
                                             <small class="form-text text-muted">
                                                 <ul>
@@ -84,25 +70,35 @@
                                     <div class="mb-3">
                                         <label for="exampleFormControlInput1" class="form-label">Nama Produk</label>
                                         <input type="text" class="form-control" id="exampleFormControlInput1"
-                                            name="namaProduk" required>
+                                            name="namaProduk" value="{{ $produk->nama_produk }}" required>
                                         <div id="namaProduk" class="form-text" style="opacity: 50%;">Disarankan untuk
                                             memasukkan nama series pada
                                             produk agar penyewa gampang menemukan dari seris apa produks cosplay anda</div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="exampleFormControlTextarea1" class="form-label">Deskripsi Produk</label>
-                                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="deskripsiProduk" required></textarea>
+                                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="deskripsiProduk" required>{{ $produk->deskripsi_produk }}</textarea>
                                     </div>
                                     <label for="selectSeries" class="form-label">Series</label>
                                     <div class="form-floating mb-3">
                                         <select class="form-select" id="selectSeries" name="kategori"
                                             data-placeholder="Pilih Series" required>
                                             <option></option>
-                                            <option value="Genshin">Genshin Impact</option>
-                                            <option value="Blue Archive">Blue Archive</option>
-                                            <option value="Honkai Star Rail">Honkai Star Rail</option>
-                                            <option value="Wuthering Waves">Wuthering Waves</option>
-                                            <option value="Attack on Titan">Attack on Titan</option>
+                                            <option value="Genshin Impact"
+                                                {{ $produk->kategori == 'Genshin Impact' ? 'selected' : '' }}>Genshin Impact
+                                            </option>
+                                            <option value="Blue Archive"
+                                                {{ $produk->kategori == 'Blue Archive' ? 'selected' : '' }}>Blue Archive
+                                            </option>
+                                            <option value="Honkai Star Rail"
+                                                {{ $produk->kategori == 'Honkai Star Rail' ? 'selected' : '' }}>Honkai Star
+                                                Rail</option>
+                                            <option value="Wuthering Waves"
+                                                {{ $produk->kategori == 'Wuthering Waves' ? 'selected' : '' }}>Wuthering
+                                                Waves</option>
+                                            <option value="Attack on Titan"
+                                                {{ $produk->kategori == 'Attack on Titan' ? 'selected' : '' }}>Attack on
+                                                Titan</option>
                                         </select>
                                         <label for="selectSeries">Series</label>
                                     </div>
@@ -112,27 +108,64 @@
                                     <div class="mb-3">
                                         <label class="form-label">Ukuran Produk</label><br>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input ukuran-checkbox" type="checkbox"
-                                                id="S" value="S" name="ukuran[]" data-target="S">
+                                            <input class="form-check-input ukuran-checkbox" type="checkbox" id="S"
+                                                value="S" name="ukuran[]" data-target="S"
+                                                {{ in_array('S', $ukuranKey) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="S">S</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input ukuran-checkbox" type="checkbox"
-                                                id="M" value="M" name="ukuran[]" data-target="M">
+                                            <input class="form-check-input ukuran-checkbox" type="checkbox" id="M"
+                                                value="M" name="ukuran[]" data-target="M"
+                                                {{ in_array('M', $ukuranKey) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="M">M</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input ukuran-checkbox" type="checkbox"
-                                                id="L" value="L" name="ukuran[]" data-target="L">
+                                            <input class="form-check-input ukuran-checkbox" type="checkbox" id="L"
+                                                value="L" name="ukuran[]" data-target="L"
+                                                {{ in_array('L', $ukuranKey) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="L">L</label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input ukuran-checkbox" type="checkbox"
-                                                id="XL" value="XL" name="ukuran[]" data-target="XL">
+                                                id="XL" value="XL" name="ukuran[]" data-target="XL"
+                                                {{ in_array('XL', $ukuranKey) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="XL">XL</label>
                                         </div>
                                     </div>
                                     <div id="ukuranInputs">
+                                        @foreach ($produk->ukuran_produk as $ukuran => $data)
+                                            <div id="Inputan_{{ $ukuran }}" class="mb-3 ukuran-input">
+                                                <div class="form-outline">
+                                                    <label class="form-label" id="ukuranlabel_{{ $ukuran }}"
+                                                        for="harga_{{ $ukuran }}">Informasi Ukuran
+                                                        {{ $ukuran }}</label>
+                                                </div>
+                                                <div class="input-group mb-3">
+                                                    <div class="form-floating">
+                                                        <input type="text" id="harga_{{ $ukuran }}"
+                                                            class="form-control" name="harga_{{ $ukuran }}"
+                                                            pattern="[0-9]*" placeholder="Harga" required=""
+                                                            value="{{ $data['harga'] }}">
+                                                        <label for="harga_{{ $ukuran }}"
+                                                            id="ukuranlabel_{{ $ukuran }}">Harga / 3 hari</label>
+                                                    </div>
+                                                    <span id="hargaSpan_{{ $ukuran }}"
+                                                        class="input-group-text fw-100">/ 3 hari</span>
+                                                </div>
+                                                <div id="labelhelp1_{{ $ukuran }}" class="form-text mb-3"
+                                                    style="opacity: 50%;">Masukan harga tanpa titik</div>
+                                                <div class="input-group mb-3">
+                                                    <div class="form-floating">
+                                                        <input type="text" id="stok_{{ $ukuran }}"
+                                                            class="form-control" name="stok_{{ $ukuran }}"
+                                                            pattern="[0-9]*" placeholder="Stok" required=""
+                                                            value="{{ $data['stok'] }}">
+                                                        <label for="stok_{{ $ukuran }}"
+                                                            id="stoklabel_{{ $ukuran }}">Stok</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
                                         <!-- Kontainer untuk input harga dan stok yang akan ditambahkan secara dinamis -->
                                     </div>
                                     <hr class="border border-secondary border-3 my-5">
@@ -141,7 +174,7 @@
                                     <div class="mb-3">
                                         <label for="exampleFormControlInput1" class="form-label">Berat Produk</label>
                                         <input type="text" class="form-control" id="exampleFormControlInput1"
-                                            name="beratProduk" required>
+                                            name="beratProduk" value="{{ $produk->berat_produk }}" required>
                                         <div id="namaProduk" class="form-text" style="opacity: 50%;">Masukan dalam satuan
                                             gram. 1000g = 1kg</div>
                                     </div>
@@ -149,28 +182,32 @@
                                         <label class="form-label">Metode Pengiriman</label><br>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" id="grab"
-                                                value="Grab" name="metode_kirim[]">
+                                                value="Grab" name="metode_kirim[]"
+                                                {{ in_array('Grab', $decodeKirim) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="grab">Grab</label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" id="goSend"
-                                                value="GoSend" name="metode_kirim[]">
+                                                value="GoSend" name="metode_kirim[]"
+                                                {{ in_array('GoSend', $decodeKirim) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="goSend">GoSend</label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" id="jne"
-                                                value="JNE" name="metode_kirim[]">
+                                                value="JNE" name="metode_kirim[]"
+                                                {{ in_array('JNE', $decodeKirim) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="jne">JNE</label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" id="jnt"
-                                                value="JNT" name="metode_kirim[]">
+                                                value="JNT" name="metode_kirim[]"
+                                                {{ in_array('JNT', $decodeKirim) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="jnt">JNT</label>
                                         </div>
                                     </div>
                                     <div class="d-grid mb-5">
-                                        <button class="btn btn-kalasewa btn-lg btn-block" type="submit">Buat
-                                            Produk</button>
+                                        <button class="btn btn-kalasewa btn-lg btn-block" type="submit">Simpan
+                                            Perubahan</button>
                                     </div>
                                 </form>
                             </div>

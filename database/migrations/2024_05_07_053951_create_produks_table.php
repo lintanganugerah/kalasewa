@@ -20,7 +20,7 @@ return new class extends Migration
             $table->unsignedInteger('berat_produk');
             $table->json('ukuran_produk');
             $table->json('metode_kirim')->default(json_encode([]));
-            $table->enum('status_produk',['unverified','aktif', 'arsip',]);
+            $table->enum('status_produk',['aktif', 'arsip',]);
             $table->timestamps();
         });
     }

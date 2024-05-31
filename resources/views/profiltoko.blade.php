@@ -117,25 +117,25 @@
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" id="grab"
                                                 value="Grab" name="metode_kirim[]"
-                                                {{ in_array('Grab', $decodeToko) ? 'checked' : '' }}>
+                                                {{ in_array('Grab', $decodeKirim) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="grab">Grab</label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" id="goSend"
                                                 value="GoSend" name="metode_kirim[]"
-                                                {{ in_array('GoSend', $decodeToko) ? 'checked' : '' }}>
+                                                {{ in_array('GoSend', $decodeKirim) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="goSend">GoSend</label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" id="jne"
                                                 value="JNE" name="metode_kirim[]"
-                                                {{ in_array('JNE', $decodeToko) ? 'checked' : '' }}>
+                                                {{ in_array('JNE', $decodeKirim) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="jne">JNE</label>
                                         </div>
                                         <div class="form-check form-check-inline">
                                             <input class="form-check-input" type="checkbox" id="jnt"
                                                 value="JNT" name="metode_kirim[]"
-                                                {{ in_array('JNT', $decodeToko) ? 'checked' : '' }}>
+                                                {{ in_array('JNT', $decodeKirim) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="jnt">JNT</label>
                                         </div>
                                     </div>
