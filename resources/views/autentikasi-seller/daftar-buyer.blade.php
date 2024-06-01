@@ -60,7 +60,7 @@
 
                                             <!-- Login -->
                                             <div class="text-center">
-                                                <p>Sudah memiliki akun? <a href="{{ route('seller.loginView') }}"
+                                                <p>Sudah memiliki akun? <a href="{{ route('loginView') }}"
                                                         class="fw-bold text-dark">Klik untuk Login</a></p>
                                             </div>
 

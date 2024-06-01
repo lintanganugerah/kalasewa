@@ -23,7 +23,7 @@ class pemilik_sewa
         if (Auth::user()) {
             return redirect()->back();
         } else {
-            return redirect()->route('seller.loginView');
+            return redirect()->route('loginView');
         }
     }
 }

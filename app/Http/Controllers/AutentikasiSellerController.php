@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Toko;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
+
 
 class AutentikasiSellerController extends Controller
 {
@@ -74,7 +77,7 @@ class AutentikasiSellerController extends Controller
 
     public function verifikasiView(Request $request) {
         if (!session()->has('verify')) {
-            return redirect()->route('seller.loginView');
+            return redirect()->route('loginView');
         } elseif (session()->has('verified')) {
             return redirect()->route('seller.verifiedView');
         }
@@ -83,16 +86,76 @@ class AutentikasiSellerController extends Controller
 
     public function verifiedView(Request $request) {
         if (!session()->has('verified')) {
-            return redirect()->route('seller.loginView');
+            return redirect()->route('loginView');
         }
         Session::forget('verified');
         return view('autentikasi-seller.daftar-verified-view');
     }
 
+    public function viewForgotPass(Request $request) {
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->role === "pemilik_sewa") {
+                return redirect()->route('seller.berandaView');
+            }
+        }
+        return view('autentikasi-seller.resetPassRequestEmail');
+    }
+
+    public function ForgotPassAction(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:users,email'
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $status = Password::sendResetLink(
+            $request->only('email')
+        );
+
+        return $status === Password::RESET_LINK_SENT ? back()->with(['success' => __($status)]) : back()->withErrors(['email' => __($status)]);
+    }
+
+    public function viewresetPass(Request $request, $token) {
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->role === "pemilik_sewa") {
+                return redirect()->route('seller.berandaView');
+            }
+        }
+        return view('autentikasi-seller.resetPass')->with(['token' => $token, 'email' => $request->email]);
+    }
+
+    public function resetPassAction(Request $request) {
+        $validator = Validator::make($request->all(), [
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ]);
+
+                $user->save();
+
+                event(new PasswordReset($user));
+            }
+        );
+
+        return $status === Password::PASSWORD_RESET ? redirect()->route('loginView')->with('success', __($status)) :
+        back()->withErrors(['email' => [__($status)]]);
+    }
+
     public function registerInformationActionSeller(Request $request) {
         //SIMPAN INFORMASI AKUN BARU SAAT REGISTER
         $validator = Validator::make($request->all(), [
-            'password' => 'required|string',
+            'password' => 'required|string|min:8,',
             'nama' => 'required|string',
             'namaToko' => 'required|string',
             'noTelp' => 'required|numeric|digits_between:10,14|unique:users,no_telp',
@@ -189,7 +252,7 @@ class AutentikasiSellerController extends Controller
         $user->verifyIdentitas = "Tidak";
         $user->save();
 
-        return redirect()->route('seller.loginView')->with('success', 'Mohon Tunggu Konfirmasi Admin 1x24 Jam');
+        return redirect()->route('loginView')->with('success', 'Mohon Tunggu Konfirmasi Admin 1x24 Jam');
     }
 
     public function checkEmailSeller(Request $request) {
@@ -267,14 +330,14 @@ class AutentikasiSellerController extends Controller
                 Auth::logout();
                 Session::flush();
                 Session::regenerate(true);
-                return redirect()->route('seller.loginView')->with('error', 'Mohon Tunggu Konfirmasi admin 1x24 jam');
+                return redirect()->route('loginView')->with('error', 'Mohon Tunggu Konfirmasi admin 1x24 jam');
             } else if($user->verifyIdentitas === "Ditolak") {
                 Auth::logout();
                 Session::flush();
                 Session::regenerate(true);
                 session(['user_ID' => $user_id]);
                 session(['Invalid_Identitas' => TRUE]);
-                return redirect()->route('seller.loginView')->with('error', 'Informasi anda ditolak oleh admin');
+                return redirect()->route('loginView')->with('error', 'Informasi anda ditolak oleh admin');
             }
 
             session(['uid' => $user->id]);
@@ -288,7 +351,7 @@ class AutentikasiSellerController extends Controller
                 return redirect()->route('');
             }
         } else {
-            return redirect()->route('seller.loginView')->with(['error' => 'Email atau password salah!']);
+            return redirect()->route('loginView')->with(['error' => 'Email atau password salah!']);
         }
     }
 
@@ -298,7 +361,7 @@ class AutentikasiSellerController extends Controller
             Auth::logout();
             Session::flush();
             Session::regenerate(true);
-            return redirect()->route('seller.loginView');
+            return redirect()->route('loginView');
         }
     }
 }

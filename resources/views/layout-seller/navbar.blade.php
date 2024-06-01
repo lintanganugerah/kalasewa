@@ -21,7 +21,7 @@
                     <a class="nav-link" href="#">Jadi Seller</a>
                 </li>
             </ul>
-            <a class="me-5" href="{{ route('seller.loginView') }}" style="color: #EE1B2F; text-decoration:none">Sign
+            <a class="me-5" href="{{ route('loginView') }}" style="color: #EE1B2F; text-decoration:none">Sign
                 in</a>
         </div>
     </div>

@@ -5,7 +5,7 @@ use App\Http\Controllers\ProdukSellerController;
 use App\Http\Controllers\AutentikasiSellerController;
 use App\Http\Controllers\SellerController;
 
-Route::get('/login', [AutentikasiSellerController::class, 'loginView'])->name('seller.loginView');
+Route::get('/login', [AutentikasiSellerController::class, 'loginView'])->name('loginView');
 Route::get('/test', [SellerController::class, 'testView'])->name('seller.testView');
 
 Route::post('/login/act', [AutentikasiSellerController::class, 'loginAction'])->name('seller.loginAction');
@@ -28,6 +28,14 @@ Route::get('/daftar/verifikasi', [AutentikasiSellerController::class, 'verifikas
 Route::get('/daftar/verified', [AutentikasiSellerController::class, 'verifiedView'])->name('seller.verifiedView');
 
 Route::get('/email/verify/{id}/{hash}', [AutentikasiSellerController::class, 'verify'])->name('verification.verify');
+
+Route::get('/forgot-password', [AutentikasiSellerController::class,'viewForgotPass'])->name('viewForgotPass');
+
+Route::post('/forgot-password', [AutentikasiSellerController::class,'ForgotPassAction'])->name('ForgotPassAction');
+
+Route::get('/reset-password/{token}', [AutentikasiSellerController::class,'viewresetPass'])->name('password.reset');
+
+Route::post('/reset-password', [AutentikasiSellerController::class,'resetPassAction'])->name('resetPassAction');
 
 
 Route::group(['middleware' => 'pemilik_sewa'], function () {

@@ -28,8 +28,7 @@ return new class extends Migration
             $table->string('foto_profil')->default('storage/profiles/profil_default.jpg');
             $table->enum('role',['penyewa','pemilik_sewa', 'admin']);
             $table->enum('verifyIdentitas',['Sudah','Tidak', 'Ditolak'])->default('Tidak');
-            $table->rememberToken();
-            $table->timestamps();   
+            $table->timestamps();
         });
 
         Schema::create('sessions', function (Blueprint $table) {

@@ -59,12 +59,12 @@
                                     <!-- Password input -->
                                     <div class="mb-3">
                                         <label for="pass" class="form-label">Password</label>
-                                        <input type="password" class="form-control" id="pass" name="password"
-                                            minlength="8">
+                                        <input type="password" class="form-control" id="pass" name="password">
                                     </div>
 
                                     <div class="form-check d-flex justify-content-end mb-4">
-                                        <a class="form-check-label text-reset" href="#" for="form2Example33">
+                                        <a class="form-check-label text-reset" href="{{ route('viewForgotPass') }}"
+                                            for="form2Example33">
                                             Lupa password?
                                         </a>
                                     </div>

@@ -29,7 +29,7 @@
                                     <h5 class="fw-bold mb-3 pb-3" style="letter-spacing: 1px;">Informasi Akun dan Toko
                                     </h5>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
+                                    <div class="form-outline mb-4">
                                         <label class="form-label" for="form2Example17">Nama Lengkap Pribadi</label>
                                         <input type="text" id="form2Example17" class="form-control form-control-lg"
                                             name="nama" value="{{ $user->nama }}" required />
@@ -38,7 +38,7 @@
                                         </div>
                                     </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
+                                    <div class="form-outline mb-4">
                                         <label class="form-label" for="form2Example27">Alamat Toko</label>
                                         <textarea type="text" id="alamat" class="form-control form-control-lg" name="AlamatToko" required>{{ $user->alamat }}</textarea>
                                     </div>
@@ -69,7 +69,7 @@
                                     </div>
 
                                     <div class="d-grid mb-5">
-                                        <div data-mdb-input-init class="form-outline">
+                                        <div class="form-outline">
                                             <label class="form-label" for="kodePos">Kode Pos</label>
                                             <input type="text" id="kodePos" class="form-control" name="kodePos"
                                                 pattern="[0-9]*" minlength="5" maxlength="6" value="{{ $user->kode_pos }}"
@@ -77,7 +77,7 @@
                                         </div>
                                     </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
+                                    <div class="form-outline mb-4">
                                         <label class="form-label" for="form2Example17">NIK</label>
                                         <input type="text" id="form2Example17" class="form-control form-control-lg"
                                             name="NIK" value="{{ $user->NIK }}" required />
@@ -133,22 +133,26 @@
                                         </div>
                                     </div>
                                 </div> --}}
-                                    <div data-mdb-input-init class="form-outline mb-4">
+                                    <div class="form-outline mb-4">
                                         <label class="form-label" for="form2Example17">Email</label>
                                         <input type="text" id="form2Example17" class="form-control form-control-lg"
                                             name="email" value="{{ session('emailRegis') }}" disabled />
                                     </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
-                                        <label class="form-label" for="form2Example17">Password</label>
-                                        <input type="password" id="form2Example17" class="form-control form-control-lg"
-                                            name="password" required />
+                                    <div class="form-outline mb-4">
+                                        <label for="validpassword" class="form-label">Password</label>
+                                        <div class="input-group">
+                                            <input type="password" class="form-control" id="validpassword"
+                                                name="password" minlength="8" required>
+                                        </div>
+                                        <div id="password" class="form-text">Minimal 8 karakter
+                                        </div>
                                     </div>
 
                                     <h5 class="fw-bold mb-3 pb-3" style="letter-spacing: 1px;">Informasi Akun dan Toko
                                     </h5>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
+                                    <div class="form-outline mb-4">
                                         <label class="form-label" for="form2Example17">Nama Lengkap Pribadi</label>
                                         <input type="text" id="form2Example17" class="form-control form-control-lg"
                                             name="nama" required />
@@ -157,19 +161,19 @@
                                         </div>
                                     </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
+                                    <div class="form-outline mb-4">
                                         <label class="form-label" for="noTelp">Nomor Telpon Toko</label>
                                         <input type="text" id="noTelp" class="form-control form-control-lg"
                                             name="noTelp" pattern="[0-9]*" minlength="10" maxlength="14" required />
                                     </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
+                                    <div class="form-outline mb-4">
                                         <label class="form-label" for="form2Example17">Nama Toko</label>
                                         <input type="text" id="form2Example17" class="form-control form-control-lg"
                                             name="namaToko" required />
                                     </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
+                                    <div class="form-outline mb-4">
                                         <label class="form-label" for="form2Example27">Alamat Toko</label>
                                         <textarea type="text" id="alamat" class="form-control form-control-lg" name="AlamatToko" required></textarea>
                                     </div>
@@ -198,14 +202,14 @@
                                     </div>
 
                                     <div class="d-grid mb-5">
-                                        <div data-mdb-input-init class="form-outline">
+                                        <div class="form-outline">
                                             <label class="form-label" for="kodePos">Kode Pos</label>
                                             <input type="text" id="kodePos" class="form-control" name="kodePos"
                                                 pattern="[0-9]*" minlength="5" maxlength="6" required />
                                         </div>
                                     </div>
 
-                                    <div data-mdb-input-init class="form-outline mb-4">
+                                    <div class="form-outline mb-4">
                                         <label class="form-label" for="form2Example17">NIK</label>
                                         <input type="text" id="form2Example17" class="form-control form-control-lg"
                                             name="NIK" required />
