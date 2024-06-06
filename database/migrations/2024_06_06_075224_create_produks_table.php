@@ -13,15 +13,21 @@ return new class extends Migration
     {
         Schema::create('produks', function (Blueprint $table) {
             $table->id()->index();
-            $table->bigInteger('ID_toko')->unsigned();
+            $table->bigInteger('id_toko')->unsigned();
             $table->string('nama_produk');
-            $table->string('kategori');
             $table->string('deskripsi_produk');
+            $table->string('brand');
+            $table->unsignedInteger('harga');
+            $table->enum('gender',['Pria', 'Wanita']);
             $table->unsignedInteger('berat_produk');
             $table->json('ukuran_produk');
+            $table->bigInteger('id_series')->unsigned();
             $table->json('metode_kirim')->default(json_encode([]));
             $table->enum('status_produk',['aktif', 'arsip',])->default('aktif');
             $table->timestamps();
+
+            $table->foreign('id_series')->references('id')->on('series')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_toko')->references('id')->on('tokos')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

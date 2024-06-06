@@ -16,33 +16,6 @@ use App\Models\Toko;
 class SellerController extends Controller
 {
     public function sellerBerandaView(Request $request) {
-        $user = Auth::user();
-
-        if (!isset($user->nama)) {
-            return redirect()->route('seller.registerInformationView');
-        } else if (!isset($user->identitas) && $user->verifyIdentitas === 'Tidak') {
-            session(['Isi_Identitas' => "Mohon Isi Identitas Anda untuk dapat mulai berjualan"]);
-            session(['regisIdentitas' => TRUE]);
-            return view('beranda');
-        } else if (isset($user->identitas) && $user->verifyIdentitas === 'Tidak') {
-            session(['Menunggu_Identitas' => "Identitas Anda sedang menunggu konfirmasi Admin! Mohon tunggu 1x24 jam"]);
-            return view('beranda');
-        } else if ($user->verifyIdentitas === "Ditolak") {
-            if(session()->has('Menunggu_Identitas')) {
-                Session::forget('Menunggu_Identitas');
-                Session::forget('Isi_Identitas');
-            }
-            session(['regisIdentitas' => TRUE]);
-            session(['Invalid_Identitas' => "Identitas anda ditolak oleh admin"]);
-            
-            return view('beranda');
-        }else if ($user->verifyIdentitas === "Sudah") {
-            Session::forget('Menunggu_Identitas');
-            Session::forget('Isi_Identitas');
-            Session::forget('Invalid_Identitas');
-
-            return view('beranda');
-        }
         return view('beranda');
     }
 
@@ -62,14 +35,14 @@ class SellerController extends Controller
 
     public function profilTokoView(Request $request) {
         $user = Auth::user();
-        $toko = Toko::where('ID_user', $user->id)->first();
-        $decodeToko = json_decode($toko->metode_kirim);
-        return view('profiltoko', compact('user', 'toko', 'decodeToko'));
+        $toko = Toko::where('id_user', $user->id)->first();
+        $decodeKirim = json_decode($toko->metode_kirim);
+        return view('profiltoko', compact('user', 'toko', 'decodeKirim'));
     }
 
     public function profilTokoAction(Request $request) {
         $user = Auth::user();
-        $toko = Toko::where('ID_user', $user->id)->first();
+        $toko = Toko::where('id_user', $user->id)->first();
 
         $validator = Validator::make( $request->all (), [
             'nama' => 'required|string',

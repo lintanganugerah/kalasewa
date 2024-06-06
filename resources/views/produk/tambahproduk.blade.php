@@ -93,6 +93,19 @@
                                         <label for="exampleFormControlTextarea1" class="form-label">Deskripsi Produk</label>
                                         <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="deskripsiProduk" required></textarea>
                                     </div>
+                                    <label for="harga" class="form-label">Harga</label>
+                                    <div class="input-group mb-3">
+                                        <div class="form-floating">
+                                            <input type="text" id="harga" class="form-control" name="harga"
+                                                pattern="[0-9]*" placeholder="Harga" required>
+                                            <label for="harga">Harga / 3
+                                                hari</label>
+                                        </div>
+                                        <span id="harga_span" class="input-group-text fw-100">/ 3 hari</span>
+                                    </div>
+                                    <div id="labelhelp1_${targetId}" class="form-text mb-3" style="opacity: 50%;">
+                                        Masukan
+                                        harga tanpa titik</div>
                                     <label for="selectSeries" class="form-label">Series</label>
                                     <div class="form-floating mb-3">
                                         <select class="form-select" id="selectSeries" name="kategori"

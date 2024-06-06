@@ -18,10 +18,9 @@
                 <div class="row gx-lg-5 align-items-center">
                     <div class="col-lg-6 mb-5 mb-lg-0">
                         <h1 class="my-5 display-3 fw-bold ls-tight">
-                            Selamat Datang, Penjual!
+                            Selamat Datang!
                         </h1>
-                        <p style="color: hsl(217, 10%, 50.8%)">Ayo mulai mengelola toko anda secara mudah dan efisien dengan
-                            kalasewa!
+                        <p style="color: hsl(217, 10%, 50.8%)">Ayo mulai Penyewaan secara mudah bersama Kalasewa!
                         </p>
                     </div>
 
@@ -40,13 +39,7 @@
                                     @endif
                                     @if (session('error'))
                                         <div class="alert alert-danger">
-                                            {{ session('error') }} @if (session('Invalid_Identitas'))
-                                                <a class="fw-bold text-danger"
-                                                    href="{{ route('seller.registerInformationView') }}"> Klik disini untuk
-                                                    upload
-                                                    ulang
-                                                    <a>
-                                            @endif
+                                            {{ session('error') }}
                                         </div>
                                     @endif
 

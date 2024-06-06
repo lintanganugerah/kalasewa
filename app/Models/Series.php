@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FotoProduk extends Model
+class Series extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'id_produk', 'path',
+        'series'
     ];
 
-    public function FotoProduk()
+    public function series()
     {
-        return $this->belongsTo(FotoProduk::class, 'id')->withDefault();
+        return $this->hasOne(Produk::class, 'id_series')->withDefault();
     }
 }

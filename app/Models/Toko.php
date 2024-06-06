@@ -10,7 +10,7 @@ class Toko extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nama_toko', 'rating_toko', 'no_rek', 'bank', 'saldo_penghasilan', 'ID_user',
+        'nama_toko', 'rating_toko', 'no_rek', 'bank', 'saldo_penghasilan', 'id_user',
     ];
 
     public function toko()

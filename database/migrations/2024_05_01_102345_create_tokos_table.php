@@ -12,17 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tokos', function (Blueprint $table) {
-            $table->id();
+            $table->id()->index();
             $table->string('nama_toko')->unique();
             $table->string('rating_toko')->nullable();
             $table->string('no_rek')->nullable();
             $table->string('bank')->nullable();
             $table->json('metode_kirim')->default(json_encode([]));
             $table->unsignedInteger('saldo_penghasilan')->nullable()->default(0);
-            $table->bigInteger('ID_user')->unsigned();
+            $table->bigInteger('id_user')->unsigned();
             $table->timestamps();
 
-            $table->foreign('ID_user')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_user')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

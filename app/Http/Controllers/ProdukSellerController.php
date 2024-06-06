@@ -25,41 +25,113 @@ class ProdukSellerController extends Controller
     public function viewProdukAnda()
     {
         $user = Auth::user();
-        $toko = Toko::where('ID_user', $user->id)->first();
-        $produk = Produk::where('ID_toko', $toko->id)->get();
+        $toko = Toko::where('id_user', $user->id)->first();
+        $produk = Produk::where('id_toko', $toko->id)->get();
         $produkIds = $produk->pluck('id');
-        $fotoProduk = FotoProduk::whereIn('ID_produk', $produkIds)->get();
+        $fotoProduk = FotoProduk::whereIn('id_produk', $produkIds)->get();
         return view('produk.produkanda', compact('produk', 'fotoProduk'));
     }
 
     public function viewEditProduk($id)
     {
         $user = Auth::user();
-        $toko = Toko::where('ID_user', $user->id)->first();
+        $toko = Toko::where('id_user', $user->id)->first();
         $produk = Produk::find($id);
+        if (!$produk) {
+            return redirect()->route('seller.viewProdukAnda')->with('error', 'Produk Invalid');
+        }
         $produkIds = $produk->pluck('id');
         $decodeKirim = json_decode($produk->metode_kirim);
-        $fotoProduk = FotoProduk::whereIn('ID_produk', $produkIds)->get();
+        $fotoProduk = FotoProduk::whereIn('id_produk', $produkIds)->get();
         $ukuranKey = array_keys($produk->ukuran_produk);
         session(['id_produk' => $produk->id]);
 
-        if ($toko->id == $produk->ID_toko) {
+        if ($toko->id == $produk->id_toko) {
             return view('produk.editproduk', compact('produk', 'fotoProduk', 'decodeKirim', 'ukuranKey'));
         } else {
             return redirect()->back()->with('error', 'Produk Invalid');
         }
     }
 
-    public function tambahProdukAction(Request $request)
+    public function editProdukAction(Request $request, $id)
     {
         $user = Auth::user();
-        $toko = Toko::where('ID_user', $user->id)->first();
+        $produk = Produk::where('id', $id)->first();
+        $toko = Toko::where('id_user', $user->id)->first();
 
         $validator = Validator::make( $request->all (), [
             'namaProduk' => 'required|string',
             'deskripsiProduk' => 'required|string',
             'kategori' => 'required',
             'ukuran' => 'required',
+            'harga' => 'required|numeric',
+            'brand' => 'required|string',
+            'gender' => 'required|in:Pria, Wanita',
+            'foto_produk' => 'nullable|max:5120',
+            'beratProduk' => 'required|numeric',
+            'metode_kirim' => 'required',
+        ]);
+
+        if ($toko->id != $produk->id_toko) {
+            return redirect()->back()->with('error', "Produk Invalid");
+        }
+
+        if ($validator->fails()) {
+        return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $ukuranData = [];
+        $ukuranSize = ['S', 'M', 'L', 'XL'];
+
+        // Loop untuk setiap ukuran
+        foreach ($ukuranSize as $size) {
+            // Memeriksa apakah input untuk harga dan stok dari ukuran tersebut ada dalam request
+            if ($request->has("harga_$size") && $request->has("stok_$size")) {
+                // Jika ada, tambahkan data untuk ukuran tersebut ke dalam array $ukuranData
+                $ukuranData[$size] = [
+                'harga' => $request->input("harga_$size"),
+                'stok' => $request->input("stok_$size"),
+                ];
+            }
+        }
+
+        $produk->nama_produk = $request->namaProduk;
+        $produk->deskripsi_produk = $request->deskripsiProduk;
+        $produk->kategori = $request->kategori;
+        $produk->berat_produk = $request->beratProduk;
+        $produk->metode_kirim = json_encode($request->metode_kirim);
+        $produk->ukuran_produk = $ukuranData;
+        $produk->save();
+
+        if($request->has("foto_produk")) {
+            foreach ($request->foto_produk as $foto) {
+                $pathSebelum = $foto->store('public/produk/foto_produk');
+                $path = str_replace('public/', 'storage/', $pathSebelum);
+
+                // Buat instance model FotoProduk
+                $fotoProduk = new FotoProduk();
+                $fotoProduk->id_produk = $id;
+                $fotoProduk->path = $path;
+                $fotoProduk->save();
+            }
+        }
+
+        return redirect()->route('seller.viewProdukAnda')->with('success', 'Produk Berhasil Diubah');
+    }
+
+    public function tambahProdukAction(Request $request)
+    {
+        $user = Auth::user();
+        $toko = Toko::where('id_user', $user->id)->first();
+
+        $validator = Validator::make( $request->all (), [
+            'namaProduk' => 'required|string',
+            'deskripsiProduk' => 'required|string',
+            'kategori' => 'required',
+            'ukuran' => 'required',
+            'harga' => 'required|numeric',
+            'brand' => 'required|string',
+            'gender' => 'required|in:Pria, Wanita',
             'foto_produk' => 'required|max:5120',
             'beratProduk' => 'required|numeric',
             'metode_kirim' => 'required',
@@ -91,7 +163,7 @@ class ProdukSellerController extends Controller
         $produk->berat_produk = $request->beratProduk;
         $produk->metode_kirim = json_encode($request->metode_kirim);
         $produk->ukuran_produk = $ukuranData;
-        $produk->ID_toko = $toko->id;
+        $produk->id_toko = $toko->id;
         $produk->save();
         $id_produk = $produk->getKey();
 
@@ -101,7 +173,7 @@ class ProdukSellerController extends Controller
 
             // Buat instance model FotoProduk
             $fotoProduk = new FotoProduk();
-            $fotoProduk->ID_produk = $id_produk;
+            $fotoProduk->id_produk = $id_produk;
             $fotoProduk->path = $path;
             $fotoProduk->save();
         }
@@ -112,12 +184,12 @@ class ProdukSellerController extends Controller
     public function arsipProduk($id)
     {
         $user = Auth::user();
-        $toko = Toko::where('ID_user', $user->id)->first();
+        $toko = Toko::where('id_user', $user->id)->first();
         $produk = Produk::find($id);
         if (!$produk) {
             return redirect()->back()->with('error', 'Produk Invalid');
         }
-        if ($toko->id == $produk->ID_toko) {
+        if ($toko->id == $produk->id_toko) {
             $produk->update(['status_produk' => 'arsip']);
             return redirect()->back()->with('success', 'Produk berhasil diarsipkan.');
         } else {
@@ -128,12 +200,12 @@ class ProdukSellerController extends Controller
     public function aktifkanProduk($id)
     {
         $user = Auth::user();
-        $toko = Toko::where('ID_user', $user->id)->first();
+        $toko = Toko::where('id_user', $user->id)->first();
         $produk = Produk::find($id);
         if (!$produk) {
             return redirect()->back()->with('error', 'Produk Invalid');
         }
-        if ($toko->id == $produk->ID_toko) {
+        if ($toko->id == $produk->id_toko) {
             $produk->update(['status_produk' => 'aktif']);
             return redirect()->back()->with('success', 'Produk berhasil diaktifkan untuk ditampilkan pada marketplace.');
         } else {
@@ -144,13 +216,13 @@ class ProdukSellerController extends Controller
     public function hapusProduk($id)
     {
         $user = Auth::user();
-        $toko = Toko::where('ID_user', $user->id)->first();
+        $toko = Toko::where('id_user', $user->id)->first();
         $produk = Produk::find($id);
         if (!$produk) {
             return redirect()->back()->with('error', 'Produk Invalid');
         }
-        if ($toko->id == $produk->ID_toko) {
-            $fotoProduk = FotoProduk::where('ID_produk', $produk->id)->get();
+        if ($toko->id == $produk->id_toko) {
+            $fotoProduk = FotoProduk::where('id_produk', $produk->id)->get();
             if ($fotoProduk) {
                 foreach ($fotoProduk as $foto) {
                     $path = $foto->path; // Path foto di storage
@@ -168,13 +240,13 @@ class ProdukSellerController extends Controller
     public function hapusFoto($id)
     {
         $user = Auth::user();
-        $toko = Toko::where('ID_user', $user->id)->first();
+        $toko = Toko::where('id_user', $user->id)->first();
         $foto = FotoProduk::find($id);
         if (!$foto) {
             return redirect()->back()->with('error', 'Foto Invalid');
         }
         $produk = Produk::where('id', session('id_produk'))->first();
-        if ($foto->ID_produk == $produk->id) {
+        if ($foto->id_produk == $produk->id) {
             $path = $foto->path;
             Storage::delete(str_replace('storage/', 'public/', $path));
             $foto->delete();

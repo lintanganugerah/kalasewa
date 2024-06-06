@@ -60,16 +60,8 @@ document.addEventListener("DOMContentLoaded", function () {
                 newInput.classList.add("mb-3", "ukuran-input");
                 newInput.innerHTML = `
                             <div class="form-outline">
-                                <label class="form-label" id="ukuranlabel_${targetId}" for="harga_${targetId}">Informasi Ukuran ${targetId}</label>
+                                <label class="form-label" id="ukuranlabel_${targetId}">Stok Ukuran ${targetId}</label>
                             </div>
-                            <div class="input-group mb-3">
-                                <div class="form-floating">
-                                    <input type="text" id="harga_${targetId}" class="form-control" name="harga_${targetId}" pattern="[0-9]*" placeholder="Harga" required>
-                                    <label for="harga_${targetId}" id="ukuranlabel_${targetId}">Harga / 3 hari</label>
-                                </div>
-                                <span id="hargaSpan_${targetId}" class="input-group-text fw-100">/ 3 hari</span>
-                            </div>
-                            <div id="labelhelp1_${targetId}" class="form-text mb-3" style="opacity: 50%;">Masukan harga tanpa titik</div>
                            <div class="input-group mb-3">
                                 <div class="form-floating">
                                     <input type="text" id="stok_${targetId}" class="form-control" name="stok_${targetId}" pattern="[0-9]*" placeholder="Stok" required>

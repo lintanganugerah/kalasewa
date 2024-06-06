@@ -56,7 +56,7 @@ class AutentikasiSellerController extends Controller
             return view('autentikasi-seller.daftar-informasi-seller');
         } else if (session('Invalid_Identitas') === TRUE) {
             $user = User::where('id', session('user_ID'))->first();
-            $toko = Toko::where('ID_user', session('user_ID'))->first();
+            $toko = Toko::where('id_user', session('user_ID'))->first();
 
             // Perbaikan: Mengubah compact() agar nama variabel diberikan sebagai string
             return view('autentikasi-seller.daftar-informasi-seller', compact('user', 'toko'));
@@ -72,7 +72,7 @@ class AutentikasiSellerController extends Controller
                 return redirect()->route('seller.berandaView');
             }
         }
-        return view('autentikasi-seller.login-seller');
+        return view('autentikasi-seller.loginView');
     }
 
     public function verifikasiView(Request $request) {
@@ -184,7 +184,7 @@ class AutentikasiSellerController extends Controller
         }
 
         $photoPath = $request->file('identitas')->store('public/data');
-        $photoPath = Str::replaceFirst('data/', 'storage/', $photoPath);
+        $photoPath = Str::replaceFirst('public/', 'storage/', $photoPath);
 
         $user = new User;
         $toko = new Toko;
@@ -201,7 +201,7 @@ class AutentikasiSellerController extends Controller
         $user->role = "pemilik_sewa";
         $user->save();
         $toko->nama_toko = $request->namaToko;
-        $toko->ID_user = $user->id;
+        $toko->id_user = $user->id;
         $toko->metode_kirim = json_encode($request->metode_kirim);
         $toko->save();
         $user->sendEmailVerificationNotification();
@@ -262,7 +262,9 @@ class AutentikasiSellerController extends Controller
         $email = strtolower($request->email);
         $u = DB::table('users')->where('email',$email)->first();
         if($u){
-            return redirect()->back()->with('error', 'Alamat Email sudah terdaftar, silahkan login atau gunakan email lain!');
+            if ($u->verifyIdentitas == "Sudah" || $u->verifyIdentitas == "Tidak") {
+                return redirect()->back()->with('error', 'Alamat Email sudah terdaftar, silahkan login atau gunakan email lain!');
+            }
         }
 
         session(['emailRegis' => $email]);
@@ -318,7 +320,7 @@ class AutentikasiSellerController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             $user_id = $user->id;
-            $toko = Toko::where('ID_User', $user->id)->first();
+            $toko = Toko::where('id_user', $user->id)->first();
 
             if (!isset($user->email_verified_at)) {
                 session(['verify' => TRUE]);
@@ -335,9 +337,7 @@ class AutentikasiSellerController extends Controller
                 Auth::logout();
                 Session::flush();
                 Session::regenerate(true);
-                session(['user_ID' => $user_id]);
-                session(['Invalid_Identitas' => TRUE]);
-                return redirect()->route('loginView')->with('error', 'Informasi anda ditolak oleh admin');
+                return redirect()->route('loginView')->with('error', 'Informasi anda ditolak oleh admin! Silahkan daftar ulang');
             }
 
             session(['uid' => $user->id]);

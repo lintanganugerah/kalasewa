@@ -54,22 +54,26 @@
                                             <div class="col-md-3 col-sm-6 mb-4">
                                                 <div class="card p-3" style="width: 100%;">
                                                     <div class="image-container">
-                                                        @foreach ($fotoProduk->where('ID_produk', $prod->id)->take(1) as $fp)
+                                                        @foreach ($fotoProduk->where('id_produk', $prod->id)->take(1) as $fp)
                                                             <img src="{{ asset($fp->path) }}" alt="...">
                                                         @endforeach
                                                     </div>
                                                     <div class="product-details">
-                                                        <h5 class="card-title mt-2">{{ $prod->nama_produk }}</h5>
-                                                        <p class="cut-text"> {{ $prod->deskripsi_produk }}
+                                                        <h5 class="card-title mt-2 fw-bolder fs-4">{{ $prod->nama_produk }}
+                                                        </h5>
+                                                        <p class="cut-text"> {{ $prod->brand }}, {{ $prod->gender }}
                                                         </p>
+                                                        Ukuran:
                                                         @foreach ($prod->ukuran_produk as $ukuran => $detail)
-                                                            <li>Ukuran: {{ $ukuran }} - Harga: {{ $detail['harga'] }}
-                                                                - Stok: {{ $detail['stok'] }}</li>
+                                                            {{ $ukuran }} ({{ $detail['stok'] }})
                                                         @endforeach
                                                         <p> Metode Kirim :
                                                             @foreach (json_decode($prod->metode_kirim) as $metode)
                                                                 {{ $metode }}
                                                             @endforeach
+                                                        </p>
+                                                        <p class="cut-text fw-bold fs-6"> Rp. {{ $prod->harga }} / 3
+                                                            hari
                                                         </p>
                                                     </div>
                                                     <div class="d-flex mt-2">
@@ -101,7 +105,7 @@
                                             <div class="col-md-3 col-sm-6 mb-4">
                                                 <div class="card p-3" style="width: 100%;">
                                                     <div class="image-container">
-                                                        @foreach ($fotoProduk->where('ID_produk', $prod->id)->take(1) as $fp)
+                                                        @foreach ($fotoProduk->where('id_produk', $prod->id)->take(1) as $fp)
                                                             <img src="{{ asset($fp->path) }}" alt="...">
                                                         @endforeach
                                                     </div>

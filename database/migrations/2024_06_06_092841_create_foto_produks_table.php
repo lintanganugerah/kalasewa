@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('foto_produks', function (Blueprint $table) {
             $table->id();
             $table->string('path');
-            $table->bigInteger('ID_produk')->unsigned();
+            $table->bigInteger('id_produk')->unsigned();
             $table->timestamps();
 
-            $table->foreign('ID_produk')->references('id')->on('produks')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_produk')->references('id')->on('produks')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

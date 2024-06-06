@@ -65,6 +65,7 @@ Route::group(['middleware' => 'pemilik_sewa'], function () {
     Route::post('/produk/{id}/delete', [ProdukSellerController::class,'hapusProduk'])->name('seller.hapusProduk');
 
     Route::get('/produk/edit/{id}', [ProdukSellerController::class, 'viewEditProduk'])->name('seller.viewEditProduk');
+    Route::post('/produk/edit/{id}/act', [ProdukSellerController::class, 'editProdukAction'])->name('seller.editProdukAction');
     Route::post('/produk/foto/{id}/delete', [ProdukSellerController::class,'hapusFoto'])->name('seller.hapusFoto');
 
     Route::get('/logout', [AutentikasiSellerController::class, 'logout'])->name('seller.logout');

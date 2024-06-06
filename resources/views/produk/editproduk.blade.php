@@ -2,7 +2,7 @@
 @section('content')
     <div class="row">
         <div class="col">
-            <div class="text-left mb-5 mt-3">
+            <div class="text-left mb-5 mt-3 ml-4">
                 <h1 class="fw-bold text-secondary">Produk</h1>
                 <h4 class="fw-semibold text-secondary">Edit Produk Anda</h4>
             </div>
@@ -34,7 +34,7 @@
 
                                 <label for="userPhoto" class="form-label">Foto Produk</label>
                                 <div id="photoInputs">
-                                    @foreach ($fotoProduk->where('ID_produk', $produk->id) as $fp)
+                                    @foreach ($fotoProduk->where('id_produk', $produk->id) as $fp)
                                         <div class="photo-input mb-2">
                                             <div class="d-flex align-items-start">
                                                 <img class="img-thumbnail" src="{{ asset($fp->path) }}"
@@ -50,10 +50,26 @@
                                         </div>
                                     @endforeach
                                 </div>
-                                <form action="{{ route('seller.tambahProdukAction') }}" method="POST"
+                                <form action="{{ route('seller.editProdukAction', $produk->id) }}" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
-                                    <div class="mb-3">
+                                    <div class="mb-3 mt-5">
+                                        <label for="userPhoto" class="form-label">Tambah Foto Produk (Opsional)</label>
+                                        <div id="photoInputs">
+                                            <div class="photo-input mb-2">
+                                                <div class="d-flex align-items-start">
+                                                    <div class="me-3">
+                                                        <img class="img-thumbnail" src=""
+                                                            style="width: 150px; height: 150px; object-fit: cover;"
+                                                            alt="Foto Produk">
+                                                    </div>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <input type="file" name="foto_produk[]"
+                                                        class="form-control userPhoto" accept=".jpg,.png,.jpeg">
+                                                </div>
+                                            </div>
+                                        </div>
                                         <div class="flex-grow-1">
                                             <small class="form-text text-muted">
                                                 <ul>
@@ -79,8 +95,21 @@
                                         <label for="exampleFormControlTextarea1" class="form-label">Deskripsi Produk</label>
                                         <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="deskripsiProduk" required>{{ $produk->deskripsi_produk }}</textarea>
                                     </div>
+                                    <label for="harga" class="form-label">Harga</label>
+                                    <div class="input-group mb-3">
+                                        <div class="form-floating">
+                                            <input type="text" id="harga" class="form-control" name="harga"
+                                                pattern="[0-9]*" placeholder="Harga" value="{{ $produk->harga }}" required>
+                                            <label for="harga">Harga / 3
+                                                hari</label>
+                                        </div>
+                                        <span id="harga_span" class="input-group-text fw-100">/ 3 hari</span>
+                                    </div>
+                                    <div id="labelhelp1_${targetId}" class="form-text mb-3" style="opacity: 50%;">
+                                        Masukan
+                                        harga tanpa titik</div>
                                     <label for="selectSeries" class="form-label">Series</label>
-                                    <div class="form-floating mb-3">
+                                    {{-- <div class="form-floating mb-3">
                                         <select class="form-select" id="selectSeries" name="kategori"
                                             data-placeholder="Pilih Series" required>
                                             <option></option>
@@ -101,7 +130,7 @@
                                                 Titan</option>
                                         </select>
                                         <label for="selectSeries">Series</label>
-                                    </div>
+                                    </div> --}}
                                     <hr class="border border-secondary border-3 my-5">
                                     <!-- Informasi Pengiriman -->
                                     <h5 class="card-title">Informasi Ukuran</h5>
@@ -114,14 +143,14 @@
                                             <label class="form-check-label" for="S">S</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input ukuran-checkbox" type="checkbox" id="M"
-                                                value="M" name="ukuran[]" data-target="M"
+                                            <input class="form-check-input ukuran-checkbox" type="checkbox"
+                                                id="M" value="M" name="ukuran[]" data-target="M"
                                                 {{ in_array('M', $ukuranKey) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="M">M</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input ukuran-checkbox" type="checkbox" id="L"
-                                                value="L" name="ukuran[]" data-target="L"
+                                            <input class="form-check-input ukuran-checkbox" type="checkbox"
+                                                id="L" value="L" name="ukuran[]" data-target="L"
                                                 {{ in_array('L', $ukuranKey) ? 'checked' : '' }}>
                                             <label class="form-check-label" for="L">L</label>
                                         </div>
@@ -136,24 +165,10 @@
                                         @foreach ($produk->ukuran_produk as $ukuran => $data)
                                             <div id="Inputan_{{ $ukuran }}" class="mb-3 ukuran-input">
                                                 <div class="form-outline">
-                                                    <label class="form-label" id="ukuranlabel_{{ $ukuran }}"
-                                                        for="harga_{{ $ukuran }}">Informasi Ukuran
+                                                    <label class="form-label" id="ukuranlabel_{{ $ukuran }}">Stok
+                                                        Ukuran
                                                         {{ $ukuran }}</label>
                                                 </div>
-                                                <div class="input-group mb-3">
-                                                    <div class="form-floating">
-                                                        <input type="text" id="harga_{{ $ukuran }}"
-                                                            class="form-control" name="harga_{{ $ukuran }}"
-                                                            pattern="[0-9]*" placeholder="Harga" required=""
-                                                            value="{{ $data['harga'] }}">
-                                                        <label for="harga_{{ $ukuran }}"
-                                                            id="ukuranlabel_{{ $ukuran }}">Harga / 3 hari</label>
-                                                    </div>
-                                                    <span id="hargaSpan_{{ $ukuran }}"
-                                                        class="input-group-text fw-100">/ 3 hari</span>
-                                                </div>
-                                                <div id="labelhelp1_{{ $ukuran }}" class="form-text mb-3"
-                                                    style="opacity: 50%;">Masukan harga tanpa titik</div>
                                                 <div class="input-group mb-3">
                                                     <div class="form-floating">
                                                         <input type="text" id="stok_{{ $ukuran }}"
