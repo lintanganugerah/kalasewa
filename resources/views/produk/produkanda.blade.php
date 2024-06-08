@@ -61,7 +61,12 @@
                                                     <div class="product-details">
                                                         <h5 class="card-title mt-2 fw-bolder fs-4">{{ $prod->nama_produk }}
                                                         </h5>
-                                                        <p class="cut-text"> {{ $prod->brand }}, {{ $prod->gender }}
+                                                        <p class="cut-text"> {{ $prod->brand }}, {{ $prod->gender }},
+                                                            @foreach ($series as $sr)
+                                                                @if ($sr->id == $prod->id_series)
+                                                                    {{ $sr->series }}
+                                                                @endif
+                                                            @endforeach
                                                         </p>
                                                         Ukuran:
                                                         @foreach ($prod->ukuran_produk as $ukuran => $detail)
@@ -72,7 +77,8 @@
                                                                 {{ $metode }}
                                                             @endforeach
                                                         </p>
-                                                        <p class="cut-text fw-bold fs-6"> Rp. {{ $prod->harga }} / 3
+                                                        <p class="cut-text fw-bold fs-6"> Rp.
+                                                            {{ number_format($prod->harga, 0, ',', '.') }} / 3
                                                             hari
                                                         </p>
                                                     </div>
@@ -110,18 +116,27 @@
                                                         @endforeach
                                                     </div>
                                                     <div class="product-details">
-                                                        <h5 class="card-title mt-2">{{ $prod->nama_produk }}</h5>
-                                                        <p class="cut-text"> {{ $prod->deskripsi_produk }}
+                                                        <h5 class="card-title mt-2 fw-bolder fs-4">{{ $prod->nama_produk }}
+                                                        </h5>
+                                                        <p class="cut-text"> {{ $prod->brand }}, {{ $prod->gender }},
+                                                            @foreach ($series as $sr)
+                                                                @if ($sr->id == $prod->id_series)
+                                                                    {{ $sr->series }}
+                                                                @endif
+                                                            @endforeach
                                                         </p>
+                                                        Ukuran:
                                                         @foreach ($prod->ukuran_produk as $ukuran => $detail)
-                                                            <li>Ukuran: {{ $ukuran }} - Harga:
-                                                                {{ $detail['harga'] }}
-                                                                - Stok: {{ $detail['stok'] }}</li>
+                                                            {{ $ukuran }} ({{ $detail['stok'] }})
                                                         @endforeach
                                                         <p> Metode Kirim :
                                                             @foreach (json_decode($prod->metode_kirim) as $metode)
                                                                 {{ $metode }}
                                                             @endforeach
+                                                        </p>
+                                                        <p class="cut-text fw-bold fs-6"> Rp.
+                                                            {{ number_format($prod->harga, 0, ',', '.') }} / 3
+                                                            hari
                                                         </p>
                                                     </div>
                                                     <div class="d-flex mt-2">

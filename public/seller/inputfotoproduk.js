@@ -28,7 +28,31 @@ document.getElementById("addPhotoBtn").addEventListener("click", function () {
     });
 });
 
-// Tambahkan event listener ke input file yang sudah ada pada saat halaman dimuat
+document.getElementById("hargaInput").addEventListener("input", function (e) {
+    // Menghilangkan selain angka yang ada
+    this.value = this.value.replace(/[^0-9]/g, "");
+    // Menambahkan titik setiap tiga digit
+    this.value = this.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+});
+
+document.getElementById("beratProduk").addEventListener("input", function (e) {
+    // Menghilangkan selain angka yang ada
+    this.value = this.value.replace(/[^0-9g]/g, "");
+    // Menambahkan titik setiap tiga digit
+    this.value = this.value.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+});
+
+document.getElementById("formproduk").addEventListener("submit", function (e) {
+    var hargaInput = document.getElementById("hargaInput").value;
+    var beratProduk = document.getElementById("beratProduk").value;
+
+    var hargaTanpaTitik = hargaInput.replace(/\./g, "");
+    var beratTanpaTitik = beratProduk.replace(/\./g, "");
+
+    document.getElementById("hargaInput").value = hargaTanpaTitik;
+    document.getElementById("beratProduk").value = beratTanpaTitik;
+});
+
 document.querySelectorAll(".userPhoto").forEach((input) => {
     input.addEventListener("change", function (event) {
         const file = event.target.files[0];

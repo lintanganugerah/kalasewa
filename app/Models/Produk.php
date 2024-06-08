@@ -10,7 +10,7 @@ class Produk extends Model
     use HasFactory;
 
     protected $fillable = [
-    'nama_prouk', 'id_toko', 'kategori', 'ukuran_produk', 'status_produk', 'deskripsi_produk'
+        'nama_prouk', 'id_toko', 'id_series', 'ukuran_produk', 'status_produk', 'deskripsi_produk', 'brand', 'harga', 'gender','metode_kirim'
     ];
 
     public function setUkuranProdukAttribute($value)

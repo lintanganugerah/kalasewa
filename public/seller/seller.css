@@ -50,11 +50,6 @@
     background-color: #F4F4F4;
 }
 
-.btn-kalasewa {
-    background-color: #EE1B2F;
-    color: white;
-}
-
 *,
 *::before,
 *::after {
@@ -136,8 +131,13 @@ margin-bottom: 1rem;
 
 
 .btn-kalasewa {
-    background-color: #EE1B2F;
-    color: white;
+    background-color: #EE1B2F !important;
+    color: white !important;
+}
+
+.btn-kalasewa:hover {
+    background-color: #FF3D3D !important;
+    color: white !important;
 }
 
 .select2-container--bootstrap-5 .select2-selection--single .select2-selection__rendered {

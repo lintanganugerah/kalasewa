@@ -48,7 +48,7 @@
                                         {{ session('error') }}
                                     </div>
                                 @endif
-                                <form action="{{ route('seller.tambahProdukAction') }}" method="POST"
+                                <form action="{{ route('seller.tambahProdukAction') }}" id="formproduk" method="POST"
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="mb-3">
@@ -93,31 +93,40 @@
                                         <label for="exampleFormControlTextarea1" class="form-label">Deskripsi Produk</label>
                                         <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="deskripsiProduk" required></textarea>
                                     </div>
-                                    <label for="harga" class="form-label">Harga</label>
+                                    <div class="mb-3">
+                                        <label for="exampleFormControlInput1" class="form-label">Brand</label>
+                                        <input type="text" class="form-control" id="exampleFormControlInput1"
+                                            name="brand" required>
+                                        <div id="namaProduk" class="form-text" style="opacity: 50%;">Jika tidak ada brand
+                                            silahkan tuliskan Buatan Sendiri/No Brand</div>
+                                    </div>
+                                    <label for="selectSeries" class="form-label">Series</label>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="selectSeries" name="series" required>
+                                            <option></option>
+                                            @foreach ($series as $sr)
+                                                <option value="{{ $sr->id }}">{{ $sr->series }}</option>
+                                            @endforeach
+                                        </select>
+                                        <label for="selectSeries">Series</label>
+                                    </div>
+                                    <label for="selectGender" class="form-label">Gender</label>
+                                    <div class="form-floating mb-3">
+                                        <select class="form-select" id="selectGender" name="gender" required>
+                                            <option></option>
+                                            <option value="Pria">Pria</option>
+                                            <option value="Wanita">Wanita</option>
+                                        </select>
+                                    </div>
+                                    <label for="hargaInput" class="form-label">Harga</label>
                                     <div class="input-group mb-3">
                                         <div class="form-floating">
-                                            <input type="text" id="harga" class="form-control" name="harga"
-                                                pattern="[0-9]*" placeholder="Harga" required>
-                                            <label for="harga">Harga / 3
+                                            <input type="text" id="hargaInput" class="form-control" name="harga"
+                                                placeholder="Harga" required>
+                                            <label for="hargaInput">Harga / 3
                                                 hari</label>
                                         </div>
                                         <span id="harga_span" class="input-group-text fw-100">/ 3 hari</span>
-                                    </div>
-                                    <div id="labelhelp1_${targetId}" class="form-text mb-3" style="opacity: 50%;">
-                                        Masukan
-                                        harga tanpa titik</div>
-                                    <label for="selectSeries" class="form-label">Series</label>
-                                    <div class="form-floating mb-3">
-                                        <select class="form-select" id="selectSeries" name="kategori"
-                                            data-placeholder="Pilih Series" required>
-                                            <option></option>
-                                            <option value="Genshin">Genshin Impact</option>
-                                            <option value="Blue Archive">Blue Archive</option>
-                                            <option value="Honkai Star Rail">Honkai Star Rail</option>
-                                            <option value="Wuthering Waves">Wuthering Waves</option>
-                                            <option value="Attack on Titan">Attack on Titan</option>
-                                        </select>
-                                        <label for="selectSeries">Series</label>
                                     </div>
                                     <hr class="border border-secondary border-3 my-5">
                                     <!-- Informasi Pengiriman -->
@@ -153,9 +162,9 @@
                                     <h5 class="card-title">Informasi Pengiriman</h5>
                                     <div class="mb-3">
                                         <label for="exampleFormControlInput1" class="form-label">Berat Produk</label>
-                                        <input type="text" class="form-control" id="exampleFormControlInput1"
-                                            name="beratProduk" required>
-                                        <div id="namaProduk" class="form-text" style="opacity: 50%;">Masukan dalam satuan
+                                        <input type="number" class="form-control" id="beratProduk" name="beratProduk"
+                                            required>
+                                        <div id="helpberat" class="form-text" style="opacity: 50%;">Masukan dalam satuan
                                             gram. 1000g = 1kg</div>
                                     </div>
                                     <div class="mb-5">
@@ -197,6 +206,12 @@
     </div>
     <script>
         $('#selectSeries').select2({
+            theme: "bootstrap-5",
+            width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
+            width: $(this).data('height') ? $(this).data('height') : $(this).hasClass('h-100') ? '100%' : 'style',
+            placeholder: $(this).data('placeholder'),
+        });
+        $('#selectGender').select2({
             theme: "bootstrap-5",
             width: $(this).data('width') ? $(this).data('width') : $(this).hasClass('w-100') ? '100%' : 'style',
             width: $(this).data('height') ? $(this).data('height') : $(this).hasClass('h-100') ? '100%' : 'style',

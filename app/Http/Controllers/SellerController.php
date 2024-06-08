@@ -15,6 +15,10 @@ use App\Models\Toko;
 
 class SellerController extends Controller
 {
+    public function jadiSellerView(Request $request) {
+        return view('jadiseller');
+    }
+
     public function sellerBerandaView(Request $request) {
         return view('beranda');
     }

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Toko;
+use App\Models\Series;
 use App\Models\Produk;
 use App\Models\FotoProduk;
 
@@ -19,7 +20,8 @@ class ProdukSellerController extends Controller
 {
     public function viewTambahProduk()
     {
-        return view('produk.tambahproduk');
+        $series = Series::all();
+        return view('produk.tambahproduk', compact('series'));
     }
 
     public function viewProdukAnda()
@@ -28,8 +30,11 @@ class ProdukSellerController extends Controller
         $toko = Toko::where('id_user', $user->id)->first();
         $produk = Produk::where('id_toko', $toko->id)->get();
         $produkIds = $produk->pluck('id');
+        $seriesIds = $produk->pluck('id_series');
         $fotoProduk = FotoProduk::whereIn('id_produk', $produkIds)->get();
-        return view('produk.produkanda', compact('produk', 'fotoProduk'));
+        $series = Series::whereIn('id', $seriesIds)->get();
+
+        return view('produk.produkanda', compact('produk', 'fotoProduk', 'series'));
     }
 
     public function viewEditProduk($id)
@@ -45,9 +50,10 @@ class ProdukSellerController extends Controller
         $fotoProduk = FotoProduk::whereIn('id_produk', $produkIds)->get();
         $ukuranKey = array_keys($produk->ukuran_produk);
         session(['id_produk' => $produk->id]);
+        $series = Series::all();
 
         if ($toko->id == $produk->id_toko) {
-            return view('produk.editproduk', compact('produk', 'fotoProduk', 'decodeKirim', 'ukuranKey'));
+            return view('produk.editproduk', compact('produk', 'fotoProduk', 'decodeKirim', 'ukuranKey', 'series'));
         } else {
             return redirect()->back()->with('error', 'Produk Invalid');
         }
@@ -62,7 +68,7 @@ class ProdukSellerController extends Controller
         $validator = Validator::make( $request->all (), [
             'namaProduk' => 'required|string',
             'deskripsiProduk' => 'required|string',
-            'kategori' => 'required',
+            'series' => 'required',
             'ukuran' => 'required',
             'harga' => 'required|numeric',
             'brand' => 'required|string',
@@ -86,18 +92,20 @@ class ProdukSellerController extends Controller
         // Loop untuk setiap ukuran
         foreach ($ukuranSize as $size) {
             // Memeriksa apakah input untuk harga dan stok dari ukuran tersebut ada dalam request
-            if ($request->has("harga_$size") && $request->has("stok_$size")) {
+            if ($request->has("stok_$size")) {
                 // Jika ada, tambahkan data untuk ukuran tersebut ke dalam array $ukuranData
                 $ukuranData[$size] = [
-                'harga' => $request->input("harga_$size"),
-                'stok' => $request->input("stok_$size"),
+                    'stok' => $request->input("stok_$size"),
                 ];
             }
         }
 
         $produk->nama_produk = $request->namaProduk;
         $produk->deskripsi_produk = $request->deskripsiProduk;
-        $produk->kategori = $request->kategori;
+        $produk->id_series = $request->series;
+        $produk->brand = $request->brand;
+        $produk->harga = $request->harga;
+        $produk->gender = $request->gender;
         $produk->berat_produk = $request->beratProduk;
         $produk->metode_kirim = json_encode($request->metode_kirim);
         $produk->ukuran_produk = $ukuranData;
@@ -127,11 +135,11 @@ class ProdukSellerController extends Controller
         $validator = Validator::make( $request->all (), [
             'namaProduk' => 'required|string',
             'deskripsiProduk' => 'required|string',
-            'kategori' => 'required',
+            'series' => 'required|exists:series,id',
             'ukuran' => 'required',
             'harga' => 'required|numeric',
             'brand' => 'required|string',
-            'gender' => 'required|in:Pria, Wanita',
+            'gender' => 'required|string|in:Pria,Wanita',
             'foto_produk' => 'required|max:5120',
             'beratProduk' => 'required|numeric',
             'metode_kirim' => 'required',
@@ -147,11 +155,10 @@ class ProdukSellerController extends Controller
         // Loop untuk setiap ukuran
         foreach ($ukuranSize as $size) {
             // Memeriksa apakah input untuk harga dan stok dari ukuran tersebut ada dalam request
-            if ($request->has("harga_$size") && $request->has("stok_$size")) {
+            if ($request->has("stok_$size")) {
                 // Jika ada, tambahkan data untuk ukuran tersebut ke dalam array $ukuranData
                 $ukuranData[$size] = [
-                'harga' => $request->input("harga_$size"),
-                'stok' => $request->input("stok_$size"),
+                    'stok' => $request->input("stok_$size"),
                 ];
             }
         }
@@ -159,7 +166,10 @@ class ProdukSellerController extends Controller
         $produk = new Produk;
         $produk->nama_produk = $request->namaProduk;
         $produk->deskripsi_produk = $request->deskripsiProduk;
-        $produk->kategori = $request->kategori;
+        $produk->id_series = $request->series;
+        $produk->brand = $request->brand;
+        $produk->harga = $request->harga;
+        $produk->gender = $request->gender;
         $produk->berat_produk = $request->beratProduk;
         $produk->metode_kirim = json_encode($request->metode_kirim);
         $produk->ukuran_produk = $ukuranData;

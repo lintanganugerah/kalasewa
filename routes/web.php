@@ -5,6 +5,7 @@ use App\Http\Controllers\ProdukSellerController;
 use App\Http\Controllers\AutentikasiSellerController;
 use App\Http\Controllers\SellerController;
 
+Route::get('/jadiseller', [SellerController::class, 'jadiSellerView'])->name('jadiSellerView');
 Route::get('/login', [AutentikasiSellerController::class, 'loginView'])->name('loginView');
 Route::get('/test', [SellerController::class, 'testView'])->name('seller.testView');
 
