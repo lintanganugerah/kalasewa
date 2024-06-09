@@ -132,7 +132,7 @@ class AutentikasiSellerController extends Controller
         $validator = Validator::make($request->all(), [
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|confirmed|min:8',
+            'password' => 'required|confirmed|min_digits:8',
         ]);
 
         $status = Password::reset(
@@ -155,17 +155,18 @@ class AutentikasiSellerController extends Controller
     public function registerInformationActionSeller(Request $request) {
         //SIMPAN INFORMASI AKUN BARU SAAT REGISTER
         $validator = Validator::make($request->all(), [
-            'password' => 'required|string|min:8,',
-            'nama' => 'required|string',
-            'namaToko' => 'required|string',
-            'noTelp' => 'required|numeric|digits_between:10,14|unique:users,no_telp',
+            'password' => 'required|string|min_digits:8,',
+            'nama' => 'alpha|string',
+            'namaToko' => 'required|string|unique:tokos,nama_toko',
+            'link_sosial_media' => 'required|url',
+            'nomor_telpon' => 'required|numeric|min_digits:10|max_digits:13|unique:users,no_telp',
             'AlamatToko' => 'required|string',
             'provinsi' => 'required|string',
             'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
-            'kodePos' => 'required|numeric|digits_between:5,6',
+            'kodePos' => 'required|numeric|min_digits:5|max_digits:5',
             'metode_kirim' => 'required',
-            'identitas' => 'mimes:jpg,png,jpeg|max:5120',
-            'NIK' => 'required|numeric|digits_between:16,16|unique:users,NIK',
+            'nomor_identitas' => 'required|numeric|min_digits:16|max_digits:16|unique:users,NIK',
+            'foto_identitas' => 'file|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         if (session()->has('emailRegis')) {
@@ -183,7 +184,7 @@ class AutentikasiSellerController extends Controller
             return redirect()->back()->withErrors(['msg' => 'Nama Toko telah ada, coba nama toko lain']);
         }
 
-        $photoPath = $request->file('identitas')->store('public/data');
+        $photoPath = $request->file('foto_identitas')->store('public/data');
         $photoPath = Str::replaceFirst('public/', 'storage/', $photoPath);
 
         $user = new User;
@@ -191,13 +192,14 @@ class AutentikasiSellerController extends Controller
         $user->email = $email;
         $user->nama = $request->nama;
         $user->password = Hash::make($request->password);
-        $user->no_telp = $request->noTelp;
+        $user->no_telp = $request->nomor_telpon;
         $user->alamat = $request->AlamatToko;
         $user->provinsi = $request->provinsi;
+        $user->link_sosial_media = $request->link_sosial_media;
         $user->kota = $request->kota;
         $user->kode_pos = $request->kodePos;
-        $user->nik = $request->NIK;
-        $user->identitas = $photoPath;
+        $user->nik = $request->nomor_identitas;
+        $user->foto_identitas = $photoPath;
         $user->role = "pemilik_sewa";
         $user->save();
         $toko->nama_toko = $request->namaToko;
@@ -210,55 +212,16 @@ class AutentikasiSellerController extends Controller
         return redirect()->route('seller.verifikasiView');
     }
 
-    public function uploadUlangRegisterInformationSeller(Request $request) {
-        //BUAT UPDATE INFORMASI DARI UPLOAD ULANG DATA YANG DITOLAK ADMIN
+    public function checkEmailSeller(Request $request) {
         $validator = Validator::make($request->all(), [
-            'nama' => 'required|string',
-            'AlamatToko' => 'required|string',
-            'provinsi' => 'required|string',
-            'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
-            'kodePos' => 'required|numeric|digits_between:5,6',
-            'identitas' => 'mimes:jpg,png,jpeg|max:5120',
-            'NIK' => 'required|numeric|digits_between:16,16',
+            'email' => 'required|email',
+            'setuju_syarat_dan_ketentuan' => 'accepted',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        
-        $user = User::where('id', session('user_ID'))->first();
-        $cekNIK = User::where('NIK',$request->NIK)->first();
 
-        if ($cekNIK->id != $user->id) {
-            return redirect()->back()->with("error", "NIK Telah Digunakan Pada akun lain");
-        }
-
-        $identitasSebelum = $user->identitas;
-        $identitasSebelum = str_replace('storage/', 'data/', $identitasSebelum);
-        $identitasSebelum = str_replace('public/', 'storage/', $identitasSebelum);
-
-        Storage::delete($identitasSebelum);
-        $photoPath = $request->file('identitas')->store('public/data');
-        $photoPath = Str::replaceFirst('data/', 'storage/', $photoPath);
-        $user->identitas = $photoPath;
-        $user->save();
-
-        $user->nama = $request->nama;
-        $user->alamat = $request->AlamatToko;
-        $user->provinsi = $request->provinsi;
-        $user->kota = $request->kota;
-        $user->kode_pos = $request->kodePos;
-        $user->nik = $request->NIK;
-        $user->verifyIdentitas = "Tidak";
-        $user->save();
-
-        return redirect()->route('loginView')->with('success', 'Mohon Tunggu Konfirmasi Admin 1x24 Jam');
-    }
-
-    public function checkEmailSeller(Request $request) {
-        $request->validate([
-            'email' => 'required|email',
-        ]);
         $email = strtolower($request->email);
         $u = DB::table('users')->where('email',$email)->first();
         if($u){
@@ -288,7 +251,7 @@ class AutentikasiSellerController extends Controller
 
     public function verify(Request $request,$user_id,$hash) {
         if (!$request->hasValidSignature()) {
-            return response()->json(["msg" => "Invalid/Expired url provided."], 401);
+            return response()->json(["msg" => "Expired url provided. Silahkan Login untuk mengirimkan ulang link verifikasi"], 401);
         }
 
         Session::forget('verify');
@@ -316,7 +279,6 @@ class AutentikasiSellerController extends Controller
     public function loginAction(Request $request)
     {
         $credentials = $request->only('email', 'password');
-        Session::forget('Invalid_Identitas');
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
             $user_id = $user->id;

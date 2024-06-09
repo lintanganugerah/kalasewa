@@ -21,7 +21,6 @@ Route::post('/daftar/act/buyer', [AutentikasiSellerController::class, 'checkEmai
 Route::get('/daftar/seller/informasi', [AutentikasiSellerController::class,'registerInformationView'])->name('seller.registerInformationView');
 
 Route::post('/daftar/seller/informasi/act', [AutentikasiSellerController::class,'registerInformationActionSeller'])->name('seller.registerInformationActionSeller');
-Route::post('/daftar/seller/resend/informasi/act', [AutentikasiSellerController::class,'uploadUlangRegisterInformationSeller'])->name('seller.uploadUlangRegisterInformation');
 
 Route::get('/resend/verify', [AutentikasiSellerController::class, 'resendVerify'])->name('seller.resendVerify');
 
@@ -40,10 +39,6 @@ Route::post('/reset-password', [AutentikasiSellerController::class,'resetPassAct
 
 
 Route::group(['middleware' => 'pemilik_sewa'], function () {
-
-    Route::get('/daftar/identitas', [SellerController::class,'regisIdentitasView'])->name('seller.regisIdentitasView');
-    
-    Route::post('/daftar/identitas/act', [SellerController::class,'identitasAction'])->name('seller.identitasAction');
     
     Route::get('/beranda', [SellerController::class, 'sellerBerandaView'])->name('seller.berandaView');
     

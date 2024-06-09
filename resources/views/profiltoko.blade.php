@@ -4,7 +4,7 @@
         <div class="col">
             <div class="text-left mb-5 mt-3">
                 <h1 class="fw-bold text-secondary">Profil Toko</h1>
-                <h4 class="fw-semibold text-secondary">Atur Profil Toko Anda</h4>
+                <h4 class="fw-semibold text-secondary">Ubah Profil Toko Anda</h4>
             </div>
 
             <div class="row gx-5">
@@ -17,11 +17,6 @@
                                 <button class="nav-link active" id="profil-tab" data-bs-toggle="tab"
                                     data-bs-target="#profil" type="button" role="tab" aria-controls="profil"
                                     aria-selected="true">Profil</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="penilaian-tab" onclick="window.location.href='#'"
-                                    type="button" role="tab" aria-controls="penilaian"
-                                    aria-selected="false">Penilaian</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="contact-tab" onclick="window.location.href='#'" type="button"
@@ -60,7 +55,7 @@
                                             <div class="flex-grow-1">
                                                 <small class="form-text text-muted">
                                                     <ul>
-                                                        <li>Disarankan Rasio foto 1:1</li>
+                                                        <li>Disarankan Rasio foto 1:1 atau object berada di tengah</li>
                                                         <li>Ukuran max 5MB</li>
                                                         <li>JPG, JPEG, PNG</li>
                                                     </ul>
@@ -74,7 +69,9 @@
                                         <label for="exampleFormControlInput1" class="form-label">Nama Lengkap
                                             Pribadi</label>
                                         <input type="text" class="form-control" id="exampleFormControlInput1"
-                                            value="{{ $user->nama }}" name="nama" required>
+                                            value="{{ $user->nama }}"disabled>
+                                        <div id="HELP" class="form-text fw-light">Nama Tidak Bisa diubah karena sudah
+                                            sesuai Identitas. Nama Anda tidak akan ditampilkan ke publik</div>
                                     </div>
                                     <div class="mb-3">
                                         <label for="exampleFormControlInput1" class="form-label">Nama Toko</label>
@@ -82,9 +79,14 @@
                                             value="{{ session('namatoko') }}" name="namaToko" required>
                                     </div>
                                     <div class="mb-3">
+                                        <label class="form-label" for="form2Example17">Link Sosial Media</label>
+                                        <input type="text" id="form2Example17" class="form-control"
+                                            value="{{ $user->link_sosial_media }}" name="link_sosial_media" required />
+                                    </div>
+                                    <div class="mb-3">
                                         <label for="exampleFormControlInput1" class="form-label">Nomor Telpon</label>
-                                        <input type="text" class="form-control" id="noTelp"
-                                            value="{{ $user->no_telp }}" name="noTelp"minlength="10" maxlength="14"
+                                        <input type="text" class="form-control" id="nomor_telpon"
+                                            value="{{ $user->no_telp }}" name="nomor_telpon"minlength="10" maxlength="14"
                                             required>
                                     </div>
                                     <div class="mb-3">

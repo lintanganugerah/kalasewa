@@ -15,7 +15,7 @@
                     <a class="nav-link" href="#">Marketplace</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="/">Jadi Seller</a>
+                    <a class="nav-link" href="{{ route('jadiSellerView') }}">Jadi Seller</a>
                 </li>
             </ul>
             <a class="me-5" href="{{ route('loginView') }}" style="color: #EE1B2F; text-decoration:none">Sign

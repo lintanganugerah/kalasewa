@@ -50,6 +50,8 @@
                                                 <label class="form-label" for="formPenyewaEmail">Email address</label>
                                                 <input type="email" id="formPenyewaEmail" name="email"
                                                     class="form-control" required>
+                                                <div id="HELP" class="form-text fw-bolder">Masukan email aktif
+                                                    untuk proses verifikasi email</div>
                                             </div>
 
                                             <!-- Submit -->
