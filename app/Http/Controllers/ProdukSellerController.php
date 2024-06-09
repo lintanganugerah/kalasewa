@@ -124,7 +124,7 @@ class ProdukSellerController extends Controller
             }
         }
 
-        return redirect()->route('seller.viewProdukAnda')->with('success', 'Produk Berhasil Diubah');
+        return redirect()->route('seller.viewProdukAnda')->with('success', 'Perubahan Produk Berhasil Disimpan');
     }
 
     public function tambahProdukAction(Request $request)

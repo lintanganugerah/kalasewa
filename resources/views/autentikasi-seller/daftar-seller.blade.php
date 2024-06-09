@@ -44,11 +44,18 @@
                                                     {{ session('error') }}
                                                 </div>
                                             @endif
+                                            @if ($errors->any())
+                                                <div class="alert alert-danger">
+                                                    {{ $errors->first() }}
+                                                </div>
+                                            @endif
                                             <!-- Form -->
                                             <div data-mdb-input-init class="form-outline mb-4">
                                                 <label class="form-label" for="formPemilikEmail">Email address</label>
                                                 <input type="email" id="formPemilikEmail" name="email"
                                                     class="form-control" required>
+                                                <div id="HELP" class="form-text fw-bolder">Masukan email aktif
+                                                    untuk proses verifikasi email</div>
                                             </div>
 
                                             <!-- Submit -->
@@ -62,22 +69,29 @@
                                                 <p>Sudah memiliki akun? <a href="{{ route('loginView') }}"
                                                         class="fw-bold text-dark">Klik untuk Login</a></p>
                                             </div>
-                                            <div class="modal fade" id="syaratdanKetentuan" tabindex="-1"
-                                                aria-labelledby="syaratdanKetentuanLabel" aria-hidden="true">
-                                                <div class="modal-dialog">
+                                            <div class="modal fade" id="syaratdanKetentuan" data-bs-backdrop="static"
+                                                data-bs-keyboard="false" tabindex="-1"
+                                                aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                                                     <div class="modal-content">
                                                         <div class="modal-header">
                                                             <h5 class="modal-title" id="syaratdanKetentuanlLabel">Harap baca
                                                                 syarat dan Ketentuan berikut!</h5>
-                                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                                aria-label="Close"></button>
                                                         </div>
                                                         <div class="modal-body">
                                                             { ISI SYARAT DAN KETENTUAN NANTI NYA }
+                                                            <div class="mb-3 mt-5 form-check">
+                                                                <input type="checkbox" class="form-check-input fw-bolder"
+                                                                    id="syaratCheckbox" name="setuju_syarat_dan_ketentuan"
+                                                                    required>
+                                                                <label class="form-check-label" for="syaratCheckbox">Saya
+                                                                    Setuju dengan syarat dan ketentuan yang berlaku</label>
+                                                            </div>
                                                         </div>
                                                         <div class="modal-footer">
-                                                            <button class="btn btn-kalasewa" type="submit">Saya Setuju
-                                                                dengan Syarat dan Ketentuan yang berlaku</button>
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Batal</button>
+                                                            <button class="btn btn-kalasewa" type="submit">Submit</button>
                                                         </div>
                                                     </div>
                                                 </div>

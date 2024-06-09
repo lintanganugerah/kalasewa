@@ -84,29 +84,6 @@
                     </div>
                 </div>
             </div>
-            {{-- @if (session('Isi_Identitas'))
-                <div class="alert alert-warning">
-                    {{ session('Isi_Identitas') }}! <a class="fw-bold text-danger"
-                        href="{{ route('seller.regisIdentitasView') }}"> Klik disini untuk isi
-                        Identitas
-                        <a>
-                </div>
-            @endif
-            @if (session('Menunggu_Identitas'))
-                <div class="alert alert-warning">
-                    {{ session('Menunggu_Identitas') }}!
-                </div>
-            @endif
-            @if (session('Invalid_Identitas'))
-                <div class="alert alert-danger">
-                    {{ session('Invalid_Identitas') }}! <a class="fw-bold text-danger"
-                        href="{{ route('seller.regisIdentitasView') }}"> Klik disini untuk
-                        upload
-                        ulang
-                        Identitas
-                        <a>
-                </div>
-            @endif --}}
 
             {{-- <div class="text-white p-4 rounded-3 mb-4 mt-4" style="background-color: #0D3148;">
       <h4 id="judul-tabel-1" class="mb-3">Permintaan Pinjam</h4>

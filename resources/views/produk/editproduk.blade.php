@@ -15,7 +15,6 @@
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="Informasi" role="tabpanel"
                                 aria-labelledby="Informasi-tab">
-                                <h5 class="card-title">Informasi Produk</h5>
                                 @if ($errors->any())
                                     <div class="alert alert-danger">
                                         {{ $errors->first() }}
@@ -31,44 +30,30 @@
                                         {{ session('error') }}
                                     </div>
                                 @endif
+                                <h5 class="card-title">Informasi Produk</h5>
 
-                                <label for="userPhoto" class="form-label">Foto Produk</label>
-                                <div id="photoInputs">
-                                    @foreach ($fotoProduk->where('id_produk', $produk->id) as $fp)
-                                        <div class="photo-input mb-2">
-                                            <div class="d-flex align-items-start">
-                                                <img class="img-thumbnail" src="{{ asset($fp->path) }}"
-                                                    style="width: 150px; height: 150px; object-fit: cover;"
-                                                    alt="Foto Produk">
-                                                <form action="{{ route('seller.hapusFoto', $fp->id) }}" method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-danger ml-2"
-                                                        onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?')"><i
-                                                            class="fa-solid fa-trash"></i></button>
-                                                </form>
-                                            </div>
+                                <label class="form-label">Foto Produk</label>
+
+                                @foreach ($fotoProduk->where('id_produk', $produk->id) as $fp)
+                                    <div class=" mb-2">
+                                        <div class="d-flex align-items-start">
+                                            <img class="" src="{{ asset($fp->path) }}"
+                                                style="width: 150px; height: 150px; object-fit: cover;" alt="Foto Produk">
+                                            <form action="{{ route('seller.hapusFoto', $fp->id) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-danger ml-2"
+                                                    onclick="return confirm('Apakah Anda yakin ingin menghapus produk ini?')"><i
+                                                        class="fa-solid fa-trash"></i></button>
+                                            </form>
                                         </div>
-                                    @endforeach
-                                </div>
+                                    </div>
+                                @endforeach
                                 <form action="{{ route('seller.editProdukAction', $produk->id) }}" method="POST"
-                                    id="formproduk" enctype="multipart/form-data">
+                                    id="formproduk" enctype="multipart/form-data" class="mt-5">
                                     @csrf
-                                    <div class="mb-3 mt-5">
-                                        <label for="userPhoto" class="form-label">Tambah Foto Produk (Opsional)</label>
+                                    <label class="form-label">Tambah Foto Produk (Opsional)</label>
+                                    <div class="mb-3">
                                         <div id="photoInputs">
-                                            <div class="photo-input mb-2">
-                                                <div class="d-flex align-items-start">
-                                                    <div class="me-3">
-                                                        <img class="img-thumbnail" src=""
-                                                            style="width: 150px; height: 150px; object-fit: cover;"
-                                                            alt="Foto Produk">
-                                                    </div>
-                                                </div>
-                                                <div class="flex-grow-1">
-                                                    <input type="file" name="foto_produk[]"
-                                                        class="form-control userPhoto" accept=".jpg,.png,.jpeg">
-                                                </div>
-                                            </div>
                                         </div>
                                         <div class="flex-grow-1">
                                             <small class="form-text text-muted">
@@ -80,7 +65,7 @@
                                             </small>
                                         </div>
                                         <button type="button" id="addPhotoBtn" class="btn text-white"
-                                            style="background-color: #D44E4E">Tambah Foto</button>
+                                            style="background-color: #D44E4E">Klik untuk Tambah Foto</button>
                                     </div>
 
                                     <div class="mb-3">
@@ -128,8 +113,7 @@
                                     <div class="input-group mb-3">
                                         <div class="form-floating">
                                             <input type="text" id="harga" class="form-control" name="harga"
-                                                pattern="[0-9]*" placeholder="Harga" value="{{ $produk->harga }}"
-                                                required>
+                                                pattern="[0-9]*" placeholder="Harga" value="{{ $produk->harga }}" required>
                                             <label for="harga">Harga / 3
                                                 hari</label>
                                         </div>
