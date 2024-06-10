@@ -29,6 +29,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->role === 'pemilik sewa';
     }
 
+    public function isBuyer()
+    {
+        return $this->role === 'penyewa';
+    }
+
+    public function wishlist()
+    {
+        return $this->hasMany(Wishlist::class);
+    }
     public function toko()
     {
         return $this->hasOne(Toko::class, 'id_user');

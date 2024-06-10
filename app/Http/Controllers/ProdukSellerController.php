@@ -187,7 +187,6 @@ class ProdukSellerController extends Controller
             $fotoProduk->path = $path;
             $fotoProduk->save();
         }
-
         return redirect()->route('seller.viewProdukAnda')->with('success', 'Produk Berhasil Ditambahkan');
     }
 

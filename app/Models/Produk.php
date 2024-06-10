@@ -32,4 +32,23 @@ class Produk extends Model
     {
         return $this->belongsTo(Series::class, 'id')->withDefault();
     }
+
+    public function seriesDetail()
+    {
+        return $this->belongsTo(Series::class, 'id_series')->withDefault();
+    }
+
+    public function wishlists()
+    {
+        return $this->hasMany(Wishlist::class, 'produk_id');
+    }
+
+    public function isInWishlist()
+    {
+        // Ambil user yang sedang login
+        $user = auth()->user();
+
+        // Periksa apakah produk ada dalam wishlist user
+        return $user->wishlist()->where('produk_id', $this->id)->exists();
+    }
 }

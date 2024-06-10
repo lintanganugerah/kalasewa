@@ -57,7 +57,7 @@ class SellerController extends Controller
         if ($cekToko && $cekToko->id_user != $user->id) {
             return redirect()->back()->withErrors(['msg' => 'Nama Toko telah ada, coba nama toko lain']);
         }
-
+      
         $fotoPath = $user->foto_profil;
         $namaFile = basename($fotoPath);
         
@@ -70,7 +70,6 @@ class SellerController extends Controller
             $user->foto_profil = $photoPath;
             $user->save();
         }
-
         $user->no_telp = $request->nomor_telpon;
         $user->alamat = $request->AlamatToko;
         $user->kota = $request->kota;

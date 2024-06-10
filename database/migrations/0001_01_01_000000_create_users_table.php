@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('kota')->nullable();
             $table->string('provinsi')->nullable();
             $table->string('link_sosial_media')->nullable();
-            $table->string('foto_identitas')->nullable();
+            $table->string('foto_identitas')->nullable();\
             $table->string('NIK')->nullable()->unique();
             $table->string('foto_profil')->default('storage/profiles/profil_default.jpg');
             $table->enum('role',['penyewa','pemilik_sewa', 'admin']);
