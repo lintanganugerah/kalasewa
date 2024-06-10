@@ -13,7 +13,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable;
 
     protected $fillable = [
-        'nama', 'email', 'password', 'no_telp', 'link_sosial_media', 'kota', 'kode_pos', 'role', 'alamat', 'provinsi', 'badge'
+        'nama', 'email', 'password', 'no_telp', 'kota', 'kode_pos', 'role', 'alamat', 'provinsi', 'badge'
     ];
 
     protected $hidden = [
@@ -40,6 +40,11 @@ class User extends Authenticatable implements MustVerifyEmail
     }
     public function toko()
     {
-        return $this->hasOne(Toko::class, 'id_user');
+        return $this->hasOne(Toko::class, 'ID_user');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
     }
 }

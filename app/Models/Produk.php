@@ -10,7 +10,7 @@ class Produk extends Model
     use HasFactory;
 
     protected $fillable = [
-        'nama_prouk', 'id_toko', 'id_series', 'ukuran_produk', 'status_produk', 'deskripsi_produk', 'brand', 'harga', 'gender','metode_kirim'
+    'nama_prouk', 'ID_toko', 'kategori', 'ukuran_produk', 'status_produk', 'deskripsi_produk'
     ];
 
     public function setUkuranProdukAttribute($value)
@@ -25,12 +25,7 @@ class Produk extends Model
 
     public function FotoProduk()
     {
-        return $this->hasOne(FotoProduk::class, 'id_produk')->withDefault();
-    }
-
-    public function series()
-    {
-        return $this->belongsTo(Series::class, 'id')->withDefault();
+        return $this->hasOne(FotoProduk::class, 'ID_produk')->withDefault();
     }
 
     public function seriesDetail()
