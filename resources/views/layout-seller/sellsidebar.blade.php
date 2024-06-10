@@ -38,14 +38,14 @@
 
     <!-- Nav Item - Utilities Collapse Menu -->
     <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ route('seller.viewTambahProduk') }}" data-toggle="collapse"
+        <a class="nav-link collapsed" href="{{ route('seller.viewProdukAnda') }}" data-toggle="collapse"
             data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
             <i class="fas fa-solid fa-boxes-stacked"></i>
             <span>Produk</span>
         </a>
         <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
             <div class="kalasewa-color py-2 collapse-inner rounded">
-                <a class="collapse-item" href="utilities-color.html">Produk Anda</a>
+                <a class="collapse-item" href="{{ route('seller.viewProdukAnda') }}">Produk Anda</a>
                 <a class="collapse-item" href="{{ route('seller.viewTambahProduk') }}">Tambah Produk</a>
             </div>
         </div>
@@ -59,13 +59,18 @@
         TOKO
     </div>
 
-    <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
         <a class="nav-link" href="{{ route('seller.profilTokoView') }}">
             <i class="fas fa-regular fa-store"></i>
             <span>Profil Toko</span></a>
     </li>
 
+    <li class="nav-item">
+        <a class="nav-link" href="">
+            <i class="fa-solid fa-regular fa-star"></i>
+            <span>Penilaian Produk</span></a>
+    </li>
+    
     <!-- Nav Item - Charts -->
     <li class="nav-item">
         <a class="nav-link" href="charts.html">

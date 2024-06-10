@@ -1,10 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AutentikasiBuyerController;
-use App\Http\Controllers\BuyerController;
-use App\Http\Controllers\CatalogController;
-use App\Http\Controllers\WishlistController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,35 +11,50 @@ use App\Http\Controllers\WishlistController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
-Route::get('/user/profile', function () {
-    return view('user/profile');
-});
 
-Route::get('/user/password', function () {
-    return view('user/changepassword');
-});
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AutentikasiBuyerController;
+use App\Http\Controllers\BuyerController;
+use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ProdukSellerController;
+use App\Http\Controllers\AutentikasiSellerController;
+use App\Http\Controllers\SellerController;
 
-Route::get('/login', [AutentikasiBuyerController::class, 'loginView'])->name('loginView');
 
-Route::post('/login/act', [AutentikasiBuyerController::class, 'loginAction'])->name('loginAction');
+Route::get('/jadiseller', [SellerController::class, 'jadiSellerView'])->name('jadiSellerView');
+Route::get('/login', [AutentikasiSellerController::class, 'loginView'])->name('loginView');
+Route::get('/test', [SellerController::class, 'testView'])->name('seller.testView');
 
-Route::get('/daftar/seller', [AutentikasiBuyerController::class, 'registerView'])->name('seller.registerView');
-Route::get('/daftar/buyer', [AutentikasiBuyerController::class, 'registerViewBuyer'])->name('buyer.registerViewBuyer');
+Route::post('/login/act', [AutentikasiSellerController::class, 'loginAction'])->name('seller.loginAction');
 
-Route::post('/daftar/act/buyer', [AutentikasiBuyerController::class, 'registerActionBuyer'])->name('buyer.registerAction'); 
-Route::get('/daftar/informasi', [AutentikasiBuyerController::class, 'registerInformationView'])->name('buyer.registerInformationView'); 
-Route::post('/daftar/informasi/act', [AutentikasiBuyerController::class, 'registerInformationAction'])->name('buyer.registerInformationAction'); 
+Route::get('/daftar/seller', [AutentikasiSellerController::class, 'registerView'])->name('seller.registerView');
+Route::get('/daftar/buyer', [AutentikasiSellerController::class, 'registerViewBuyer'])->name('buyer.registerViewBuyer');
 
-Route::get('/daftar/verifikasi', [AutentikasiBuyerController::class, 'verifikasiView'])->name('buyer.verifikasiView');
-Route::get('/daftar/verified', [AutentikasiBuyerController::class, 'verifiedView'])->name('buyer.verifiedView');
-Route::get('/resend/verify', [AutentikasiBuyerController::class, 'resendVerify'])->name('buyer.resendVerify');
+Route::post('/daftar/act/seller', [AutentikasiSellerController::class, 'checkEmailSeller'])->name('seller.registerAction');
 
-Route::get('/email/verify/{id}/{hash}', [AutentikasiBuyerController::class, 'verify'])->name('verification.verify'); 
+Route::post('/daftar/act/buyer', [AutentikasiSellerController::class, 'checkEmailBuyer'])->name('buyer.registerAction');
 
-Route::get('/search', [CatalogController::class, 'search'])->name('search');
+Route::get('/daftar/seller/informasi', [AutentikasiSellerController::class,'registerInformationView'])->name('seller.registerInformationView');
 
-Route::get('/logout', [AutentikasiBuyerController::class, 'logout'])->name('userLogout'); 
+Route::post('/daftar/seller/informasi/act', [AutentikasiSellerController::class,'registerInformationActionSeller'])->name('seller.registerInformationActionSeller');
 
+Route::get('/resend/verify', [AutentikasiSellerController::class, 'resendVerify'])->name('seller.resendVerify');
+
+Route::get('/daftar/verifikasi', [AutentikasiSellerController::class, 'verifikasiView'])->name('seller.verifikasiView');
+Route::get('/daftar/verified', [AutentikasiSellerController::class, 'verifiedView'])->name('seller.verifiedView');
+
+Route::get('/email/verify/{id}/{hash}', [AutentikasiSellerController::class, 'verify'])->name('verification.verify');
+
+Route::get('/forgot-password', [AutentikasiSellerController::class,'viewForgotPass'])->name('viewForgotPass');
+
+Route::post('/forgot-password', [AutentikasiSellerController::class,'ForgotPassAction'])->name('ForgotPassAction');
+
+Route::get('/reset-password/{token}', [AutentikasiSellerController::class,'viewresetPass'])->name('password.reset');
+
+Route::post('/reset-password', [AutentikasiSellerController::class,'resetPassAction'])->name('resetPassAction');
+
+// Penyewa SEMUA ROUTE
 Route::get('/', [BuyerController::class, 'viewHomepage'])->name('viewHomepage');
 Route::get('/series', [BuyerController::class, 'viewSeries'])->name('viewSeries');
 Route::get('/brand', [BuyerController::class, 'viewBrand'])->name('viewBrand');
@@ -62,6 +72,48 @@ Route::post('/wishlist/add/{id}', [WishlistController::class, 'addToWishlist'])-
 Route::post('/wishlist/remove/{id}', [WishlistController::class, 'removeFromWishlist'])->name('wishlist.remove');
 Route::get('/wishlist', [WishlistController::class, 'viewWishlist'])->name('wishlist.view');
 
+
+Route::get('/daftar/buyer', [AutentikasiBuyerController::class, 'registerViewBuyer'])->name('buyer.registerViewBuyer');
+Route::post('/daftar/act/buyer', [AutentikasiBuyerController::class, 'registerActionBuyer'])->name('buyer.registerAction'); 
+
+Route::get('/daftar/buyer/informasi', [AutentikasiBuyerController::class, 'registerInformationView'])->name('buyer.registerInformationView'); 
+Route::post('/daftar/buyer/informasi/act', [AutentikasiBuyerController::class, 'registerInformationAction'])->name('buyer.registerInformationAction'); 
+
+
+Route::get('/search', [CatalogController::class, 'search'])->name('search');
+
+Route::get('/logout/buyer', [AutentikasiBuyerController::class, 'logout'])->name('userLogout'); 
+
 Route::group(['middleware' => 'penyewa'], function () {
-    
 });
+
+//Pemilik Sewa SEMUA ROUTE
+Route::group(['middleware' => 'pemilik_sewa'], function () {
+    
+    Route::get('/beranda', [SellerController::class, 'sellerBerandaView'])->name('seller.berandaView');
+    
+    Route::get('/profil/toko', [SellerController::class, 'profilTokoView'])->name('seller.profilTokoView');
+
+    Route::post('/profil/toko/act', [SellerController::class, 'profilTokoAction'])->name('seller.profilTokoAction');
+    
+    Route::get('/pesanan/perluproses', function () {
+        return view('pesanan.perluproses');
+    });  
+
+    Route::get('/produk/tambahproduk', [ProdukSellerController::class, 'viewTambahProduk'])->name('seller.viewTambahProduk');
+
+    Route::get('/produk/produkanda', [ProdukSellerController::class, 'viewProdukAnda'])->name('seller.viewProdukAnda');
+
+    Route::post('/produk/tambahproduk/act', [ProdukSellerController::class, 'tambahProdukAction'])->name('seller.tambahProdukAction');
+
+    Route::post('/produk/{id}/arsipkan', [ProdukSellerController::class,'arsipProduk'])->name('seller.arsipProduk');
+    Route::post('/produk/{id}/aktifkan', [ProdukSellerController::class,'aktifkanProduk'])->name('seller.aktifkanProduk');
+    Route::post('/produk/{id}/delete', [ProdukSellerController::class,'hapusProduk'])->name('seller.hapusProduk');
+
+    Route::get('/produk/edit/{id}', [ProdukSellerController::class, 'viewEditProduk'])->name('seller.viewEditProduk');
+    Route::post('/produk/edit/{id}/act', [ProdukSellerController::class, 'editProdukAction'])->name('seller.editProdukAction');
+    Route::post('/produk/foto/{id}/delete', [ProdukSellerController::class,'hapusFoto'])->name('seller.hapusFoto');
+
+    Route::get('/logout/seller', [AutentikasiSellerController::class, 'logout'])->name('seller.logout');
+});
+

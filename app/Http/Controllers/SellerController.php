@@ -15,73 +15,49 @@ use App\Models\Toko;
 
 class SellerController extends Controller
 {
+    public function jadiSellerView(Request $request) {
+        return view('jadiseller');
+    }
+
     public function sellerBerandaView(Request $request) {
-        $user = Auth::user();
-
-        if (!isset($user->nama)) {
-            return redirect()->route('seller.registerInformationView');
-        } else if (!isset($user->identitas) && $user->verifyIdentitas === 'Tidak') {
-            session(['Isi_Identitas' => "Mohon Isi Identitas Anda untuk dapat mulai berjualan"]);
-            session(['regisIdentitas' => TRUE]);
-            return view('beranda');
-        } else if (isset($user->identitas) && $user->verifyIdentitas === 'Tidak') {
-            session(['Menunggu_Identitas' => "Identitas Anda sedang menunggu konfirmasi Admin! Mohon tunggu 1x24 jam"]);
-            return view('beranda');
-        } else if ($user->verifyIdentitas === "Ditolak") {
-            if(session()->has('Menunggu_Identitas')) {
-                Session::forget('Menunggu_Identitas');
-                Session::forget('Isi_Identitas');
-            }
-            session(['regisIdentitas' => TRUE]);
-            session(['Invalid_Identitas' => "Identitas anda ditolak oleh admin"]);
-            
-            return view('beranda');
-        }else if ($user->verifyIdentitas === "Sudah") {
-            Session::forget('Menunggu_Identitas');
-            Session::forget('Isi_Identitas');
-            Session::forget('Invalid_Identitas');
-
-            return view('beranda');
-        }
         return view('beranda');
     }
 
-    public function regisIdentitasView(Request $request) {
-        if (!session()->has('regisIdentitas')) {
-            return redirect()->back();
-        }
-
-        $user = Auth::user();
-
-        return view('autentikasi-seller.regisIdentitas')->with('nama', $user->nama);
+    public function testView() {
+        return view('tes');
     }
 
     public function profilTokoView(Request $request) {
         $user = Auth::user();
-        $toko = Toko::where('ID_user', $user->id)->first();
-        $decodeToko = json_decode($toko->metode_kirim);
-        return view('profiltoko', compact('user', 'toko', 'decodeToko'));
+        $toko = Toko::where('id_user', $user->id)->first();
+        $decodeKirim = json_decode($toko->metode_kirim);
+        return view('profiltoko', compact('user', 'toko', 'decodeKirim'));
     }
 
     public function profilTokoAction(Request $request) {
         $user = Auth::user();
-        $toko = Toko::where('ID_user', $user->id)->first();
+        $toko = Toko::where('id_user', $user->id)->first();
 
         $validator = Validator::make( $request->all (), [
-            'nama' => 'required|string',
             'namaToko' => 'required|string',
-            'noTelp' => 'required|numeric|digits_between:10,14',
+            'link_sosial_media' => 'required|url',
+            'nomor_telpon' => 'required|numeric|min_digits:10|max_digits:13',
             'AlamatToko' => 'required|string',
             'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
-            'kodePos' => 'required|numeric|digits_between:5,6',
+            'kodePos' => 'required|numeric|min_digits:5|max_digits:5',
             'metode_kirim' => 'required|array',
-            'foto' => 'file|mimes:jpeg,png|max:5120',
+            'foto' => 'file|mimes:jpg,jpeg,png|max:5120',
         ]);
         
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $cekToko = DB::table('tokos')->where('nama_toko',$request->namaToko)->first();
+        if ($cekToko && $cekToko->id_user != $user->id) {
+            return redirect()->back()->withErrors(['msg' => 'Nama Toko telah ada, coba nama toko lain']);
+        }
+      
         $fotoPath = $user->foto_profil;
         $namaFile = basename($fotoPath);
         
@@ -94,12 +70,11 @@ class SellerController extends Controller
             $user->foto_profil = $photoPath;
             $user->save();
         }
-
-        $user->no_telp = $request->noTelp;
+        $user->no_telp = $request->nomor_telpon;
         $user->alamat = $request->AlamatToko;
         $user->kota = $request->kota;
         $user->kode_pos = $request->kodePos;
-        $user->nama = $request->nama;
+        $user->link_sosial_media = $request->link_sosial_media;
         $toko->nama_toko = $request->namaToko;
         $toko->metode_kirim = json_encode($request->metode_kirim);
         $user->save();
@@ -110,35 +85,5 @@ class SellerController extends Controller
         session(['profilpath' => $user->foto_profil]);
 
         return redirect()->route('seller.profilTokoView')->with('success', 'Profil Berhasil Di ubah');
-    }
-
-    public function identitasAction(Request $request) {
-        $user = Auth::user();
-        $validator = Validator::make($request->all(), [
-            'NIK' => 'required|numeric|digits_between:16,16|unique:users,NIK',
-            'photo' => 'mimes:jpg,png,jpeg|max:512',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        if ($user->verifyIdentitas == "Ditolak") {
-            $user->verifyIdentitas = "Tidak";
-            $user->save();
-        }
-
-        $photoPath = $request->file('identitas')->store('public/data');
-        $photoPath = Str::replaceFirst('data/', 'storage/', $photoPath);
-
-        $user->nik = $request->NIK;
-        $user->identitas = $photoPath;
-        $user->save();
-
-        Session::forget('Isi_Identitas');
-        Session::forget('Menunggu_Identitas');
-        Session::forget('Invalid_Identitas');
-
-        return redirect()->route('seller.berandaView')->with('success', 'Identitas Anda berhasil disimpan');
     }
 }
