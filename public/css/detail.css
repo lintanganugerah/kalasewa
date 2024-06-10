@@ -3,8 +3,7 @@ body {
     margin: 0;
     padding: 0;
     min-height: 85vh;
-    background-color: #212631;
-    color: #fff;
+    background-color: #fcfcfc; 
     overflow-x: hidden;
 }
 
@@ -12,65 +11,12 @@ body {
     margin: 20px;
 }
 
-.row {
-    width: 100%;  
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
+.custom-button{
+    margin-top: 15px;
 }
 
-.catalog-image{
-    display: flex;
-    position: relative;
-    margin: 10px;
-    /* background: aqua; */
-    justify-content: center;
-    align-content: center;
-    flex: 1;
-    max-width: 330px;
-    max-height: 350px;
-}
-
-.catalog-description{
-    display: flex;
-    position: relative;
-    margin: 10px;
-    /* background: aqua; */
-    /* justify-content: center; */
-    align-content: center;
-    flex: 2;
-    max-width: 608px;
-}
-
-.catalog-choice{
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    margin: 10px;
-    /* background: aqua; */
-    justify-content: center;
-    align-content: center;
-    flex: 3;
-    max-width: 230px;
-}
-
-.footer {
-    display: flex;
-    justify-content: center;
-    position: relative;
-    flex: 1;
-    margin: 10px;
-    max-width: 1200px;
-}
-
-.description h3{
-    font-weight: 100;
-}
-
-.description h6{
-    font-weight: 100;
-}
-
-.btn{
-    margin-bottom: 30px;
+.img-thumbnail{
+    width: 350px;
+    height: 350px;
+    object-fit: cover;
 }

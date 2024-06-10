@@ -1,32 +1,86 @@
-@extends('layout.template')
+@extends('layout-seller.layout-seller')
 @section('content')
+    @include('layout.navbar')
 
-<link rel="stylesheet" type="text/css" href="{{ asset('css/authentication.css') }}">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
 
-<div class="container mt-5 pt-5">
-    <div class="row">
-        <div class="col-12 col-sm-8 col-md-6 m-auto">
-            <div class="card border-1 shadow text-bg-dark">
-                <div class="login-card card-body text-center">
-                    <form action="#" method="POST">
-                        @csrf
-                        <img src="{{ asset('images/kalasewa.png') }}" alt="Kalasewa Logo" width="100" height="100">
-                        <h1>KALASEWA</h1>
-                        <p>Silahkan login terlebih dahulu!</p>
-                        <input type="text" name="username" id="username" class="email form-control my-4 py-2" placeholder="Email">
-                        <input type="password" name="password" id="password" class="password form-control my-4 py-2" placeholder="Password">
-                        <div class="text-center mt-3">
-                            <button class="btn btn-outline-success">
-                                Login
-                            </button>
-                            <a href="" class="nav-link mt-3">Lupa password?</a>
-                            <a href="" class="nav-link mt-3">Belum punya akun? Yuk daftar!</a>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+
+    <!-- (Optional) Latest compiled and minified JavaScript translation files -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/i18n/defaults-*.min.js"></script>
+
+    <section style="background-color: #f6f6f6;">
+        <div class="px-4 py-5 px-md-5 text-center text-lg-start" style="background-color: hsl(0, 0%, 96%)">
+            <div class="container">
+                <div class="row gx-lg-5 align-items-center">
+                    <div class="col-lg-6 mb-5 mb-lg-0">
+                        <h1 class="my-5 display-3 fw-bold ls-tight">
+                            Selamat Datang
+                        </h1>
+                        <p style="color: hsl(217, 10%, 50.8%)">Ayo mulai Wujudkan impian cosplaymu bersama Kalasewa!
+                        </p>
+                    </div>
+
+                    <div class="col-lg-6 mb-5 mb-lg-0">
+                        <div class="card">
+                            <div class="card-body py-5 px-md-5">
+                                <form action="{{ route('loginAction') }}" method="POST">
+                                    <h1 class="mb-5 fw-bold ls-tight">
+                                        Login
+                                    </h1>
+                                    @csrf
+                                    @if (session('success'))
+                                        <div class="alert alert-success">
+                                            {{ session('success') }}
+                                        </div>
+                                    @endif
+                                    @if (session('error'))
+                                        <div class="alert alert-danger">
+                                            {{ session('error') }}
+                                        </div>
+                                    @endif
+
+                                    <!-- Email input -->
+                                    <div class="mb-3">
+                                        <label for="exampleInputEmail1" class="form-label">Email address</label>
+                                        <input type="email" class="form-control" id="exampleInputEmail1" name="email">
+                                    </div>
+
+                                    <!-- Password input -->
+                                    <div class="mb-3">
+                                        <label for="pass" class="form-label">Password</label>
+                                        <input type="password" class="form-control" id="pass" name="password"
+                                            minlength="8">
+                                    </div>
+
+                                    <div class="form-check d-flex justify-content-end mb-4">
+                                        <a class="form-check-label text-reset" href="#" for="form2Example33">
+                                            Lupa password?
+                                        </a>
+                                    </div>
+
+                                    <!-- Submit button -->
+                                    <div class="d-grid mb-5">
+                                        <button class="btn btn-kalasewa" type="submit">Masuk</button>
+                                    </div>
+
+                                    <!-- Register buttons -->
+                                    <div class="text-center">
+                                        <p>Belum memiliki akun? <a href="{{ route('buyer.registerViewBuyer') }}"
+                                                class="fw-bold text-dark">Klik untuk daftar</a>
+                                        </p>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
+    </Section>
+    <!-- Add Bootstrap JS and jQuery scripts here -->
+    @include('layout.footer')
 @endsection

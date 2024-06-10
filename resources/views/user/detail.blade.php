@@ -1,66 +1,67 @@
 @extends('layout.template')
 @extends('layout.navbar')
-
 @section('content')
+    <link rel="stylesheet" type="text/css" href="{{ asset('css/detail.css') }}" />
 
-<link rel="stylesheet" type="text/css" href="{{ asset('css/detail.css') }}">
+    <section>
+        <div class="detail-container">
+            <div class="container text-center">
+                <div class="row align-items-start">
+                    <div class="col">
+                        @foreach ($fotoproduk->where('id_produk', $produk->id)->take(1) as $foto)
+                            <img src="{{ asset($foto->path) }}" class="img-thumbnail" alt="{{ $produk->nama_produk }}">
+                        @endforeach
+                    </div>
 
-<div class="detail-container">
-    <div class="row">
-        <div class="catalog-item catalog-image">
+                    <div class="col text-start">
+                        <h1><strong>{{ $produk->nama_produk }}</strong></h1>
+                        <h3>Rp{{ number_format($produk->harga) }} / 3 Hari</h3>
+                        <h6>Brand: {{ $produk->brand }}</h6>
+                        <h6>Series: {{ $produk->seriesDetail->series }}</h6>
+                        @foreach ($produk->ukuran_produk as $size => $detail)
+                            <button type="button" class="btn btn-sm btn-outline-dark" disabled>{{ $size }}</button>
+                        @endforeach
+                        <button type="button" class="btn btn-sm btn-outline-dark" disabled>Female</button>
+                        <h1><strong>DESKRIPSI</strong></h1>
+                        <p>{{ $produk->deskripsi_produk }}</p>
+                    </div>
 
-            <div id="carouselExampleIndicators" class="carousel slide">
-                <div class="carousel-indicators">
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
-                    <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    <div class="col">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ $toko->nama_toko }}</h5>
+                                <p class="card-text">Rating : {{ $toko->rating_toko }}</p>
+                                <div class="custom-button d-flex justify-content-evenly">
+                                    @if (auth()->check() && auth()->user()->role === 'penyewa')
+                                        @if ($produk->isInWishlist())
+                                            <form action="{{ route('wishlist.remove', ['id' => $produk->id]) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-outline-danger btn-block">Hapus Wishlist</button>
+                                            </form>
+                                        @else
+                                            <form action="{{ route('wishlist.add', ['id' => $produk->id]) }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-outline-danger btn-block">Tambah Wishlist</button>
+                                            </form>
+                                        @endif
+                                    @else
+                                        <form action="" method="POST">
+                                            @csrf
+                                            <button type="submit" class="btn btn-outline-danger btn-block" disabled>Tambah Wishlist</button>
+                                        </form>
+                                    @endif
+                                    <form action="#" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-danger btn-block" disabled>Rental Sekarang</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-                <div class="carousel-inner">
-                    <div class="carousel-item active">
-                    <img src="{{ asset('images/catalogue.jpg') }}" class="d-block w-100" alt="Catalog_Photo">
-                    </div>
-                    <div class="carousel-item">
-                    <img src="{{ asset('images/catalogue.jpg') }}" class="d-block w-100" alt="Catalog_Photo">
-                    </div>
-                    <div class="carousel-item">
-                    <img src="{{ asset('images/catalogue.jpg') }}" class="d-block w-100" alt="Catalog_Photo">
-                    </div>
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-            </div>
-            
-        </div>
-        <div class="catalog-item catalog-description">
-            <div class="description">
-                <h1>NAMA KATALOG</h1>
-                <h3>Rp100.000 / 3 Hari</h3>
-                <h6>Brand A</h6>
-                <h6>Sereis B</h6>
-                <h6>Karakter C</h6>
-                <button type="button" class="btn btn-sm btn-outline-light">M</button>
-                <button type="button" class="btn btn-sm btn-outline-light">Female</button>
-                <h1>INFORMASI LENGKAP</h1>
-                <h6>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam id tristique sem, nec sollicitudin tortor. Sed in suscipit sem. Vestibulum dapibus eget lectus eu consectetur. Nulla commodo condimentum lorem, id egestas magna pellentesque et. Curabitur velit dolor, condimentum eget pulvinar non, tempus eget lacus. Mauris cursus feugiat suscipit. Etiam nisi tellus, lacinia sit amet tempus eu, convallis sed dolor. Morbi in maximus tellus.
-
-Donec id ipsum viverra, fringilla lorem in, pretium ipsum. Maecenas bibendum lacus sed massa iaculis, eget commodo mi sodales. Nulla nec diam ac est consequat tempus. Proin ac posuere metus. Donec a fringilla lectus, eu pulvinar risus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla posuere venenatis orci, in pretium magna sollicitudin vel. Nulla in nisl eget massa rhoncus bibendum ut id tortor. Nulla ipsum ante, congue sed iaculis id, finibus ultricies nisl.</h6>
             </div>
         </div>
-        <div class="catalog-item catalog-choice">
-            <h1>CATALOG CHOICE</h1>
-        </div>
-    </div>
-    <div class="row">
-        <div class="footer">
-            <h6>All right reserved by Kalasewa © 2024.</h6>
-        </div>
-    </div>
-</div>
-
+    </section>
+    @include('layout.footer')
 @endsection
