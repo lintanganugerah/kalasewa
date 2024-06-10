@@ -28,7 +28,6 @@ class ProdukSeeder extends Seeder
             'gender' => 'Pria',
             'berat_produk' => 1000, // Berat dalam gram
             'ukuran_produk' => json_encode(['L' => ['stok' => 1]]),
-            'harga' => 10000, // Contoh ukuran produk dalam format JSON
             'metode_kirim' => json_encode(['JNE', 'JNT']), // Metode pengiriman
             'status_produk' => 'aktif',
             'created_at' => now(),

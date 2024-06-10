@@ -59,16 +59,11 @@
         TOKO
     </div>
 
+    <!-- Nav Item - Pages Collapse Menu -->
     <li class="nav-item">
         <a class="nav-link" href="{{ route('seller.profilTokoView') }}">
             <i class="fas fa-regular fa-store"></i>
             <span>Profil Toko</span></a>
-    </li>
-
-    <li class="nav-item">
-        <a class="nav-link" href="">
-            <i class="fa-solid fa-regular fa-star"></i>
-            <span>Penilaian Produk</span></a>
     </li>
 
     <!-- Nav Item - Charts -->

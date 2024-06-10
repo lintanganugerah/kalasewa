@@ -13,22 +13,22 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id()->index();
-            $table->string('nama');
+            $table->string('nama')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
             $table->string('no_telp')->unique()->nullable();
             $table->string('badge')->nullable();
             $table->string('kode_pos')->nullable();
             $table->string('alamat')->nullable();
             $table->string('kota')->nullable();
             $table->string('provinsi')->nullable();
-            $table->string('link_sosial_media')->nullable();
-            $table->string('foto_identitas')->nullable();
+            $table->string('identitas')->nullable();
             $table->string('NIK')->nullable()->unique();
             $table->string('foto_profil')->default('storage/profiles/profil_default.jpg');
-            $table->enum('role',['penyewa','pemilik_sewa', 'admin']);
-            $table->enum('verifyIdentitas',['Sudah','Tidak', 'Ditolak'])->default('Tidak');
+            $table->enum('role',['penyewa','pemilik_sewa','admin']);
+            $table->enum('verifyIdentitas',['Sudah','Tidak','Ditolak'])->default('Tidak');
+            $table->rememberToken();
             $table->timestamps();
         });
 

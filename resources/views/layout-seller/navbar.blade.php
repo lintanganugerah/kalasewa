@@ -12,10 +12,13 @@
         <div class="navbar-collapse collapse" id="collapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="#">Marketplace</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('jadiSellerView') }}">Jadi Seller</a>
+                    <a class="nav-link" href="#">Jadi Seller</a>
                 </li>
             </ul>
             <a class="me-5" href="{{ route('loginView') }}" style="color: #EE1B2F; text-decoration:none">Sign
