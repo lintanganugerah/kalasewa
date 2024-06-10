@@ -104,11 +104,16 @@ class AutentikasiSellerController extends Controller
 
     public function ForgotPassAction(Request $request) {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email'
+            'email' => 'required|email'
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $cekMail = DB::table('users')->where('email',$request->email)->first();
+        if (!$cekMail) {
+            return redirect()->back()->withErrors(['msg' => 'Email Tidak Ditemukan. Silahkan Lakukan Registrasi']);
         }
 
         $status = Password::sendResetLink(

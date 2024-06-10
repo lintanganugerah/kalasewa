@@ -20,35 +20,19 @@
     </li>
 
     <!-- Nav Item - Pages Collapse Menu -->
+
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTwo"
-            aria-expanded="true" aria-controls="collapseTwo">
+        <a class="nav-link" href="">
             <i class="fas fa-light fa-clipboard-list"></i>
-            <span>Pesanan</span>
-        </a>
-        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-            <div class="kalasewa-color py-2 collapse-inner rounded">
-                <a class="collapse-item" href="/pesanan/perluproses">Perlu Proses</a>
-                <a class="collapse-item" href="cards.html">Dalam Pengiriman</a>
-                <a class="collapse-item" href="cards.html">Penyewaan Berlangsung</a>
-                <a class="collapse-item" href="cards.html">Pesanan Selesai</a>
-            </div>
-        </div>
+            <span>Pesanan</span></a>
     </li>
 
     <!-- Nav Item - Utilities Collapse Menu -->
+
     <li class="nav-item">
-        <a class="nav-link collapsed" href="{{ route('seller.viewProdukAnda') }}" data-toggle="collapse"
-            data-target="#collapseUtilities" aria-expanded="true" aria-controls="collapseUtilities">
+        <a class="nav-link" href="{{ route('seller.viewProdukAnda') }}">
             <i class="fas fa-solid fa-boxes-stacked"></i>
-            <span>Produk</span>
-        </a>
-        <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
-            <div class="kalasewa-color py-2 collapse-inner rounded">
-                <a class="collapse-item" href="{{ route('seller.viewProdukAnda') }}">Produk Anda</a>
-                <a class="collapse-item" href="{{ route('seller.viewTambahProduk') }}">Tambah Produk</a>
-            </div>
-        </div>
+            <span>Produk</span></a>
     </li>
 
     <!-- Divider -->
