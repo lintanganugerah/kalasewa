@@ -23,7 +23,10 @@ class DatabaseSeeder extends Seeder
             SeriesSeeder::class,
             TokoSeeder::class,
             ProdukSeeder::class,
+            ReviewProdukSeeder::class,
+            OrderSeeder::class,
+            TujuanRekeningSeeder::class,
         ]);
-        
+
     }
 }

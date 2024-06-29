@@ -1,6 +1,6 @@
-@extends('layout-seller.layout-seller')
+@extends('layout.layout-seller')
 @section('content')
-    @include('layout-seller.navbar')
+    @include('layout.navbar')
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet"
@@ -30,7 +30,7 @@
                                 cepat!
                             </p>
                             <div class="mb-5">
-                                <a href="{{ route('seller.registerView') }}">
+                                <a href="{{ route('registerViewPemilikSewa') }}">
                                     <button class="btn btn-kalasewa btn-lg px-4" type="button">
                                         Gabung Sekarang
                                     </button>
@@ -91,5 +91,5 @@
             </div>
     </Section>
     <!-- Add Bootstrap JS and jQuery scripts here -->
-    @include('layout-seller.footer')
+    @include('layout.footer')
 @endsection

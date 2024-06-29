@@ -1,10 +1,10 @@
-@extends('layout-seller.selllayout')
+@extends('layout.selllayout')
 @section('content')
     <div class="row">
         <div class="col">
             <div class="text-left mb-5 mt-3">
                 <h1 class="fw-bold text-secondary">Profil Toko</h1>
-                <h4 class="fw-semibold text-secondary">Ubah Profil Toko Anda</h4>
+                <h4 class="fw-semibold text-secondary">Manajemen Informasi Toko Anda</h4>
             </div>
 
             <div class="row gx-5">
@@ -14,13 +14,20 @@
                         <!-- Nav tabs -->
                         <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="profil-tab" data-bs-toggle="tab"
-                                    data-bs-target="#profil" type="button" role="tab" aria-controls="profil"
-                                    aria-selected="true">Profil</button>
+                                <button class="nav-link active text-secondary fw-bold" id="profil-tab"
+                                    onclick="window.location.href='/profil/toko'" type="button" role="tab"
+                                    aria-controls="profil" aria-selected="true">Profil</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="contact-tab" onclick="window.location.href='#'" type="button"
-                                    role="tab" aria-controls="contact" aria-selected="false">Peraturan Sewa Toko
+                                <button class="nav-link text-secondary" id="profil-tab"
+                                    onclick="window.location.href='/profil/toko/AlamatTambahan'" type="button"
+                                    role="tab" aria-selected="false">Alamat Lainnya</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link text-secondary" id="contact-tab"
+                                    onclick="window.location.href='/profil/toko/peraturansewa'" type="button"
+                                    role="tab" aria-selected="false">Peraturan
+                                    Sewa Toko
                                     Anda</button>
                             </li>
                         </ul>
@@ -30,7 +37,6 @@
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="profil" role="tabpanel"
                                 aria-labelledby="profil-tab">
-                                <h5 class="card-title">Profil</h5>
                                 @if ($errors->any())
                                     <div class="alert alert-danger">
                                         {{ $errors->first() }}
@@ -41,7 +47,7 @@
                                         {{ session('success') }}
                                     </div>
                                 @endif
-                                <form action="{{ route('seller.profilTokoAction') }}" method="POST"
+                                <form action="{{ route('seller.profilTokoAction') }}" method="POST" id="formToko"
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="mb-3">
@@ -61,47 +67,71 @@
                                                     </ul>
                                                 </small>
                                                 <input type="file" name="foto" class="form-control mb-2"
-                                                    id="userPhoto" accept=".jpg,.png">
+                                                    id="userPhoto" accept=".jpg,.png,.jpeg,.webp">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="exampleFormControlInput1" class="form-label">Nama Lengkap
-                                            Pribadi</label>
-                                        <input type="text" class="form-control" id="exampleFormControlInput1"
-                                            value="{{ $user->nama }}"disabled>
-                                        <div id="HELP" class="form-text fw-light">Nama Tidak Bisa diubah karena sudah
-                                            sesuai Identitas. Nama Anda tidak akan ditampilkan ke publik</div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="exampleFormControlInput1" class="form-label">Nama Toko</label>
+                                        <label for="exampleFormControlInput1" class="form-label">Nama Toko<span
+                                                class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="exampleFormControlInput1"
                                             value="{{ session('namatoko') }}" name="namaToko" required>
                                     </div>
+                                    @if ($toko->bio_toko)
+                                        <div class="mb-3">
+                                            <label for="exampleFormControlTextarea1" class="form-label">Bio Toko</label>
+                                            <textarea class="form-control" id="exampleFormControlTextarea1" rows="10" name="bio_toko">{{ $toko->bio_toko }}</textarea>
+                                        </div>
+                                    @else
+                                        <div class="mb-3">
+                                            <label for="exampleFormControlTextarea1" class="form-label">Bio Toko</label>
+                                            <textarea class="form-control" rows="5" name="bio_toko"></textarea>
+                                            <div id="HELP" class="form-text fw-light">Berikan informasi tentang toko
+                                                anda (Opsional)
+                                            </div>
+                                        </div>
+                                    @endif
                                     <div class="mb-3">
-                                        <label class="form-label" for="form2Example17">Link Sosial Media</label>
+                                        <label class="form-label" for="form2Example17">Link Sosial Media<span
+                                                class="text-danger">*</span></label>
                                         <input type="text" id="form2Example17" class="form-control"
                                             value="{{ $user->link_sosial_media }}" name="link_sosial_media" required />
                                     </div>
                                     <div class="mb-3">
-                                        <label for="exampleFormControlInput1" class="form-label">Nomor Telpon</label>
+                                        <label for="exampleFormControlInput1" class="form-label">Nomor Telpon<span
+                                                class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="nomor_telpon"
                                             value="{{ $user->no_telp }}" name="nomor_telpon"minlength="10" maxlength="14"
                                             required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="exampleFormControlTextarea1" class="form-label">Alamat Toko</label>
-                                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" name="AlamatToko" required>asdas</textarea>
+                                        <label for="exampleFormControlTextarea1" class="form-label">Alamat Utama Toko<span
+                                                class="text-danger">*</span></label>
+                                        <textarea class="form-control" id="exampleFormControlTextarea1" rows="5" name="AlamatToko" required>{{ $user->alamat }}</textarea>
                                     </div>
                                     <div class="mb-3">
                                         <div data-mdb-input-init class="form-outline">
-                                            <label class="form-label" for="kodePos">Kode Pos</label>
-                                            <input type="text" id="kodePos" class="form-control" name="kodePos"
-                                                pattern="[0-9]*" minlength="5" maxlength="6"
+                                            <label class="form-label" for="kodePos">Kode Pos<span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control kodePos" name="kodePos"
+                                                id="kodePos" pattern="[0-9]*" minlength="5" maxlength="5"
                                                 value="{{ $user->kode_pos }}" required />
+                                            <div class="form-text error-message text-danger" id="kodePosError"></div>
                                         </div>
                                     </div>
-                                    <div class="form-floating mb-3">
+                                    <div class="mb-3">
+                                        <label for="exampleFormControlTextarea1" class="form-label">Provinsi<span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" id="floatingSelect" name="provinsi"
+                                            aria-label="Floating select example" required>
+                                            <option value="Jawa Barat"
+                                                {{ $user->kota == 'Jawa Barat' ? 'selected' : '' }}>
+                                                Jawa Barat</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exampleFormControlTextarea1" class="form-label">Kota/Kabupaten<span
+                                                class="text-danger">*</span></label>
                                         <select class="form-select" id="floatingSelect" name="kota"
                                             aria-label="Floating label select example" required>
                                             <option value="Kota Bandung"
@@ -111,36 +141,18 @@
                                                 Bandung
                                             </option>
                                         </select>
-                                        <label for="floatingSelect">Kota/Kabupaten</label>
                                     </div>
 
-                                    <div class="mb-5">
-                                        <label class="form-label">Metode Pengiriman</label><br>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" id="grab"
-                                                value="Grab" name="metode_kirim[]"
-                                                {{ in_array('Grab', $decodeKirim) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="grab">Grab</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" id="goSend"
-                                                value="GoSend" name="metode_kirim[]"
-                                                {{ in_array('GoSend', $decodeKirim) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="goSend">GoSend</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" id="jne"
-                                                value="JNE" name="metode_kirim[]"
-                                                {{ in_array('JNE', $decodeKirim) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="jne">JNE</label>
-                                        </div>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="checkbox" id="jnt"
-                                                value="JNT" name="metode_kirim[]"
-                                                {{ in_array('JNT', $decodeKirim) ? 'checked' : '' }}>
-                                            <label class="form-check-label" for="jnt">JNT</label>
-                                        </div>
-                                    </div>
+                                    <hr class="border border-secondary border-3 my-5">
+                                    <!-- Informasi Alamat Lainnya -->
+                                    <h5>Informasi Alamat Lainnya</h5>
+                                    <div id="helpberat" class="mb-3" style="opacity: 75%;">Jika produk/kostum anda
+                                        tersebar di berbagai lokasi, anda bisa menambahkan alamat baru. Nantinya
+                                        anda bisa memilih lokasi produk/kostum anda berada di alamat yang mana. <a
+                                            id="addAlamat" style="color: #D44E4E; text-decoration: underline!important;"
+                                            href="{{ route('seller.profil.viewAlamatTambahanToko') }}">Klik disini untuk
+                                            tambah alamat</a></div>
+                                    <hr class="border border-secondary border-3 my-5">
                                     <div class="d-grid mb-5">
                                         <button class="btn btn-kalasewa btn-lg btn-block" type="submit">Simpan
                                             perubahan</button>
@@ -150,9 +162,9 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
-        <script src="{{ asset('seller/inputangka.js') }}"></script>
-    @endsection
+    </div>
+    <script src="{{ asset('seller/validasiProfilToko.js') }}"></script>
+    <script src="{{ asset('seller/inputangka.js') }}"></script>
+@endsection

@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 
 class pemilik_sewa
 {
@@ -16,6 +17,13 @@ class pemilik_sewa
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (auth()->check() && auth()->user()->badge === "Banned") {
+            Auth::logout();
+            Session::flush();
+            Session::regenerate(true);
+            return redirect()->route('loginView')->with('error', 'Anda Telah Di Banned!');
+        }
+        
         if (auth()->check() && auth()->user()->role === 'pemilik_sewa') {
             return $next($request);
         }

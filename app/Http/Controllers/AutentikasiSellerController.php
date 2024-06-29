@@ -19,27 +19,30 @@ use Illuminate\Auth\Events\PasswordReset;
 class AutentikasiSellerController extends Controller
 {
 
-    public function registerView(Request $request) {
+    public function registerView(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
             if ($user->role === "pemilik_sewa") {
-                return redirect()->route('seller.berandaView');
+                return redirect()->route('seller.dashboardtoko');
             }
         }
         return view('autentikasi-seller.daftar-seller');
     }
 
-    public function registerActionBuyer(Request $request) {
+    public function registerActionBuyer(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
             if ($user->role === "pemilik_sewa") {
-                return redirect()->route('seller.berandaView');
+                return redirect()->route('seller.dashboardtoko');
             }
         }
         return view('autentikasi-seller.daftar-buyer');
     }
 
-    public function registerViewBuyer(Request $request) {
+    public function registerViewBuyer(Request $request)
+    {
         return view('autentikasi-seller.daftar-buyer');
     }
 
@@ -49,7 +52,7 @@ class AutentikasiSellerController extends Controller
             $user = Auth::user();
 
             if (isset($user->nama)) {
-                return redirect()->route('seller.berandaView');
+                return redirect()->route('seller.dashboardtoko');
             }
             session(['profilpath' => $user->foto_profil]);
         } else if (session()->has('regis')) {
@@ -65,17 +68,19 @@ class AutentikasiSellerController extends Controller
         }
     }
 
-    public function loginView(Request $request) {
+    public function loginView(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
             if ($user->role === "pemilik_sewa") {
-                return redirect()->route('seller.berandaView');
+                return redirect()->route('seller.dashboardtoko');
             }
         }
         return view('autentikasi-seller.loginView');
     }
 
-    public function verifikasiView(Request $request) {
+    public function verifikasiView(Request $request)
+    {
         if (!session()->has('verify')) {
             return redirect()->route('loginView');
         } elseif (session()->has('verified')) {
@@ -84,7 +89,8 @@ class AutentikasiSellerController extends Controller
         return view('autentikasi-seller.daftar-kode-verifikasi');
     }
 
-    public function verifiedView(Request $request) {
+    public function verifiedView(Request $request)
+    {
         if (!session()->has('verified')) {
             return redirect()->route('loginView');
         }
@@ -92,28 +98,25 @@ class AutentikasiSellerController extends Controller
         return view('autentikasi-seller.daftar-verified-view');
     }
 
-    public function viewForgotPass(Request $request) {
+    public function viewForgotPass(Request $request)
+    {
         if (Auth::check()) {
             $user = Auth::user();
             if ($user->role === "pemilik_sewa") {
-                return redirect()->route('seller.berandaView');
+                return redirect()->route('seller.dashboardtoko');
             }
         }
         return view('autentikasi-seller.resetPassRequestEmail');
     }
 
-    public function ForgotPassAction(Request $request) {
+    public function ForgotPassAction(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email'
+            'email' => 'required|email|exists:users,email'
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
-        }
-
-        $cekMail = DB::table('users')->where('email',$request->email)->first();
-        if (!$cekMail) {
-            return redirect()->back()->withErrors(['msg' => 'Email Tidak Ditemukan. Silahkan Lakukan Registrasi']);
         }
 
         $status = Password::sendResetLink(
@@ -123,17 +126,19 @@ class AutentikasiSellerController extends Controller
         return $status === Password::RESET_LINK_SENT ? back()->with(['success' => __($status)]) : back()->withErrors(['email' => __($status)]);
     }
 
-    public function viewresetPass(Request $request, $token) {
+    public function viewresetPass(Request $request, $token)
+    {
         if (Auth::check()) {
             $user = Auth::user();
             if ($user->role === "pemilik_sewa") {
-                return redirect()->route('seller.berandaView');
+                return redirect()->route('seller.dashboardtoko');
             }
         }
         return view('autentikasi-seller.resetPass')->with(['token' => $token, 'email' => $request->email]);
     }
 
-    public function resetPassAction(Request $request) {
+    public function resetPassAction(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'token' => 'required',
             'email' => 'required|email',
@@ -154,10 +159,11 @@ class AutentikasiSellerController extends Controller
         );
 
         return $status === Password::PASSWORD_RESET ? redirect()->route('loginView')->with('success', __($status)) :
-        back()->withErrors(['email' => [__($status)]]);
+            back()->withErrors(['email' => [__($status)]]);
     }
 
-    public function registerInformationActionSeller(Request $request) {
+    public function registerInformationActionSeller(Request $request)
+    {
         //SIMPAN INFORMASI AKUN BARU SAAT REGISTER
         $validator = Validator::make($request->all(), [
             'password' => 'required|string|min_digits:8,',
@@ -171,25 +177,25 @@ class AutentikasiSellerController extends Controller
             'kodePos' => 'required|numeric|min_digits:5|max_digits:5',
             'metode_kirim' => 'required',
             'nomor_identitas' => 'required|numeric|min_digits:16|max_digits:16|unique:users,NIK',
-            'foto_identitas' => 'file|mimes:jpg,jpeg,png|max:5120',
+            'foto_identitas' => 'file|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        if (session()->has('emailRegis')) {
-            $email = Session::get('emailRegis');
+        if (session()->has('email')) {
+            $email = Session::get('email');
         } else {
-             return redirect()->route('seller.registerView')->with('error', 'Silahkan coba daftar ulang');
+            return redirect()->route('seller.registerView')->with('error', 'Silahkan coba daftar ulang');
         }
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $cekToko = DB::table('tokos')->where('nama_toko',$request->namaToko)->first();
+        $cekToko = DB::table('tokos')->where('nama_toko', $request->namaToko)->first();
         if ($cekToko !== null) {
             return redirect()->back()->withErrors(['msg' => 'Nama Toko telah ada, coba nama toko lain']);
         }
 
-        $photoPath = $request->file('foto_identitas')->store('public/data');
+        $photoPath = $request->file('foto_identitas')->store('public/identitas');
         $photoPath = Str::replaceFirst('public/', 'storage/', $photoPath);
 
         $user = new User;
@@ -217,7 +223,8 @@ class AutentikasiSellerController extends Controller
         return redirect()->route('seller.verifikasiView');
     }
 
-    public function checkEmailSeller(Request $request) {
+    public function checkEmailSeller(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
             'setuju_syarat_dan_ketentuan' => 'accepted',
@@ -228,48 +235,50 @@ class AutentikasiSellerController extends Controller
         }
 
         $email = strtolower($request->email);
-        $u = DB::table('users')->where('email',$email)->first();
-        if($u){
+        $u = DB::table('users')->where('email', $email)->first();
+        if ($u) {
             if ($u->verifyIdentitas == "Sudah" || $u->verifyIdentitas == "Tidak") {
                 return redirect()->back()->with('error', 'Alamat Email sudah terdaftar, silahkan login atau gunakan email lain!');
             }
         }
 
-        session(['emailRegis' => $email]);
+        session(['email' => $email]);
         session(['regis' => TRUE]);
-        
+
         return redirect()->route('seller.registerInformationView');
     }
 
-    public function checkEmailBuyer(Request $request) {
+    public function checkEmailBuyer(Request $request)
+    {
         $request->validate([
             'email' => 'required|email',
         ]);
         $email = strtolower($request->email);
-        $u = DB::table('users')->where('email',$email)->first();
-        if($u){
+        $u = DB::table('users')->where('email', $email)->first();
+        if ($u) {
             return redirect()->back()->with('error', 'Alamat Email sudah terdaftar, silahkan login atau gunakan email lain!');
         }
 
         return redirect()->route('seller.verifikasiView');
     }
 
-    public function verify(Request $request,$user_id,$hash) {
+    public function verify(Request $request, $user_id, $hash)
+    {
         if (!$request->hasValidSignature()) {
             return response()->json(["msg" => "Expired url provided. Silahkan Login untuk mengirimkan ulang link verifikasi"], 401);
         }
 
         Session::forget('verify');
         session(['verified' => TRUE]);
-        Session::forget('emailRegis');
+        Session::forget('email');
         Session::forget('regis');
 
-        if(!Auth::check()) {
+        if (!Auth::check()) {
             $user = User::findOrFail($user_id);
         } else {
             $user = Auth::user();
         }
-    
+
         if (!$user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
         } else {
@@ -277,7 +286,7 @@ class AutentikasiSellerController extends Controller
         }
 
         Auth::logout();
-    
+
         return redirect()->route('seller.verifiedView');
     }
 
@@ -295,12 +304,12 @@ class AutentikasiSellerController extends Controller
                 $user->sendEmailVerificationNotification();
                 Auth::logout();
                 return redirect()->route('seller.verifikasiView');
-            } else if($user->verifyIdentitas === "Tidak") {
+            } else if ($user->verifyIdentitas === "Tidak") {
                 Auth::logout();
                 Session::flush();
                 Session::regenerate(true);
                 return redirect()->route('loginView')->with('error', 'Mohon Tunggu Konfirmasi admin 1x24 jam');
-            } else if($user->verifyIdentitas === "Ditolak") {
+            } else if ($user->verifyIdentitas === "Ditolak") {
                 Auth::logout();
                 Session::flush();
                 Session::regenerate(true);
@@ -309,11 +318,11 @@ class AutentikasiSellerController extends Controller
 
             session(['uid' => $user->id]);
             session(['profilpath' => $user->foto_profil]);
-            session(['namatoko' => $toko->nama_toko]);
 
 
             if ($user->role == "pemilik_sewa") {
-                return redirect()->route('seller.berandaView');
+                session(['namatoko' => $toko->nama_toko]);
+                return redirect()->route('seller.dashboardtoko');
             } else if ($user->role == "pemilik_sewa") {
                 return redirect()->route('');
             }

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -15,20 +14,22 @@ return new class extends Migration
             $table->id()->index();
             $table->string('nama');
             $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('no_telp')->unique()->nullable();
-            $table->string('badge')->nullable();
+            $table->string('no_darurat')->nullable();
+            $table->enum('ket_no_darurat', ['Teman', 'Kerabat', 'Orang Tua'])->nullable();
+            $table->enum('badge', ['Banned', 'Aktif'])->default('Aktif');
             $table->string('kode_pos')->nullable();
-            $table->string('alamat')->nullable();
+            $table->text('alamat')->nullable();
             $table->string('kota')->nullable();
             $table->string('provinsi')->nullable();
             $table->string('link_sosial_media')->nullable();
             $table->string('foto_identitas')->nullable();
+            $table->string('foto_diri')->nullable();
             $table->string('NIK')->nullable()->unique();
             $table->string('foto_profil')->default('storage/profiles/profil_default.jpg');
-            $table->enum('role',['penyewa','pemilik_sewa', 'admin']);
-            $table->enum('verifyIdentitas',['Sudah','Tidak', 'Ditolak'])->default('Tidak');
+            $table->enum('role', ['penyewa', 'pemilik_sewa', 'admin']);
+            $table->enum('verifyIdentitas', ['Sudah', 'Tidak', 'Ditolak'])->default('Tidak');
             $table->timestamps();
         });
 
