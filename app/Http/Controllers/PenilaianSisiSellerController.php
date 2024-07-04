@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\OrderPenyewaan;
 use App\Models\Review;
+use App\Models\SaldoUser;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -118,6 +119,35 @@ class PenilaianSisiSellerController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $saldoPemilik = SaldoUser::where('id_user', Auth::id())->first();
+        $saldoPenyewa = SaldoUser::where('id_user', $order->id_penyewa)->first();
+
+        if ($saldoPemilik) {
+            $totalSaldo = $order->total_penghasilan + $saldoPemilik->saldo;
+            $saldoPemilik->saldo = $totalSaldo;
+            $saldoPemilik->save();
+        } else {
+            SaldoUser::create([
+                "id_user" => Auth::id(),
+                'tujuan_rek' => null,
+                'nomor_rekening' => null,
+                'saldo' => $order->total_penghasilan
+            ]);
+        }
+
+        if ($saldoPenyewa) {
+            $totalSaldo = $order->jaminan + $saldoPenyewa->saldo;
+            $saldoPenyewa->saldo = $totalSaldo;
+            $saldoPenyewa->save();
+        } else {
+            SaldoUser::create([
+                "id_user" => $order->id_penyewa,
+                'tujuan_rek' => null,
+                'nomor_rekening' => null,
+                'saldo' => $order->jaminan,
+            ]);
+        }
+
         try {
             $fotoReview = NULL;
 
@@ -143,7 +173,6 @@ class PenilaianSisiSellerController extends Controller
 
             $order->status = "Penyewaan Selesai";
             $order->save();
-
 
             return redirect()->route('seller.statuspenyewaan.riwayatPenyewaan')->with('success', 'Penyewaan Telah Selesai! Review berhasil ditambahkan');
         } catch (Exception $e) {
