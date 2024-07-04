@@ -16,9 +16,13 @@ return new class extends Migration {
             $table->string('nama_produk');
             $table->text('deskripsi_produk');
             $table->string('brand');
-            $table->unsignedInteger('harga');
-            $table->enum('gender', ['Pria', 'Wanita']);
-            $table->unsignedInteger('berat_produk');
+            $table->unsignedBigInteger('biaya_cuci')->nullable();
+            $table->string('brand_wig')->nullable();
+            $table->string('keterangan_wig')->nullable();
+            $table->enum('grade', ['Grade 1', 'Grade 2', 'Grade 3']);
+            $table->unsignedBigInteger('harga');
+            $table->enum('gender', ['Pria', 'Wanita', 'Semua Gender']);
+            $table->unsignedBigInteger('berat_produk');
             $table->string('ukuran_produk');
             $table->json('additional')->nullable();
             $table->bigInteger('id_series')->unsigned();

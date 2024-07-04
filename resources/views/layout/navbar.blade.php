@@ -15,70 +15,78 @@
         <div class="navbar-collapse collapse" id="collapse">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 @if (auth()->check())
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="{{ route('viewHomepage') }}">Homepage</a>
-                    </li>
-                    @if (auth()->check() && auth()->user()->role === 'penyewa')
-                        <li class="nav-item">
-                            <a class="nav-link" href="">History</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{{ route('wishlist.view') }}">Wishlist</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="">Ticketing</a>
-
-                        </li>
-                    @endif
-                @else
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="{{ route('viewHomepage') }}">Homepage</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" aria-current="page" href="{{ route('jadiSellerView') }}">Buka Toko</a>
-                    </li>
-                @endif
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ route('viewRules') }}">Aturan Kalasewa</a>
+                    <a class="nav-link" aria-current="page" href="{{ route('viewHomepage') }}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ route('viewAbout') }}">Tentang Kami</a>
+                    <a class="nav-link" aria-current="page" href="{{ route('viewPencarian') }}">Pencarian</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ route('viewListToko') }}">Toko</a>
+                </li>
+                @if (auth()->check() && auth()->user()->role === 'penyewa')
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('viewHistory') }}">History</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('wishlist.view') }}">Wishlist</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="">Ticketing</a>
+
+                </li>
+                @endif
+                @else
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ route('viewHomepage') }}">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ route('viewPencarian') }}">Pencarian</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ route('viewListToko') }}">Toko</a>
+                </li>
+                @endif
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ route('viewRules') }}">Aturan</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" aria-current="page" href="{{ route('viewAbout') }}">About</a>
                 </li>
             </ul>
             @if (auth()->check() && auth()->user()->role === 'penyewa')
-                <div class="nav-item dropstart mx-2">
-                    <button class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <img src="{{ asset(session('profilpath')) }}" alt="{{ auth()->user()->nama }}"
-                            style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu">
-                        <li><a class="dropdown-item"
-                                href="{{ route('viewProfile', ['id' => auth()->user()->id]) }}">Ubah
-                                Profil</a></li>
-                        <li><a class="dropdown-item"
-                                href="{{ route('viewGantiPassword', ['id' => auth()->user()->id]) }}">Ubah Password</a>
-                        </li>
-                        <li><a class="dropdown-item" href="{{ route('logout') }}">Logout</a></li>
-                    </ul>
-                </div>
+            <div class="nav-item dropdown mx-2">
+                <button class="btn btn-outline-danger dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{{ asset(session('profilpath')) }}" alt="{{ auth()->user()->nama }}"
+                        style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                    {{ auth()->user()->nama }}
+                </button>
+                <ul class="dropdown-menu dropdown-menu">
+                    <li><a class="dropdown-item" href="{{ route('viewProfile', ['id' => auth()->user()->id]) }}">Ubah
+                            Profil</a></li>
+                    <li><a class="dropdown-item"
+                            href="{{ route('viewGantiPassword', ['id' => auth()->user()->id]) }}">Ubah Password</a>
+                    </li>
+                    <li><a class="dropdown-item" href="{{ route('logout') }}">Logout</a></li>
+                </ul>
+            </div>
             @elseif (auth()->check() && auth()->user()->role === 'pemilik_sewa')
-                <div class="nav-item dropstart mx-2">
-                    <button class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown"
-                        aria-expanded="false">
-                        <img src="{{ asset(session('profilpath')) }}" alt="{{ auth()->user()->nama }}"
-                            style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu">
-                        <li><a class="dropdown-item" href="{{ route('seller.dashboardtoko') }}">Dashboard Toko</a></li>
-                        <li><a class="dropdown-item" href="{{ route('logout') }}">Logout</a></li>
-                    </ul>
-                </div>
+            <div class="nav-item dropstart mx-2">
+                <button class="btn btn-outline-light dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="{{ asset(session('profilpath')) }}" alt="{{ auth()->user()->nama }}"
+                        style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
+                </button>
+                <ul class="dropdown-menu dropdown-menu">
+                    <li><a class="dropdown-item" href="{{ route('seller.dashboardtoko') }}">Dashboard Toko</a></li>
+                    <li><a class="dropdown-item" href="{{ route('logout') }}">Logout</a></li>
+                </ul>
+            </div>
             @else
-                <a class="me-4" href="{{ route('registerViewPenyewa') }}"
-                    style="color: #EE1B2F; text-decoration:none">Daftar</a>
-                <a class="me-5" href="{{ route('loginView') }}" style="color: #EE1B2F; text-decoration:none">Sign
-                    in</a>
+            <a class="me-4" href="{{ route('jadiSellerView') }}" style="color: #EE1B2F; text-decoration:none">Buka
+                Toko</a>
+            <a class="me-4" href="{{ route('registerViewPenyewa') }}"
+                style="color: #EE1B2F; text-decoration:none">Register</a>
+            <a class="me-5" href="{{ route('loginView') }}" style="color: #EE1B2F; text-decoration:none">Login</a>
             @endif
         </div>
     </div>

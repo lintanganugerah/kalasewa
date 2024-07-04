@@ -167,7 +167,7 @@ class ProdukSellerController extends Controller
         $validator = Validator::make($request->all(), [
             'namaProduk' => 'required|string',
             'deskripsiProduk' => 'required|string',
-            'series' => 'required|exists:series,id',
+            'series' => 'required|string', // Mengubah validasi menjadi string
             'ukuran' => 'required|in:XS,S,M,L,XL,XXL,All_Size',
             'harga' => 'required|numeric|min:100',
             'brand' => 'required|string',
@@ -191,10 +191,13 @@ class ProdukSellerController extends Controller
             }
         }
 
+        // Cek dan buat series baru jika perlu
+        $series = Series::firstOrCreate(['series' => $request->series]);
+
         $produk = new Produk;
         $produk->nama_produk = $request->namaProduk;
         $produk->deskripsi_produk = $request->deskripsiProduk;
-        $produk->id_series = $request->series;
+        $produk->id_series = $series->id; // Menggunakan ID series yang ditemukan atau baru dibuat
         $produk->brand = $request->brand;
         $produk->harga = $request->harga;
         $produk->gender = $request->gender;

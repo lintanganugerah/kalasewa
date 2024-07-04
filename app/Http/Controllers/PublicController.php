@@ -18,6 +18,8 @@ use App\Models\Penyewa;
 use App\Models\Produk;
 use App\Models\FotoProduk;
 use App\Models\Series;
+use App\Models\Review;
+use App\Models\PeraturanSewa;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -27,12 +29,25 @@ class PublicController extends Controller
     // MARKETPLACE HOMEPAGE
     public function viewHomepage(Request $request)
     {
-        $produk = Produk::where('status_produk', 'aktif')->get();
+        // Ambil semua nilai unik brand, tanpa memandang status produk
+        $brand = Produk::select('brand')->distinct()->orderBy('brand', 'asc')->pluck('brand');
+
+        // Ambil produk dengan status 'aktif'
+        $produkQuery = Produk::where('status_produk', 'aktif');
+
+        // Terapkan filter jika ada
+        if ($request->has('brand')) {
+            $produkQuery->where('brand', $request->brand);
+        }
+        $produk = $produkQuery->get();
+
+        // Ambil semua foto produk, toko, dan pengguna
         $fotoproduk = FotoProduk::all();
-        $toko = Toko::all();
+        $toko = Toko::withCount('produks')->take(5)->get(); // <-- tambahkan take(5) jika ingin membatasi hasil
         $user = User::all();
-        $series = Series::all();
-        $brand = Produk::select('brand')->distinct()->get();
+
+        // Ambil semua series dan urutkan secara abjad
+        $series = Series::orderBy('series', 'asc')->get();
         /* dd(session('profilpath')); */
         return view('homepage', compact('produk', 'fotoproduk', 'toko', 'user', 'series', 'brand'));
     }
@@ -58,8 +73,123 @@ class PublicController extends Controller
         $fotoproduk = FotoProduk::where('ID_produk', $id)->get();
         $series = Series::all();
         $brand = Produk::select('brand')->distinct()->get();
+        $toko = Toko::all();
+        $review = Review::where('id_produk', $id)->with('user')->get();
+        $aturan = PeraturanSewa::where('id_toko', $produk->toko->id)->get();
 
-        return view('detail', compact('produk', 'fotoproduk', 'series', 'brand'));
+        // Hitung rata-rata nilai review produk
+        $averageRating = Review::where('id_produk', $id)->avg('nilai');
+
+        // Hitung rata-rata nilai review toko
+        $averageTokoRating = Review::where('id_toko', $produk->toko->id)->avg('nilai');
+
+        return view('detail', compact('produk', 'fotoproduk', 'series', 'brand', 'toko', 'review', 'averageRating', 'averageTokoRating', 'aturan'));
+    }
+
+    public function viewListToko(Request $request)
+    {
+        // Ambil semua nilai unik brand, tanpa memandang status produk
+        $brand = Produk::select('brand')->distinct()->orderBy('brand', 'asc')->pluck('brand');
+
+        // Ambil produk dengan status 'aktif'
+        $produkQuery = Produk::where('status_produk', 'aktif');
+
+        // Terapkan filter jika ada
+        if ($request->has('brand')) {
+            $produkQuery->where('brand', $request->brand);
+        }
+        $produk = $produkQuery->get();
+
+        // Ambil semua foto produk, toko, dan pengguna
+        $fotoproduk = FotoProduk::all();
+        $toko = Toko::withCount('produks')->get();
+        $user = User::all();
+
+        // Ambil semua series dan urutkan secara abjad
+        $series = Series::orderBy('series', 'asc')->get();
+        /* dd(session('profilpath')); */
+        return view('listToko', compact('produk', 'fotoproduk', 'toko', 'user', 'series', 'brand'));
+    }
+
+    public function viewToko(Request $request, $id)
+    {
+        $toko = Toko::findOrFail($id);
+
+        // Ambil semua nilai unik brand, tanpa memandang status produk
+        $brand = Produk::select('brand')->distinct()->orderBy('brand', 'asc')->pluck('brand');
+
+        // Ambil produk dengan status 'aktif' dan milik toko yang bersangkutan
+        $produkQuery = Produk::where('status_produk', 'aktif')->where('id_toko', $id);
+
+        // Terapkan filter jika ada
+        if ($request->has('brand')) {
+            $produkQuery->where('brand', $request->brand);
+        }
+        $produk = $produkQuery->get();
+
+        // Ambil semua foto produk, toko, dan pengguna
+        $fotoproduk = FotoProduk::all();
+        $user = User::all();
+
+        // Ambil semua series dan urutkan secara abjad
+        $series = Series::orderBy('series', 'asc')->get();
+
+        $review = Review::where('id_toko', $id)->get();
+
+        // Hitung rata-rata nilai review toko
+        $averageTokoRating = Review::where('id_toko', $id)->avg('nilai');
+
+        return view('viewToko', compact('produk', 'fotoproduk', 'toko', 'user', 'series', 'brand', 'review', 'averageTokoRating'));
+    }
+
+    public function searchProdukToko(Request $request, $id)
+    {
+        $toko = Toko::findOrFail($id);
+        $brand = Produk::select('brand')->distinct()->orderBy('brand', 'asc')->pluck('brand');
+        $fotoproduk = FotoProduk::all();
+        $user = User::all();
+        $series = Series::orderBy('series', 'asc')->get();
+
+        // Mulai query produk dengan id_toko
+        $query = Produk::where('status_produk', 'Aktif')->where('id_toko', $id);
+
+        // Filter berdasarkan search term
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('nama_produk', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhere('brand', 'LIKE', '%' . $searchTerm . '%')
+                    ->orWhereHas('seriesDetail', function ($q) use ($searchTerm) {
+                        $q->where('series', 'LIKE', '%' . $searchTerm . '%');
+                    });
+            });
+        }
+
+        // Filter berdasarkan gender
+        if ($request->filled('gender')) {
+            $query->where('gender', $request->gender);
+        }
+
+        // Filter berdasarkan size
+        if ($request->filled('size')) {
+            $query->where('ukuran_produk', $request->size);
+        }
+
+        // Filter berdasarkan series
+        if ($request->filled('series')) {
+            $query->whereHas('seriesDetail', function ($q) use ($request) {
+                $q->where('id', $request->series);
+            });
+        }
+
+        // Filter berdasarkan brand
+        if ($request->filled('brand')) {
+            $query->where('brand', $request->brand);
+        }
+
+        $produk = $query->get();
+
+        return view('viewToko', compact('produk', 'fotoproduk', 'toko', 'user', 'series', 'brand'));
     }
 
     public function viewRules()
@@ -72,52 +202,80 @@ class PublicController extends Controller
         return view('aboutus');
     }
 
-    // SEARCH & FILTER
-    public function search(Request $request)
+    public function viewPencarian(Request $request)
     {
-        $query = $request->input('search');
-        $ukuran_produk = $request->input('ukuran_produk');
-        $gender = $request->input('gender');
-        $series = $request->input('series');
-        $brands = $request->input('brand');
+        // Ambil semua nilai unik brand, tanpa memandang status produk
+        $brand = Produk::select('brand')->distinct()->orderBy('brand', 'asc')->pluck('brand');
 
-        $products = Produk::where('status_produk', 'aktif');
+        // Ambil produk dengan status 'aktif'
+        $produkQuery = Produk::where('status_produk', 'aktif');
 
-        if ($query) {
-            $products = $products->where('nama_produk', 'LIKE', "%{$query}%");
+        // Terapkan filter jika ada
+        if ($request->has('brand')) {
+            $produkQuery->where('brand', $request->brand);
         }
+        $produk = $produkQuery->get();
 
-        if ($gender) {
-            $products = $products->where('gender', $gender);
-        }
-
-        if ($series) {
-            $products = $products->where('id_series', $series);
-        }
-
-        if ($brands) {
-            $products = $products->where('brand', $brands);
-        }
-
-        if ($ukuran_produk) {
-            $products = $products->where('ukuran_produk', $ukuran_produk);
-        }
-
-        $products = $products->get();
-
+        // Ambil semua foto produk, toko, dan pengguna
         $fotoproduk = FotoProduk::all();
         $toko = Toko::all();
         $user = User::all();
-        $series = Series::all();
-        $brand = Produk::select('brand')->distinct()->get();
 
-        return view('homepage', [
-            'produk' => $products,
-            'fotoproduk' => $fotoproduk,
-            'toko' => $toko,
-            'user' => $user,
-            'series' => $series
-        ], compact('series', 'brand'));
+        // Ambil semua series dan urutkan secara abjad
+        $series = Series::orderBy('series', 'asc')->get();
+        /* dd(session('profilpath')); */
+        return view('pencarian', compact('produk', 'fotoproduk', 'toko', 'user', 'series', 'brand'));
+    }
+
+    // SEARCH & FILTER
+    public function searchProduk(Request $request)
+    {
+        $query = Produk::where('status_produk', 'Aktif');
+        $fotoproduk = FotoProduk::all();
+        $toko = Toko::all();
+        $user = User::all();
+        $series = Series::orderBy('series', 'asc')->get();
+        $brand = Produk::select('brand')->distinct()->orderBy('brand', 'asc')->pluck('brand');
+
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where('nama_produk', 'LIKE', '%' . $request->search . '%')
+                ->orWhere('brand', 'LIKE', '%' . $request->search . '%')
+                ->orWhereHas('seriesDetail', function ($q) use ($searchTerm) {
+                    $q->where('series', 'LIKE', '%' . $searchTerm . '%');
+                });
+        }
+
+        if ($request->filled('gender')) {
+            $query->where('gender', $request->gender);
+        }
+
+        if ($request->filled('size')) {
+            $query->where('ukuran_produk', $request->size);
+        }
+
+        if ($request->filled('series')) {
+            $query->whereHas('series', function ($q) use ($request) {
+                $q->where('id_series', $request->series);
+            });
+        }
+
+        if ($request->filled('brand')) {
+            $query->where('brand', $request->brand);
+        }
+
+        $produk = $query->get();
+
+        return view('pencarian', compact('produk', 'fotoproduk', 'toko', 'user', 'series', 'brand'));
+    }
+
+    public function searchToko(Request $request)
+    {
+        $search = $request->get('search'); // Mengambil nilai dari input 'search' di form
+        $toko = Toko::where('nama_toko', 'like', '%' . $search . '%')->withCount('produks')->get();
+        ; // Melakukan pencarian berdasarkan nama toko
+
+        return view('listToko', compact('toko'));
     }
 
 }

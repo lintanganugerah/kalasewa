@@ -17,7 +17,8 @@ return new class extends Migration {
             $table->string('password');
             $table->string('no_telp')->unique()->nullable();
             $table->string('no_darurat')->nullable();
-            $table->enum('badge', ['Banned', 'Bermasalah', 'Pendatang', 'Standart', 'Terpercaya'])->default('Pendatang');
+            $table->enum('ket_no_darurat', ['Teman', 'Kerabat', 'Orang Tua'])->nullable();
+            $table->enum('badge', ['Banned', 'Aktif'])->default('Aktif');
             $table->string('kode_pos')->nullable();
             $table->text('alamat')->nullable();
             $table->string('kota')->nullable();

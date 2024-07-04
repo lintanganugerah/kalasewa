@@ -51,6 +51,10 @@ class PenyewaController extends Controller
         $fotoPath = $user->foto_profil;
         $namaFile = basename($fotoPath);
 
+        if ($request->nomor_telpon == $request->nomor_telpon_darurat) {
+            return redirect()->back()->withErrors("Nomor darurat tidak boleh sama dengan nomor telepon pribadi")->withInput();
+        }
+
         if ($request->has('foto')) {
             if ($namaFile !== 'profil_default.jpg') {
                 Storage::delete(str_replace('storage/', 'public/', $fotoPath));
@@ -89,12 +93,16 @@ class PenyewaController extends Controller
     public function updatePassword(Request $request)
     {
         // Validasi data input
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'password' => 'required|string',
-            'newPassword' => 'required|string|min:8',
-            'confNewPassword' => 'required|string|min:8', // Menambahkan aturan untuk memastikan konfirmasi password baru cocok dengan password baru
+            'newPassword' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+            ],
+            'confNewPassword' => 'required|string', // Menambahkan aturan untuk memastikan konfirmasi password baru cocok dengan password baru
         ]);
-
 
         // Ambil user yang sedang login
         $user = auth()->user();
@@ -109,13 +117,17 @@ class PenyewaController extends Controller
             return redirect()->route('viewGantiPassword', ['id' => $user->id])->with('error', 'Error! Konfirmasi Password Baru Salah!');
         }
 
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         // Jika password lama sesuai, perbarui data user dengan password baru
         $user->password = Hash::make($request->input('newPassword'));
 
         $user->save();
 
         // Redirect ke halaman profil dengan pesan sukses
-        return redirect()->route('viewGantiPassword', ['id' => $user->id])->with('success', 'Password Berhasil Diganti!');
+        return redirect()->route('viewHomepage', ['id' => $user->id])->with('success', 'Password Berhasil Diganti!');
     }
 
 }

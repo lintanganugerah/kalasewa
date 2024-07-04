@@ -56,4 +56,19 @@ class Produk extends Model
     {
         return $this->belongsTo(Toko::class, 'id_toko');
     }
+
+    public function id_produk()
+    {
+        return $this->hasMany(OrderPenyewaan::class, 'id_produk');
+    }
+
+    public function id_review_produk()
+    {
+        return $this->belongsTo(Review::class, 'id_produk');
+    }
+
+    public function checkouts()
+    {
+        return $this->hasMany(Checkout::class, 'id_produk');
+    }
 }

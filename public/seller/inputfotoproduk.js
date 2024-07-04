@@ -1,11 +1,16 @@
+let fotoTambah = 0;
+
 document.getElementById("addPhotoBtn").addEventListener("click", function () {
+    fotoTambah++;
     const photoInputs = document.getElementById("photoInputs");
     const newPhotoInput = document.createElement("div");
     newPhotoInput.classList.add("photo-input", "mb-2");
+    newPhotoInput.id = `fototambah-${fotoTambah}`;
     newPhotoInput.innerHTML = `
         <div class="d-flex align-items-start">
             <div class="me-3">
                 <img class="img-thumbnail" src="" alt="Foto Produk" style="width: 150px; height: 150px; object-fit: cover;">
+                <span class="btn" onclick="removeTambahFoto('fototambah-${fotoTambah}')"><i class="fas fa-trash"></i></span>
             </div>
         </div>
         <div class="flex-grow-1">
@@ -27,6 +32,10 @@ document.getElementById("addPhotoBtn").addEventListener("click", function () {
         reader.readAsDataURL(file);
     });
 });
+
+function removeTambahFoto(id) {
+    document.getElementById(id).remove();
+}
 
 // function beriTitik(input) {
 //     // Menghilangkan selain angka yang ada

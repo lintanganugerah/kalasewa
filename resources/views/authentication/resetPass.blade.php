@@ -1,4 +1,5 @@
 @extends('layout.layout-seller')
+@extends('layout.navbar')
 @section('content')
 <section class="vh-100">
     <div class="container py-5 h-100">
