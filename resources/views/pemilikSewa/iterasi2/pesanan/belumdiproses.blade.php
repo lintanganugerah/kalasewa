@@ -310,37 +310,3 @@
     <script src="{{ asset('seller/inputangka.js') }}"></script>
     <script src="{{ asset('seller/inputfotoproduk.js') }}"></script>
 @endsection
-
-<style>
-    .product-image-container {
-        width: 100px;
-        height: 100px;
-        overflow: hidden;
-    }
-
-    .product-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    @media (max-width: 1199px) {
-        .text-lg-end {
-            text-align: left !important;
-        }
-
-        .col-lg-6 {
-            margin-top: 1rem;
-        }
-
-        .product-image-container-tabel {
-            display: none;
-        }
-    }
-
-    table {
-        border-collapse: collapse;
-        width: 100%;
-        border: 0.5px solid #ddd;
-    }
-</style>

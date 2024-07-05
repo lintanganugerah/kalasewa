@@ -221,7 +221,6 @@ class ProdukSellerController extends Controller
         $user = Auth::user();
         $toko = Toko::where('id_user', $user->id)->first();
 
-
         // dd($request->foto_produk);
         $validator = Validator::make($request->all(), [
             'namaProduk' => 'required|string',
@@ -322,6 +321,37 @@ class ProdukSellerController extends Controller
         $produk->ukuran_produk = $request->ukuran;
         $produk->id_toko = $toko->id;
 
+        if ($request->has("additional")) {
+            $additionalData = [];
+
+            if (count($request->additional) % 2 == 0) { //Cek modulus/modolu kalau sisa total data itu 0 jika dibagi 2 artinya jumlah genap
+                // Mengambil index genap sebagai harga, dan ganjil menjadi nama, loncat 2 karena nama dan harga punya index sendiri
+                for ($i = 0; $i < count($request->additional); $i += 2) {
+                    $nama = $request->additional[$i]; //Simpan isi value index ganjil array $request->additional sebagai nama (key nya) 
+                    $harga = $request->additional[$i + 1]; //Simpan isi value index genap array $request->additionalsebagai harga (value nya)
+
+                    // Cek apakah isi string harga itu numeric
+                    if (is_numeric($harga)) {
+                        if ($additionalData != null) {
+                            foreach ($additionalData as $namaTerdaftar => $hargaTerdaftar) {
+                                if ($namaTerdaftar == $nama) {
+                                    return redirect()->back()->withErrors("Nama Additional Tidak Boleh Saling sama, ganti dengan nama yang lain");
+                                }
+                            }
+                        }
+                        $additionalData[$nama] = (int) $harga; // Ubah harga jadi integer, dan memasukkan harga menjadi value dari key $nama. Key nya adalah dari index ganjil nama
+                    } else {
+                        return redirect()->back()->withErrors("Tipe data Harga pada form additional tidak valid. Mohon Refresh Halaman"); // Menampilkan error jika harga tidak valid
+                    }
+                }
+            } else {
+                return redirect()->back()->withErrors("Ada kesalahan data pada Barang Additional, Mohon Refresh halaman");
+            }
+            $produk->additional = json_encode($additionalData);
+        }
+
+        $produk->save();
+        $id_produk = $produk->getKey();
         if ($request->has('biaya_cuci')) {
             $produk->biaya_cuci = str_replace('.', '', $request->biaya_cuci);
         }

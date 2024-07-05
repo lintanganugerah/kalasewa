@@ -24,7 +24,7 @@ class admin
             return redirect()->route('loginView')->with('error', 'Anda Telah Di Banned!');
         }
 
-        if (auth()->check() && auth()->user()->role === "admin") {
+        if (auth()->check() && (auth()->user()->role === "admin" || auth()->user()->role === "super_admin")) {
             return $next($request);
         }
 

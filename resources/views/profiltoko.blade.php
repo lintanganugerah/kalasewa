@@ -63,7 +63,7 @@
                                                     <ul>
                                                         <li>Disarankan Rasio foto 1:1 atau object berada di tengah</li>
                                                         <li>Ukuran max 5MB</li>
-                                                        <li>JPG, JPEG, PNG</li>
+                                                        <li>JPG, JPEG, PNG, WEBP</li>
                                                     </ul>
                                                 </small>
                                                 <input type="file" name="foto" class="form-control mb-2"

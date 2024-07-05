@@ -1,7 +1,8 @@
 <ul class="navbar-nav sidebar sidebar-dark accordion kalasewa-color" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('seller.profilTokoView') }}">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center"
+        href="{{ route('seller.profilTokoView') }}">
         <div class="sidebar-brand-icon">
             <img src="{{ asset(session('profilpath')) }}" width="40px" height="40px" style="object-fit: cover;"
                 class="rounded-circle">

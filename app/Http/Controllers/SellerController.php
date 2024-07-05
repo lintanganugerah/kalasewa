@@ -255,7 +255,6 @@ class SellerController extends Controller
         $user->kode_pos = $request->kodePos;
         $user->link_sosial_media = $request->link_sosial_media;
         $toko->nama_toko = $request->namaToko;
-
         $user->save();
         $toko->save();
 

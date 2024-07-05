@@ -13,6 +13,12 @@
     </ol>
 </div>
 
+@if($errors->has('series'))
+    <div class="alert alert-danger mt-2">
+        {{ $errors->first('series') }}
+    </div>
+@endif
+
 <div class="card">
     <div class="card-body">
         <form action="{{ route('admin.series.update', $series->id) }}" method="POST">
@@ -25,7 +31,7 @@
             <button type="submit" class="btn btn-primary">Update</button>
             <a href="{{ route('admin.series.index') }}" class="btn btn-secondary">Cancel</a>
         </form>
-    </div>  
+    </div>
 </div>
 
 @endsection

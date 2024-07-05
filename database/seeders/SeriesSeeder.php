@@ -231,7 +231,7 @@ class SeriesSeeder extends Seeder
             "I Chu: Halfway Through the Idol (I Chu: Halfway Through the Idol)",
             "Idoly Pride (Idoly Pride)",
             "Kai Byoui Ramune (Kai Byoui Ramune)",
-            'Spy X Family',
+            "Spy X Family",
         ];
 
         $now = Carbon::now();

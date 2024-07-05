@@ -170,13 +170,14 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('/admin/dashboard', [UserController::class, 'userCount'])->name('admin.dashboard');
 
     // Series Routes
-    Route::resource('admin/series', SeriesController::class);
+    // Route::resource('admin/series', SeriesController::class);
     Route::get('/admin/series/{series}/edit', [SeriesController::class, 'edit'])->name('admin.series.edit');
     Route::put('/admin/series/{series}', [SeriesController::class, 'update'])->name('admin.series.update');
     Route::delete('/admin/series/{series}', [SeriesController::class, 'destroy'])->name('admin.series.destroy');
     Route::get('/admin/series/create', [SeriesController::class, 'create'])->name('admin.series.create');
     Route::get('/admin/series', [SeriesController::class, 'index'])->name('admin.series.index');
     Route::post('/admin/series', [SeriesController::class, 'store'])->name('admin.series.store');
+    Route::get('/admin/series/search', [SeriesController::class, 'search'])->name('admin.series.search');
 
     // Role Routes
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
@@ -186,46 +187,16 @@ Route::group(['middleware' => 'admin'], function () {
     Route::put('/admin/users/{user}', [UserController::class, 'update'])->name('admin.users.update');
     Route::delete('/admin/users/{user}', [UserController::class, 'destroy'])->name('admin.users.destroy');
     Route::post('/admin/users/{user}/nonaktifkan', [UserController::class, 'nonaktifkanUser'])->name('admin.users.nonaktifkan');
+    Route::get('/admin/users/search', [UserController::class, 'search'])->name('admin.users.search');
 
     // Verify Routes
     Route::get('/admin/verify', [UserController::class, 'index_verify'])->name('admin.verify.index');
     Route::put('/admin/users/{user}/verify', [UserController::class, 'updateVerification'])->name('admin.users.updateVerification');
     Route::get('/admin/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
-    Route::get('/banned', [AutentikasiController::class, 'viewBanned'])->name('viewBanned');
-    Route::get('/rejected', [AutentikasiController::class, 'viewRejected'])->name('viewRejected');
-    //Logout
+    Route::post('/admin/users/{user}/reject', [UserController::class, 'reject'])->name('admin.users.reject');
+    // Logout
     Route::get('/logout/admin', [AutentikasiController::class, 'logout'])->name('admin.logout');
-    // Series Search
-    Route::get('/admin/series/search', [SeriesController::class, 'search']);
+    // Ubah Sandi
+    Route::get('/admin/ubahsandi', [AutentikasiController::class, 'ubahSandi'])->name('admin.ubahSandi');
+    Route::post('/admin/ubahsandi', [AutentikasiController::class, 'updateSandi'])->name('admin.updateSandi');
 });
-
-
-
-//COMMENTED FROM ADMIN
-// Series Setting
-// Route::get('/admin/series', [AdminController::class, 'series'])
-//     ->name('admin.series')
-//     ->middleware('auth');
-// Route::resource('/admin/series', SeriesController::class);
-// Route::get('/admin/series/{series}/edit', [SeriesController::class, 'edit'])
-//     ->name('admin.series.edit');
-// Route::delete('/admin/series/{series}', [SeriesController::class, 'destroy'])
-//     ->name('admin.series.destroy');
-// Route::put('/admin/series/{id}', [SeriesController::class, 'update'])->name('admin.series.update');
-// Route::get('/admin/series', [SeriesController::class, 'index'])->name('admin.series.index');
-
-//OLD ROUTE
-// Route::get('/daftar/seller', [AutentikasiSellerController::class, 'registerView'])->name('seller.registerView');
-// Route::get('/daftar/buyer', [AutentikasiSellerController::class, 'registerViewBuyer'])->name('buyer.registerViewBuyer');
-// Route::post('/daftar/act/buyer', [AutentikasiSellerController::class, 'checkEmailBuyer'])->name('buyer.registerAction');
-// Route::post('/daftar/act/seller', [AutentikasiSellerController::class, 'checkEmailSeller'])->name('seller.registerAction');
-// Route::get('/daftar/seller/informasi', [AutentikasiSellerController::class,'registerInformationView'])->name('seller.registerInformationView');
-// Route::get('/daftar/seller/informasi', [AutentikasiSellerController::class,'registerInformationView'])->name('seller.registerInformationView');
-// Route::post('/daftar/seller/informasi/act', [AutentikasiSellerController::class,'registerInformationActionSeller'])->name('seller.registerInformationActionSeller');
-// Route::post('/daftar/buyer/informasi/act', [AutentikasiBuyerController::class, 'registerInformationAction'])->name('buyer.registerInformationAction'); 
-// Route::get('/daftar/verifikasi', [AutentikasiSellerController::class, 'verifikasiView'])->name('seller.verifikasiView');
-// Route::get('/daftar/verified', [AutentikasiSellerController::class, 'verifiedView'])->name('seller.verifiedView');
-// Route::get('/resend/verify', [AutentikasiSellerController::class, 'resendVerify'])->name('resendVerify');
-// Route::post('/forgot-password', [AutentikasiSellerController::class, 'ForgotPassAction'])->name('ForgotPassAction');
-// Route::get('/daftar/buyer', [AutentikasiBuyerController::class, 'registerViewBuyer'])->name('buyer.registerViewBuyer');
-// Route::post('/daftar/act/buyer', [AutentikasiBuyerController::class, 'registerActionBuyer'])->name('buyer.registerAction');

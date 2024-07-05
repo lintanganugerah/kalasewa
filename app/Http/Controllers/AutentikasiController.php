@@ -348,6 +348,11 @@ class AutentikasiController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $cekToko = DB::table('tokos')->where('nama_toko', $request->namaToko)->first();
+        if ($cekToko !== null) {
+            return redirect()->back()->withErrors(['msg' => 'Nama Toko telah ada, coba nama toko lain']);
+        }
+
         $photoPath = $request->file('foto_identitas')->store('public/identitas');
         $photoPath = Str::replaceFirst('public/', 'storage/', $photoPath);
 
@@ -445,7 +450,7 @@ class AutentikasiController extends Controller
                     return redirect()->route('seller.dashboardtoko');
                 } else if ($user->role == "penyewa") {
                     return redirect()->route('viewHomepage');
-                } else if ($user->role == "admin") {
+                } else if ($user->role == "admin" || $user->role == "super_admin") {
                     session(['nama' => $user->nama]);
                     return redirect()->route('admin.dashboard');
                 }
@@ -561,5 +566,23 @@ class AutentikasiController extends Controller
         return view('authentication.infoBanned');
     }
 
-    // BANNED
+    // UBAH SANDI
+    public function ubahSandi()
+    {
+        $user = Auth::user();
+        return view('admin.ubahSandi', compact('user'));
+    }
+
+    public function updateSandi(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return redirect()->route('admin.ubahSandi')->with('success', 'Kata sandi berhasil diubah');
+    }
 }

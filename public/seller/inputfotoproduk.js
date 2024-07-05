@@ -233,6 +233,24 @@ function removeAdditionalInput(id) {
 //         });
 // });
 
+document.querySelectorAll(".userPhoto").forEach((input) => {
+    input.addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        const img = event.target.closest(".photo-input").querySelector("img");
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+            img.src = e.target.result;
+        };
+
+        reader.readAsDataURL(file);
+    });
+});
+
+function removeAdditionalInput(id) {
+    document.getElementById(id).remove();
+}
+
 // document.addEventListener("DOMContentLoaded", function () {
 //     // Mendapatkan semua kotak centang
 //     var checkboxes = document.querySelectorAll(".ukuran-checkbox");
