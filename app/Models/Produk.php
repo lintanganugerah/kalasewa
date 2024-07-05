@@ -77,6 +77,10 @@ class Produk extends Model
         return $this->belongsTo(Review::class, 'id_produk');
     }
 
+    public function checkouts()
+    {
+        return $this->hasMany(Checkout::class, 'id_produk');
+    }
     public function avg_nilai_produk($id_produk)
     {
         $nilai = Review::where('id_produk', $id_produk)->where('tipe', 'review_produk')->avg('nilai');

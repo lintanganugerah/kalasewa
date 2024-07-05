@@ -2,40 +2,52 @@
 @extends('layout.navbar')
 
 @section('content')
-<link rel="stylesheet" type="text/css" href="{{ asset('css/wishlist.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/searchbar.css') }}" />
 
 <section>
-    <div class="main-container container">
-        <div class="row py-5">
-            <div class="header">
-                <img src="{{ asset('images/kalasewa.png') }}" alt="kalasewa" class="header-image">
-                <h1>K A L A S E W A</h1>
-                <h4>Wujudkan impian cosplaymu bersama-sama!</h4>
+    <div class="header-text">
+        <div class="container-fluid mt-5">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <h1><strong>Daftar Cosplan Kamu!</strong></h1>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
 
-        @include('layout.searchbar')
+    <div class="alert-container">
+        <div class="container-fluid">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12">
+                        @csrf
+                        @if (session('success'))
+                            <div class="alert alert-success">
+                                {{ session('success') }}
+                            </div>
+                        @endif
+                        @if (session('error'))
+                            <div class="alert alert-danger">
+                                {{ session('error') }}
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        <div class="content">
-            <h1 class="text-center">Wishlist</h1>
-            <div class="card-column">
-                @csrf
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
-                @if (session('error'))
-                    <div class="alert alert-danger">
-                        {{ session('error') }}
-                    </div>
-                @endif
+    <div class="wishlist-card-container">
+        <div class="container-fluid">
+            <div class="container">
                 @foreach ($wishlist->chunk(4) as $chunk)
                     <div class="row-kartu d-flex">
                         @foreach ($chunk as $prod)
                             <a href="{{ route('viewDetail', ['id' => $prod->produk->id]) }}" class="card-link">
                                 <div class="card custom-card text-bg-dark border-secondary"
-                                    style="width: 250px; height: 450px; margin-right: 5px; margin-bottom: 5px;">
+                                    style="width: 250px; height: 100%; margin-right: 5px; margin-bottom: 5px;">
                                     @foreach ($fotoproduk->where('id_produk', $prod->produk->id)->take(1) as $foto)
                                         <img src="{{ asset($foto->path) }}" class="card-img-top img-fluid h-50" alt="fotoproduk"
                                             style="object-fit: cover;">
@@ -58,8 +70,7 @@
                                             </div>
                                         </div>
                                         <h5 class="card-title">{{ $prod->produk->nama_produk }}</h5>
-                                        <p class="card-text">Rp{{ number_format($prod->produk->harga) }} / 3 Hari
-                                        </p>
+                                        <p class="card-text">Rp{{ number_format($prod->produk->harga) }} / 3 Hari</p>
                                         <p class="card-text">
                                             <img src="{{ asset('storage/icon/box-seam.png') }}" alt="box-seam"
                                                 style="width: 1em; height: 1em; vertical-align: middle; fill: white;">
@@ -90,10 +101,9 @@
                 @endforeach
             </div>
         </div>
-
-
     </div>
+
+    @include('layout.footer')
 </section>
 
-@include('layout.footer')
 @endsection

@@ -1,13 +1,13 @@
 @extends('layout.selllayout')
 @section('content')
-    <div class="row">
-        <div class="col">
-            <div class="text-left mb-5 mt-3">
-                <h1 class="fw-bold text-secondary">Produk</h1>
-                <h4 class="fw-semibold text-secondary">Manajemen Produk Anda disini</h4>
-            </div>
+<div class="row">
+    <div class="col">
+        <div class="text-left mb-5 mt-3">
+            <h1 class="fw-bold text-secondary">Produk</h1>
+            <h4 class="fw-semibold text-secondary">Manajemen Produk Anda disini</h4>
+        </div>
 
-            <div class="row gx-5">
+        <div class="row gx-5">
 
                 <div class="card">
                     <div class="card-header">
@@ -70,19 +70,24 @@
                                                     <div class="form-text error-message text-danger" id="FileError-0"></div>
                                                 </div>
                                             </div>
+                                            <div class="flex-grow-1">
+                                                <input type="file" name="foto_produk[]" class="form-control userPhoto"
+                                                    accept=".jpg,.png,.jpeg,.webp" required>
+                                            </div>
                                         </div>
-                                        <div class="flex-grow-1">
-                                            <small class="form-text text-muted">
-                                                <ul>
-                                                    <li>Disarankan Rasio foto 1:1 atau object berada di tengah</li>
-                                                    <li>Ukuran max 5MB</li>
-                                                    <li>JPG, JPEG, PNG, WEBP</li>
-                                                </ul>
-                                            </small>
-                                        </div>
-                                        <button type="button" id="addPhotoBtn" class="btn text-white"
-                                            style="background-color: #D44E4E">Tambah Foto</button>
                                     </div>
+                                    <div class="flex-grow-1">
+                                        <small class="form-text text-muted">
+                                            <ul>
+                                                <li>Disarankan Rasio foto 1:1 atau object berada di tengah</li>
+                                                <li>Ukuran max 5MB</li>
+                                                <li>JPG, JPEG, PNG, WEBP</li>
+                                            </ul>
+                                        </small>
+                                    </div>
+                                    <button type="button" id="addPhotoBtn" class="btn text-white"
+                                        style="background-color: #D44E4E">Tambah Foto</button>
+                                </div>
 
                                     <div class="mb-3">
                                         <label for="exampleFormControlInput1" class="form-label">Nama Produk<span
@@ -167,7 +172,27 @@
                                             <div class="text-danger form-text">{{ $message }}</div>
                                         @enderror
                                     </div>
-                                    <label for="hargaInput" class="form-label">Harga<span
+                                    <span id="harga_span" class="input-group-text fw-100">/ 3 hari</span>
+                                </div>
+                                <small id="helpberat" class="mb-3" style="opacity: 75%;">Masukan Tanpa
+                                    Titik
+                                </small>
+                                <hr class="border border-secondary border-3 my-5">
+                                <!-- Informasi Additional -->
+                                <h5>Informasi Barang Additional</h5>
+                                <div id="helpberat" class="mb-3" style="opacity: 75%;">Jika Anda memiliki
+                                    tambahan barang misalnya seperti aksesoris tambahan, masukan informasi tersebut
+                                    disini beserta harga</div>
+                                <div id="additionalInputs" class="mb-3">
+                                    <!-- Kontainer untuk input harga dan stok yang akan ditambahkan secara dinamis -->
+                                </div>
+                                <button type="button" id="addAdditional" class="btn btn-outline"
+                                    style="color: #D44E4E">Tambah</button>
+                                <hr class="border border-secondary border-3 my-5">
+                                <!-- Informasi Pengiriman -->
+                                <h5 class="card-title">Informasi Pengiriman</h5>
+                                <div class="mb-3">
+                                    <label for="exampleFormControlInput1" class="form-label">Berat Produk<span
                                             class="text-danger">*</span></label>
                                     <div class="input-group">
                                         <div class="form-floating">
@@ -428,12 +453,22 @@
                                             Harap
                                             Pilih Metode Kirim</div>
                                     </div>
-                                    <div class="d-grid mb-5">
-                                        <button class="btn btn-kalasewa btn-lg btn-block" type="submit">Buat
-                                            Produk</button>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="SiCepat" value="SiCepat"
+                                            name="metode_kirim[]">
+                                        <label class="form-check-label" for="SiCepat">SiCepat</label>
                                     </div>
-                                </form>
-                            </div>
+                                    <div class="form-check form-check-inline">
+                                        <input class="form-check-input" type="checkbox" id="Paxel" value="Paxel"
+                                            name="metode_kirim[]">
+                                        <label class="form-check-label" for="Paxel">Paxel</label>
+                                    </div>
+                                </div>
+                                <div class="d-grid mb-5">
+                                    <button class="btn btn-kalasewa btn-lg btn-block" type="submit">Buat
+                                        Produk</button>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
@@ -556,6 +591,8 @@
                     </div>
                 </div>
             </div>
+
+
         </div>
     </div>
     <script>

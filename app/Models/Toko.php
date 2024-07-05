@@ -37,6 +37,11 @@ class Toko extends Model
 
     public function produks()
     {
+        return $this->hasMany(Produk::class, 'id_toko');
+    }
+
+    public function produkReview()
+    {
         return $this->hasMany(Review::class, 'id_toko');
     }
 
@@ -44,5 +49,4 @@ class Toko extends Model
     {
         return $this->hasMany(AlamatTambahan::class, 'id_toko');
     }
-
 }

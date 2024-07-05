@@ -50,6 +50,10 @@ class OrderPenyewaan extends Model
         'tanggal_pengembalian' => 'datetime'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_penyewa');
+    }
     public function id_penyewa_order()
     {
         return $this->belongsTo(User::class, 'id_penyewa', 'id');
@@ -80,5 +84,15 @@ class OrderPenyewaan extends Model
         $bulan = (int) $tanggal->format('m');
 
         return $hari . ' ' . $bulanTeks[$bulan];
+    }
+
+    public function penyewa()
+    {
+        return $this->belongsTo(User::class, 'id_penyewa');
+    }
+
+    public function produk()
+    {
+        return $this->belongsTo(Produk::class, 'id_produk');
     }
 }

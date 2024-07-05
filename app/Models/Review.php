@@ -26,6 +26,12 @@ class Review extends Model
         'nilai' => 'integer',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_penyewa');
+    }
+
+
     public function id_review_penyewa()
     {
         return $this->belongsTo(User::class, 'id_penyewa', 'id');

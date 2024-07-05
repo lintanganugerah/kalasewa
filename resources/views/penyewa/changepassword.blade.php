@@ -17,9 +17,9 @@
                                 {{ session('success') }}
                             </div>
                             @endif
-                            @if (session('error'))
+                            @if ($errors->any())
                             <div class="alert alert-danger">
-                                {{ session('error') }}
+                                {{ $errors->first() }}
                             </div>
                             @endif
                             <h5 class="fw-bold mb-3 pb-3" style="letter-spacing: 1px;">Ubah Password</h5>

@@ -24,16 +24,18 @@ return new class extends Migration {
             $table->unsignedBigInteger('biaya_cuci')->nullable(); // Kalo ada produk dengan biaya cuci
             $table->unsignedBigInteger('fee_admin'); // (Harga + additional) x 5%
             $table->unsignedBigInteger('total_harga'); // Harga + additional + biaya cuci jika ada, tanpa fee admin
+            $table->unsignedBigInteger('grand_total')->nullable(); // Harga + additional + biaya cuci jika ada + fee admin + jaminan
             $table->BigInteger('jaminan'); // Bakal dikurangi denda_keterlambatan dan denda_lainnya, jika hasil minus maka akan diminta ke user
             $table->unsignedBigInteger('denda_keterlambatan')->nullable();
             $table->unsignedBigInteger('total_penghasilan'); // total_harga - fee_admin + (denda_keterlambatan + denda_lainnya), Ini adalah nominal yang akan dilepaskan ke pemilik sewa
-            $table->json('bukti_penerimaan')->nullable(); //Path foto bukti penerimaan, ga bisa di edit
+            $table->string('bukti_penerimaan')->nullable(); //Path foto bukti penerimaan, ga bisa di edit
             $table->json('denda_lainnya')->nullable(); // 'Nama Peraturan' => 'Nominal_denda'
             $table->json('additional')->nullable(); // 'Nama Additional' => 'Harga'
             $table->dateTime('tanggal_diterima')->nullable();
             $table->dateTime('tanggal_pengembalian')->nullable();
             $table->text('alasan_pembatalan')->nullable();
-            $table->enum('status', ['Menunggu di Proses', 'Dalam Pengiriman', 'Sedang Berlangsung', 'Retur', 'Retur Dikonfirmasi', 'Retur dalam Pengiriman', 'Retur Selesai', 'Telah Kembali', 'Penyewaan Selesai', 'Dibatalkan Pemilik Sewa', 'Dibatalkan Penyewa']);
+            $table->string('snapToken')->nullable();
+            $table->enum('status', ['Pending', 'Menunggu di Proses', 'Dalam Pengiriman', 'Sedang Berlangsung', 'Retur', 'Retur Dikonfirmasi', 'Retur dalam Pengiriman', 'Retur Selesai', 'Telah Kembali', 'Penyewaan Selesai', 'Dibatalkan Pemilik Sewa', 'Dibatalkan Penyewa']);
             $table->timestamps();
 
             $table->foreign('id_penyewa')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');

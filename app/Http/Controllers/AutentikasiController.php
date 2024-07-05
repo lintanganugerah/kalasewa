@@ -147,7 +147,8 @@ class AutentikasiController extends Controller
             }
             session(['profilpath' => $user->foto_profil]);
         } else if (session()->has('regis')) {
-            return view('authentication.register-penyewa-informasi');
+            $enumOptions = ['Teman', 'Kerabat', 'Orang Tua'];
+            return view('authentication.register-penyewa-informasi', compact('enumOptions'));
         } else {
             return redirect()->back();
         }
@@ -158,11 +159,18 @@ class AutentikasiController extends Controller
     {
         //SIMPAN INFORMASI AKUN BARU SAAT REGISTER
         $validator = Validator::make($request->all(), [
-            'password' => 'required|confirmed|string|min:8,',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+            ],
+            'confPassword' => 'required|string',
             'nama' => 'required|string',
             'nomor_identitas' => 'required|numeric|min_digits:16|max_digits:16|unique:users,NIK',
             'link_sosial_media' => 'required|url',
             'nomor_telpon' => 'required|numeric|min_digits:10|max_digits:13|unique:users,no_telp',
+            'ket_no_darurat' => 'required|in:Teman,Kerabat,Orang Tua',
             'nomor_telpon_darurat' => 'required|numeric|min_digits:10|max_digits:13',
             'alamat' => 'required|string',
             'provinsi' => 'required|string',
@@ -182,9 +190,15 @@ class AutentikasiController extends Controller
             return redirect()->back()->withErrors("Nomor darurat tidak boleh sama dengan nomor telepon pribadi")->withInput();
         }
 
+        if ($request->input('confPassword') != $request->input('password')) {
+            return redirect()->back()->withErrors("Konfirmasi password anda salah!")->withInput();
+        }
+
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
+
+
 
         $photoPath = $request->file('foto_identitas')->store('public/identitas');
         $photoPath = Str::replaceFirst('public/', 'storage/', $photoPath);
@@ -205,6 +219,7 @@ class AutentikasiController extends Controller
         $user->nama = $request->nama;
         $user->password = Hash::make($request->password);
         $user->no_telp = $request->nomor_telpon;
+        $user->ket_no_darurat = $request->ket_no_darurat;
         $user->no_darurat = $request->nomor_telpon_darurat;
         $user->alamat = $request->alamat;
         $user->provinsi = $request->provinsi;

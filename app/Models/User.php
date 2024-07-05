@@ -103,6 +103,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(SaldoUser::class, 'id_user');
     }
 
+    public function orders()
+    {
+        return $this->hasMany(OrderPenyewaan::class, 'id_penyewa');
+    }
     public function alasanPenolakan()
     {
         return $this->hasMany(AlasanPenolakan::class, 'id_user');

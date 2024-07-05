@@ -27,6 +27,8 @@ use App\Http\Controllers\StatusPenyewaanController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\PenilaianSisiSellerController;
 
 
@@ -64,7 +66,12 @@ Route::post('/reset-password/{token}/act', [AutentikasiController::class, 'reset
 Route::get('/catalog/detail/{id}', [PublicController::class, 'viewDetail'])->name('viewDetail');
 Route::get('/rules', [PublicController::class, 'viewRules'])->name('viewRules');
 Route::get('/about', [PublicController::class, 'viewAbout'])->name('viewAbout');
-Route::get('/search', [PublicController::class, 'search'])->name('search');
+Route::get('/pencarian', [PublicController::class, 'viewPencarian'])->name('viewPencarian');
+Route::get('/pencarian/search', [PublicController::class, 'searchProduk'])->name('searchProduk');
+Route::get('/toko', [PublicController::class, 'viewListToko'])->name('viewListToko');
+Route::get('/toko/search', [PublicController::class, 'searchToko'])->name('searchToko');
+Route::get('/toko/{id}', [PublicController::class, 'viewToko'])->name('viewToko');
+Route::get('/toko/{id}/search', [PublicController::class, 'searchProdukToko'])->name('searchProdukToko');
 
 //Logout
 Route::get('/logout', [AutentikasiController::class, 'logout'])->name('logout');
@@ -85,6 +92,23 @@ Route::group(['middleware' => 'penyewa'], function () {
     Route::post('/wishlist/add/{id}', [WishlistController::class, 'addToWishlist'])->name('wishlist.add');
     Route::post('/wishlist/remove/{id}', [WishlistController::class, 'removeFromWishlist'])->name('wishlist.remove');
     Route::get('/wishlist', [WishlistController::class, 'viewWishlist'])->name('wishlist.view');
+
+    //Order Produk
+    Route::get('/produk/{id}/create/order', [OrderController::class, 'viewOrder'])->name('viewOrder');
+    Route::post('/produk/{id}/create/order/act', [OrderController::class, 'createOrder'])->name('createOrder');
+    Route::get('/order/checkout', [OrderController::class, 'viewCheckout'])->name('viewCheckout');
+    Route::post('/order/checkout/update-status', [OrderController::class, 'updateCheckout'])->name('updateCheckout');
+    Route::get('/order/{orderId}/detail/pemesanan', [OrderController::class, 'viewDetailPemesanan'])->name('viewDetailPemesanan');
+    Route::post('/order/{orderId}/detail/pemesanan/diterima/act', [OrderController::class, 'terimaBarang'])->name('terimaBarang');
+    Route::get('/order/{orderId}/detail/pemgembalian', [OrderController::class, 'viewPengembalianBarang'])->name('viewPengembalianBarang');
+    Route::post('/order/{orderId}/detail/pemgembalian/act', [OrderController::class, 'returBarang'])->name('returBarang');
+    Route::get('/order/{orderId}/detail/penyewaan/selesai', [OrderController::class, 'viewPenyewaanSelesai'])->name('viewPenyewaanSelesai');
+
+    //History
+    Route::get('/user/history/semua', [HistoryController::class, 'viewHistory'])->name('viewHistory');
+    Route::get('/user/history/ongoing', [HistoryController::class, 'viewHistoryOngoing'])->name('viewHistoryOngoing');
+    Route::get('/user/history/selesai', [HistoryController::class, 'viewHistoryFinish'])->name('viewHistoryFinish');
+
 
 });
 
