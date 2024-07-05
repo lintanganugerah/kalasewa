@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
+use App\Events\PemilikSewaCreated;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Toko;
 use App\Models\KodeOTP;
@@ -156,7 +158,7 @@ class AutentikasiController extends Controller
     {
         //SIMPAN INFORMASI AKUN BARU SAAT REGISTER
         $validator = Validator::make($request->all(), [
-            'password' => 'required|string|min_digits:8,',
+            'password' => 'required|confirmed|string|min:8,',
             'nama' => 'required|string',
             'nomor_identitas' => 'required|numeric|min_digits:16|max_digits:16|unique:users,NIK',
             'link_sosial_media' => 'required|url',
@@ -166,8 +168,8 @@ class AutentikasiController extends Controller
             'provinsi' => 'required|string',
             'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
             'kodePos' => 'required|numeric|min_digits:5|max_digits:5',
-            'foto_identitas' => 'file|mimes:jpg,jpeg,png,webp|max:5120',
-            'foto_diri' => 'file|mimes:jpg,jpeg,png,webp|max:5120',
+            'foto_identitas' => 'file|mimes:jpg,jpeg,png,webp|max:20480',
+            'foto_diri' => 'file|mimes:jpg,jpeg,png,webp|max:20480',
         ]);
 
         if (session()->has('email')) {
@@ -323,7 +325,7 @@ class AutentikasiController extends Controller
     {
         //SIMPAN INFORMASI AKUN BARU SAAT REGISTER
         $validator = Validator::make($request->all(), [
-            'password' => 'required|string|min_digits:8,',
+            'password' => 'required|confirmed|string|min:8',
             'nama' => 'required|string',
             'namaToko' => 'required|string|unique:tokos,nama_toko',
             'link_sosial_media' => 'required|url',
@@ -333,13 +335,13 @@ class AutentikasiController extends Controller
             'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
             'kodePos' => 'required|numeric|min_digits:5|max_digits:5',
             'nomor_identitas' => 'required|numeric|min_digits:16|max_digits:16|unique:users,NIK',
-            'foto_identitas' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
+            'foto_identitas' => 'required|image|mimes:jpg,jpeg,png,webp|max:20480',
         ]);
 
         if (session()->has('email')) {
             $email = Session::get('email');
         } else {
-            return redirect()->route('registerViewPemilikSewa')->with('error', 'Silahkan coba daftar ulang');
+            return redirect()->route('registerViewPemilikSewa')->with('error', 'Email Telah Terdaftar! Silahkan Login');
         }
 
         if ($validator->fails()) {
@@ -368,27 +370,32 @@ class AutentikasiController extends Controller
             $toko = new Toko;
         }
 
-        $user->email = $email;
-        $user->nama = $request->nama;
-        $user->password = Hash::make($request->password);
-        $user->no_telp = $request->nomor_telpon;
-        $user->alamat = $request->AlamatToko;
-        $user->provinsi = $request->provinsi;
-        $user->link_sosial_media = $request->link_sosial_media;
-        $user->kota = $request->kota;
-        $user->kode_pos = $request->kodePos;
-        $user->nik = $request->nomor_identitas;
-        $user->foto_identitas = $photoPath;
-        $user->role = "pemilik_sewa";
-        $user->save();
+        $user = User::create([
+            'email' => $email,
+            'nama' => $request->nama,
+            'password' => Hash::make($request->password),
+            'no_telp' => $request->nomor_telpon,
+            'alamat' => $request->AlamatToko,
+            'provinsi' => $request->provinsi,
+            'link_sosial_media' => $request->link_sosial_media,
+            'kota' => $request->kota,
+            'kode_pos' => $request->kodePos,
+            'NIK' => $request->nomor_identitas,
+            'foto_identitas' => $photoPath,
+            'role' => 'pemilik_sewa',
+        ]);
         $toko->nama_toko = $request->namaToko;
         $toko->id_user = $user->id;
         $toko->save();
+
+
 
         $KODEOTP = KodeOTP::where('email', session('email'))->first();
         if ($KODEOTP) {
             $KODEOTP->delete();
         }
+
+        event(new PemilikSewaCreated($user));
 
         Session::forget('verify');
         Session::forget('email');
@@ -422,7 +429,6 @@ class AutentikasiController extends Controller
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            // dd($user->role); //
             $toko = Toko::where('id_user', $user->id)->first();
 
             if ($user->verifyIdentitas === "Tidak") {
@@ -484,11 +490,13 @@ class AutentikasiController extends Controller
     public function ForgotPassAction(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'required|email|exists:users,email'
+            'email' => 'required|email'
         ]);
 
-        if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return redirect()->back()->withErrors("Email tidak ditemukan");
         }
 
         $status = Password::sendResetLink(
@@ -508,15 +516,23 @@ class AutentikasiController extends Controller
                 return redirect()->route('viewHomepage');
             }
         }
-        return view('authentication.resetPass')->with(['token' => $token, 'email' => $request->email]);
+
+        $user = User::where('email', $request->email)->first();
+        $tokenExist = Password::tokenExists($user, $token);
+
+        if ($tokenExist) {
+            return view('authentication.resetPass')->with(['token' => $token, 'email' => $request->email]);
+        } else {
+            return redirect()->route('viewForgotPass')->with('error', 'Token Expired/Tidak Ditemukan. Silahkan Request Ulang! Jika sudah mengirimkan request sebelumnya, Mohon gunakan link terbaru dari email');
+        }
     }
 
-    public function resetPassAction(Request $request)
+    public function resetPassAction(Request $request, $token)
     {
         $validator = Validator::make($request->all(), [
             'token' => 'required',
             'email' => 'required|email',
-            'password' => 'required|confirmed|min_digits:8',
+            'password' => 'required|confirmed|string|min:8',
         ]);
 
         if ($validator->fails()) {

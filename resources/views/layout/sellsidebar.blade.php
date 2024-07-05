@@ -1,7 +1,8 @@
 <ul class="navbar-nav sidebar sidebar-dark accordion kalasewa-color" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('seller.profilTokoView') }}">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center"
+        href="{{ route('seller.profilTokoView') }}">
         <div class="sidebar-brand-icon">
             <img src="{{ asset(session('profilpath')) }}" width="40px" height="40px" style="object-fit: cover;"
                 class="rounded-circle">
@@ -24,7 +25,7 @@
     <li class="nav-item">
         <a class="nav-link" href="{{ route('seller.statuspenyewaan.belumdiproses') }}">
             <i class="fas fa-light fa-clipboard-list"></i>
-            <span>Pesanan</span></a>
+            <span>Status Penyewaan</span></a>
     </li>
 
     <!-- Nav Item - Utilities Collapse Menu -->
@@ -33,6 +34,12 @@
         <a class="nav-link" href="{{ route('seller.viewProdukAnda') }}">
             <i class="fas fa-solid fa-boxes-stacked"></i>
             <span>Produk</span></a>
+    </li>
+
+    <li class="nav-item">
+        <a class="nav-link" href="">
+            <i class="fa-solid fa-comments"></i>
+            <span>Chat</span></a>
     </li>
 
     <!-- Divider -->
@@ -50,7 +57,7 @@
     </li>
 
     <li class="nav-item">
-        <a class="nav-link" href="">
+        <a class="nav-link" href="{{ route('seller.view.penilaian.penilaianProduk') }}">
             <i class="fa-solid fa-regular fa-star"></i>
             <span>Penilaian Produk</span></a>
     </li>

@@ -18,13 +18,13 @@
             <h1 class="text-center mb-3"><strong>SERIES</strong></h1>
             <div class="list-group">
                 <div class="container gap-2 series-container">
-                    @foreach($groupedSeries as $letter => $seriesGroup)
+                    @foreach ($groupedSeries as $letter => $seriesGroup)
                         <div class="series-group">
                             <h4 class="series-letter text-center">{{ $letter }}</h4>
                             <div class="container">
                                 <div
                                     class="row row-cols-2 row-cols-md-2 row-cols-lg-4 row-cols-xl-5 g-2  d-flex justify-content-start">
-                                    @foreach($seriesGroup as $seriesItem)
+                                    @foreach ($seriesGroup as $seriesItem)
                                         <div class="col">
                                             <a href="{{ route('search', ['series' => $seriesItem->id]) }}"
                                                 class="list-group-item list-group-item-action"

@@ -25,7 +25,7 @@ class CreateDefaultPeraturanSewa
 
         PeraturanSewa::create([
             'nama' => 'Terlambat Mengembalikan Kostum',
-            'deskripsi' => 'Penyewa akan dikenakan denda jika pengembalian kostum yang disewa melebihi batas waktu sewa yang telah ditentukan.',
+            'deskripsi' => 'Penyewa akan dikenakan denda jika pengembalian kostum yang disewa melebihi batas waktu sewa yang telah ditentukan. Denda akan dikenakan per-hari keterlambatan!!',
             'id_toko' => $toko->id,
             'terdapat_denda' => true,
             'denda_pasti' => 50000,

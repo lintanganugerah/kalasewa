@@ -30,4 +30,9 @@ class AlamatTambahan extends Model
     {
         return $this->belongsTo(Toko::class, 'id_toko');
     }
+
+    public function produk()
+    {
+        return $this->hasMany(Produk::class, 'id');
+    }
 }

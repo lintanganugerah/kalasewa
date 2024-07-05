@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AlamatTambahan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -21,14 +22,22 @@ class ProdukSellerController extends Controller
     public function viewTambahProduk()
     {
         $series = Series::all();
-        return view('produk.tambahproduk', compact('series'));
+        $toko = Toko::where('id_user', Auth::id())->first();
+        $alamatTambahan = null;
+
+        if ($toko->isAlamatTambahan) {
+            $alamatTambahan = AlamatTambahan::where('id_toko', $toko->id)->get();
+            return view('produk.tambahproduk', compact('series', 'alamatTambahan'));
+        }
+
+        return view('produk.tambahproduk', compact('series', 'alamatTambahan'));
     }
 
     public function viewProdukAnda()
     {
         $user = Auth::user();
         $toko = Toko::where('id_user', $user->id)->first();
-        $produk = Produk::where('id_toko', $toko->id)->get();
+        $produk = Produk::where('id_toko', $toko->id)->orderByDesc('updated_at')->get();
         $produkIds = $produk->pluck('id');
         $seriesIds = $produk->pluck('id_series');
         $fotoProduk = FotoProduk::whereIn('id_produk', $produkIds)->get();
@@ -54,7 +63,13 @@ class ProdukSellerController extends Controller
         // dd($decodeAdd, $produk->additional);
 
         if ($toko->id == $produk->id_toko) {
-            return view('produk.editproduk', compact('produk', 'fotoProduk', 'series', 'decodeAdd'));
+
+            $alamatTambahan = null;
+
+            if ($toko->isAlamatTambahan) {
+                $alamatTambahan = AlamatTambahan::where('id_toko', $toko->id)->get();
+            }
+            return view('produk.editproduk', compact('produk', 'fotoProduk', 'series', 'decodeAdd', 'alamatTambahan'));
         } else {
             return redirect()->back()->with('error', 'Produk Invalid');
         }
@@ -73,10 +88,16 @@ class ProdukSellerController extends Controller
             'ukuran' => 'required',
             'harga' => 'required|numeric|min:100',
             'brand' => 'required|string',
-            'gender' => 'required|in:Pria,Wanita',
+            'gender' => 'required|in:Pria,Wanita,Semua Gender',
             'foto_produk' => 'nullable|max:5120',
             'beratProduk' => 'required|numeric|min:10',
             'metode_kirim' => 'required',
+            'grade' => 'required|String|in:Grade 1,Grade 2,Grade 3',
+            'cuci' => 'required',
+            'wig_opsi' => 'required',
+            'biaya_cuci' => 'required_if:cuci,ya|numeric|min:100',
+            'brand_wig' => 'required_if:wig_opsi,ya|String',
+            'ket_wig' => 'required_if:wig_opsi,ya|String',
         ]);
 
 
@@ -90,30 +111,34 @@ class ProdukSellerController extends Controller
 
         if ($request->has("additional")) {
             $additionalData = [];
+            $additional = $request->additional;
+            $count = count($additional);
 
-            if (count($request->additional) % 2 == 0) { //Cek modulus/modolu kalau sisa total data itu 0 jika dibagi 2 artinya jumlah genap
-                // Mengambil index genap sebagai harga, dan ganjil menjadi nama, loncat 2 karena nama dan harga punya index sendiri
-                for ($i = 0; $i < count($request->additional); $i += 2) {
-                    $nama = $request->additional[$i]; //Simpan isi value index ganjil array $request->additional sebagai nama (key nya) 
-                    $harga = $request->additional[$i + 1]; //Simpan isi value index genap array $request->additionalsebagai harga (value nya)
+            //Cek modulus/modolu kalau sisa total data itu 0 jika dibagi 2 artinya jumlah genap. Kalo ganjil berarti ada field yang kosong.
+            if ($count % 2 != 0) {
+                //Hasil additional selalu genap. Nama Additional di ganjil, Harga nya di genap (Jumlah 2 tiap additional, genap)
+                // Kalo hasil ganjil, maka ini di eksekusi, dan berarti ada satu field yang ga ke isi
+                return redirect()->back()->withErrors("Ada kesalahan data pada Barang Additional, Mohon Refresh halaman")->withInput();
+            }
 
+            // Lakukan perulangan setiap jarak 2, karena tiap additional pake 2 indeks array
+            for ($i = 0; $i < $count; $i += 2) {
+                $nama = $additional[$i]; //Simpan isi value index ganjil array $request->additional sebagai nama (key nya) 
+                $harga = $additional[$i + 1]; //Simpan isi value index genap array $request->additionalsebagai harga (value nya)
+                $harga = str_replace('.', '', $harga);
 
-                    // Cek apakah isi string harga itu numeric
-                    if (is_numeric($harga)) {
-                        if ($additionalData != null) {
-                            foreach ($additionalData as $namaTerdaftar => $hargaTerdaftar) {
-                                if ($namaTerdaftar == $nama) {
-                                    return redirect()->back()->withErrors("Nama Additional Tidak Boleh Saling sama, ganti dengan nama yang lain");
-                                }
-                            }
-                        }
-                        $additionalData[$nama] = (int) $harga; // Ubah harga jadi integer, dan memasukkan harga menjadi value dari key $nama. Key nya adalah dari index ganjil nama
-                    } else {
-                        return redirect()->back()->withErrors("Tipe data Harga pada form additional tidak valid. Mohon Refresh Halaman"); // Menampilkan error jika harga tidak valid
-                    }
+                // Cek apakah isi string harga itu numeric. Jika tidak maka balik kan ke halaman tambah produk
+                if (!is_numeric($harga)) {
+                    return redirect()->back()->withErrors(["add" . $i + 1 => "Tipe data Harga pada form additional tidak valid"])->withInput();
                 }
-            } else {
-                return redirect()->back()->withErrors("Ada kesalahan data pada Barang Additional, Mohon Refresh halaman");
+
+                // Cek apakah ada nama additional yang sama dengan sebelumnya
+                if (isset($additionalData[$nama])) {
+                    return redirect()->back()->withErrors(["add" . $i => "Nama Additional Tidak Boleh Saling sama, ganti dengan nama yang lain"])->withInput();
+                }
+
+                // Akhirnya masukin key => value_harga
+                $additionalData[$nama] = (int) $harga;
             }
 
             $produk->additional = json_encode($additionalData);
@@ -121,16 +146,47 @@ class ProdukSellerController extends Controller
             $produk->additional = null;
         }
 
+        if ($request->has('biaya_cuci')) {
+            $produk->biaya_cuci = str_replace('.', '', $request->biaya_cuci);
+        } else {
+            $produk->biaya_cuci = null;
+        }
+
+        if ($request->has('brand_wig')) {
+            $produk->brand_wig = $request->brand_wig;
+            $produk->keterangan_wig = $request->ket_wig;
+        } else {
+            $produk->brand_wig = null;
+            $produk->keterangan_wig = null;
+        }
+
+        if ($request->alamat_opsi) {
+            if ($request->alamat_opsi != 'default') {
+                $alamat = AlamatTambahan::where('id', $request->alamat_opsi)->first();
+                if (!$alamat) {
+                    return redirect()->back()->withErrors(["alamat_opsi" => "Alamat Invalid. Tidak Ditemukan"])->withInput();
+                } elseif ($alamat->id_toko != $toko->id) {
+                    return redirect()->back()->withErrors(["alamat_opsi" => "Alamat Invalid"])->withInput();
+                }
+
+                $produk->id_alamat = $request->alamat_opsi;
+            } else {
+                $produk->id_alamat = null;
+            }
+        }
+
+        $series = Series::firstOrCreate(['series' => ucwords($request->series)]);
+
+        $produk->grade = $request->grade;
         $produk->nama_produk = $request->namaProduk;
         $produk->deskripsi_produk = $request->deskripsiProduk;
-        $produk->id_series = $request->series;
+        $produk->id_series = $series->id; // Menggunakan series yang ada atau buat baru
         $produk->brand = $request->brand;
         $produk->harga = $request->harga;
         $produk->gender = $request->gender;
         $produk->berat_produk = $request->beratProduk;
         $produk->metode_kirim = json_encode($request->metode_kirim);
         $produk->ukuran_produk = $request->ukuran;
-        $produk->save();
 
         if ($request->has("foto_produk")) {
             //CEK EKSTENSI FOTO TERLEBIH DAHULU
@@ -155,7 +211,9 @@ class ProdukSellerController extends Controller
             }
         }
 
-        return redirect()->back()->with('success', 'Perubahan Produk Berhasil Disimpan');
+        $produk->save();
+
+        return redirect()->route('seller.viewProdukAnda')->with('success', 'Perubahan Produk Berhasil Disimpan');
     }
 
     public function tambahProdukAction(Request $request)
@@ -167,15 +225,22 @@ class ProdukSellerController extends Controller
         $validator = Validator::make($request->all(), [
             'namaProduk' => 'required|string',
             'deskripsiProduk' => 'required|string',
-            'series' => 'required|exists:series,id',
+            'series' => 'required|string',
             'ukuran' => 'required|in:XS,S,M,L,XL,XXL,All_Size',
             'harga' => 'required|numeric|min:100',
             'brand' => 'required|string',
-            'gender' => 'required|string|in:Pria,Wanita',
+            'gender' => 'required|string|in:Pria,Wanita,Semua Gender',
             'foto_produk' => 'required|max:5120',
             'beratProduk' => 'required|numeric|min:50',
             'metode_kirim' => 'required',
+            'grade' => 'required|String|in:Grade 1,Grade 2,Grade 3',
+            'cuci' => 'required',
+            'wig_opsi' => 'required',
+            'biaya_cuci' => 'required_if:cuci,ya|numeric|min:100',
+            'brand_wig' => 'required_if:wig_opsi,ya|String',
+            'ket_wig' => 'required_if:wig_opsi,ya|String',
         ]);
+
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -191,10 +256,63 @@ class ProdukSellerController extends Controller
             }
         }
 
+        // Cek dan buat series baru jika perlu
+        $series = Series::firstOrCreate(['series' => ucwords($request->series)]);
+
         $produk = new Produk;
+
+        if ($request->has("additional")) {
+            $additionalData = [];
+            $additional = $request->additional;
+            $count = count($additional);
+
+            //Cek modulus/modolu kalau sisa total data itu 0 jika dibagi 2 artinya jumlah genap. Kalo ganjil berarti ada field yang kosong.
+            if ($count % 2 != 0) {
+                //Hasil additional selalu genap. Nama Additional di ganjil, Harga nya di genap (Jumlah 2 tiap additional, genap)
+                // Kalo hasil ganjil, maka ini di eksekusi, dan berarti ada satu field yang ga ke isi
+                return redirect()->back()->withErrors("Ada kesalahan data pada Barang Additional, Mohon Refresh halaman")->withInput();
+            }
+
+            // Lakukan perulangan setiap jarak 2, karena tiap additional pake 2 indeks array
+            for ($i = 0; $i < $count; $i += 2) {
+                $nama = $additional[$i]; //Simpan isi value index ganjil array $request->additional sebagai nama (key nya) 
+                $harga = $additional[$i + 1]; //Simpan isi value index genap array $request->additionalsebagai harga (value nya)
+                $harga = str_replace('.', '', $harga);
+
+                // Cek apakah isi string harga itu numeric. Jika tidak maka balik kan ke halaman tambah produk
+                if (!is_numeric($harga)) {
+                    return redirect()->back()->withErrors(["add" . $i + 1 => "Tipe data Harga pada form additional tidak valid"])->withInput();
+                }
+
+                // Cek apakah ada nama additional yang sama dengan sebelumnya
+                if (isset($additionalData[$nama])) {
+                    return redirect()->back()->withErrors(["add" . $i => "Nama Additional Tidak Boleh Saling sama, ganti dengan nama yang lain"])->withInput();
+                }
+
+                // Akhirnya masukin key => value_harga
+                $additionalData[$nama] = (int) $harga;
+            }
+
+            $produk->additional = json_encode($additionalData);
+        }
+
+        if ($request->alamat_opsi) {
+            if ($request->alamat_opsi != 'default') {
+                $alamat = AlamatTambahan::where('id', $request->alamat_opsi)->first();
+                if (!$alamat) {
+                    return redirect()->back()->withErrors(["alamat_opsi" => "Alamat Invalid. Tidak Ditemukan"])->withInput();
+                } elseif ($alamat->id_toko != $toko->id) {
+                    return redirect()->back()->withErrors(["alamat_opsi" => "Alamat Invalid"])->withInput();
+                }
+
+                $produk->id_alamat = $request->alamat_opsi;
+            }
+        }
+
+        $produk->grade = $request->grade;
         $produk->nama_produk = $request->namaProduk;
         $produk->deskripsi_produk = $request->deskripsiProduk;
-        $produk->id_series = $request->series;
+        $produk->id_series = $series->id; // Menggunakan ID series yang ditemukan atau baru dibuat
         $produk->brand = $request->brand;
         $produk->harga = $request->harga;
         $produk->gender = $request->gender;
@@ -234,10 +352,21 @@ class ProdukSellerController extends Controller
 
         $produk->save();
         $id_produk = $produk->getKey();
+        if ($request->has('biaya_cuci')) {
+            $produk->biaya_cuci = str_replace('.', '', $request->biaya_cuci);
+        }
+
+        if ($request->has('brand_wig')) {
+            $produk->brand_wig = $request->brand_wig;
+            $produk->keterangan_wig = $request->ket_wig;
+        }
 
         foreach ($request->foto_produk as $foto) {
             $pathSebelum = $foto->store('public/produk/foto_produk');
             $path = str_replace('public/', 'storage/', $pathSebelum);
+
+            $produk->save();
+            $id_produk = $produk->getKey();
 
             // Buat instance model FotoProduk
             $fotoProduk = new FotoProduk();

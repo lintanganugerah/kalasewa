@@ -27,6 +27,7 @@ use App\Http\Controllers\StatusPenyewaanController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SeriesController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\PenilaianSisiSellerController;
 
 
 // HOMEPAGE
@@ -57,7 +58,7 @@ Route::post('/login/act', [AutentikasiController::class, 'loginAction'])->name('
 Route::get('/forgot-password', [AutentikasiController::class, 'viewForgotPass'])->name('viewForgotPass');
 Route::post('/forgot-password', [AutentikasiController::class, 'ForgotPassAction'])->name('ForgotPassAction');
 Route::get('/reset-password/{token}', [AutentikasiController::class, 'viewResetPass'])->name('password.reset');
-Route::post('/reset-password', [AutentikasiController::class, 'resetPassAction'])->name('resetPassAction');
+Route::post('/reset-password/{token}/act', [AutentikasiController::class, 'resetPassAction'])->name('resetPassAction');
 
 // PUBLIC ROUTE
 Route::get('/catalog/detail/{id}', [PublicController::class, 'viewDetail'])->name('viewDetail');
@@ -92,14 +93,30 @@ Route::group(['middleware' => 'pemilik_sewa'], function () {
 
     Route::get('/dashboard/toko', [SellerController::class, 'sellerDashboardToko'])->name('seller.dashboardtoko');
 
+    //TOKO ROUTE
     Route::get('/profil/toko', [SellerController::class, 'profilTokoView'])->name('seller.profilTokoView');
 
     Route::post('/profil/toko/act', [SellerController::class, 'profilTokoAction'])->name('seller.profilTokoAction');
 
-    Route::get('/pesanan/perluproses', function () {
-        return view('pesanan.perluproses');
-    });
+    //PERATURAN SEWA
+    Route::get('/profil/toko/peraturansewa', [SellerController::class, 'viewPeraturanSewaToko'])->name('seller.profil.viewPeraturanSewaToko');
+    Route::get('/profil/toko/peraturansewa/edit/{id}', [SellerController::class, 'viewEditPeraturanSewa'])->name('seller.profil.viewEditPeraturanSewa');
+    Route::get('/profil/toko/peraturansewa/tambah', [SellerController::class, 'viewTambahPeraturanSewa'])->name('seller.profil.viewTambahPeraturanSewa');
 
+    Route::post('/profil/toko/peraturansewa/edit/{id}/act', [SellerController::class, 'EditPeraturanSewaAction'])->name('seller.profil.EditPeraturanSewaAction');
+    Route::post('/profil/toko/peraturansewa/tambah/act', [SellerController::class, 'TambahPeraturanSewaAction'])->name('seller.profil.TambahPeraturanSewaAction');
+    Route::post('/profil/toko/peraturansewa/delete/{id}', [SellerController::class, 'DeletePeraturanSewaAction'])->name('seller.profil.DeletePeraturanSewaAction');
+
+    //ALAMAT TAMBAHAN / LAINNYA
+    Route::get('/profil/toko/AlamatTambahan', [SellerController::class, 'viewAlamatTambahanToko'])->name('seller.profil.viewAlamatTambahanToko');
+    Route::get('/profil/toko/AlamatTambahan/edit/{id}', [SellerController::class, 'viewEditAlamatTambahan'])->name('seller.profil.viewEditAlamatTambahan');
+    Route::get('/profil/toko/AlamatTambahan/tambah', [SellerController::class, 'viewTambahAlamatTambahan'])->name('seller.profil.viewTambahAlamatTambahan');
+
+    Route::post('/profil/toko/AlamatTambahan/edit/{id}/act', [SellerController::class, 'EditAlamatTambahanAction'])->name('seller.profil.EditAlamatTambahanAction');
+    Route::post('/profil/toko/AlamatTambahan/tambah/act', [SellerController::class, 'TambahAlamatTambahanAction'])->name('seller.profil.TambahAlamatTambahanAction');
+    Route::post('/profil/toko/AlamatTambahan/delete/{id}', [SellerController::class, 'DeleteAlamatTambahanAction'])->name('seller.profil.DeleteAlamatTambahanAction');
+
+    //PRODUK ROUTE
     Route::get('/produk/tambahproduk', [ProdukSellerController::class, 'viewTambahProduk'])->name('seller.viewTambahProduk');
 
     Route::get('/produk/produkanda', [ProdukSellerController::class, 'viewProdukAnda'])->name('seller.viewProdukAnda');
@@ -114,13 +131,38 @@ Route::group(['middleware' => 'pemilik_sewa'], function () {
     Route::post('/produk/edit/{id}/act', [ProdukSellerController::class, 'editProdukAction'])->name('seller.editProdukAction');
     Route::post('/produk/foto/{id}/delete', [ProdukSellerController::class, 'hapusFoto'])->name('seller.hapusFoto');
 
+    //LOGOUT ROUTE
+
     Route::get('/logout/seller', [AutentikasiSellerController::class, 'logout'])->name('seller.logout');
 
     //PESANAN
     Route::get('/status-sewa/belumdiproses', [StatusPenyewaanController::class, 'viewBelumDiProses'])->name('seller.statuspenyewaan.belumdiproses');
+    Route::get('/status-sewa/dalampengiriman', [StatusPenyewaanController::class, 'viewDalamPengiriman'])->name('seller.statuspenyewaan.dalampengiriman');
+    Route::get('/status-sewa/sedangberlangsung', [StatusPenyewaanController::class, 'viewSedangBerlangsung'])->name('seller.statuspenyewaan.sedangberlangsung');
+    Route::get('/status-sewa/telahkembali', [StatusPenyewaanController::class, 'viewTelahKembali'])->name('seller.statuspenyewaan.telahkembali');
+    Route::get('/status-sewa/penyewaandiretur', [StatusPenyewaanController::class, 'viewPenyewaanDiretur'])->name('seller.statuspenyewaan.penyewaandiretur');
+    Route::get('/status-sewa/riwayat', [StatusPenyewaanController::class, 'viewRiwayatPenyewaan'])->name('seller.statuspenyewaan.riwayatPenyewaan');
 
-    //BANNED
-    Route::get('/banned', [AutentikasiController::class, 'viewBanned'])->name('banned');
+    //KONFIRMASI RETUR SELESAI
+    Route::post('/konfirmasi/returSelesai/{nomor_order}', [StatusPenyewaanController::class, 'returSelesai'])->name('seller.statuspenyewaan.returSelesai');
+
+    //INGATKAN PENYEWA
+    Route::post('/reminder/order/{nomor_order}/{id_penyewa}', [StatusPenyewaanController::class, 'ingatkanPenyewa'])->name('seller.statuspenyewaan.ingatkanPenyewa');
+
+    //ORDER DIBATALKAN PEMILIK SEWA
+    Route::post('/batal/order/{nomor_order}', [StatusPenyewaanController::class, 'dibatalkanPemilikSewa'])->name('seller.statuspenyewaan.dibatalkanPemilikSewa');
+
+    //INPUT RESI
+    Route::post('/inputresi/order/{nomor_order}', [StatusPenyewaanController::class, 'inputResi'])->name('seller.statuspenyewaan.inputResi');
+
+    //REVIEW
+    Route::get('/penilaian/produk', [PenilaianSisiSellerController::class, 'viewpenilaianProduk'])->name('seller.view.penilaian.penilaianProduk');
+    Route::get('/penilaian/produk/{id}/detail', [PenilaianSisiSellerController::class, 'viewdetailPenilaianProduk'])->name('seller.view.penilaian.detailPenilaianProduk');
+    Route::get('/penilaian/penyewa/{id}', [PenilaianSisiSellerController::class, 'viewReviewPenyewa'])->name('seller.view.penilaian.reviewPenyewa');
+
+    //TAMBAH REVIEW PENYEWA DAN KONFIRMASI PENYEWAAN SELESAI
+    Route::get('/tambah/penilaian/penyewa/{id}/{nomor_order}', [PenilaianSisiSellerController::class, 'viewTambahReviewPenyewa'])->name('seller.view.penilaian.TambahReviewPenyewa');
+    Route::post('/tambah/penilaian/penyewa/{id}/{nomor_order}/act', [PenilaianSisiSellerController::class, 'tambahReviewPenyewaAction'])->name('seller.view.penilaian.tambahReviewPenyewaAction');
 });
 
 // ALL Admin Route

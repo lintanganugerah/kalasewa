@@ -354,6 +354,14 @@
         var deleteForm = document.getElementById('deleteForm');
         deleteForm.action = "{{ route('admin.users.destroy', '') }}/" + userId;
     }
+
+    function confirmNonaktifkan() {
+        return confirm('Apakah Anda yakin ingin menonaktifkan user ini?');
+    }
+
+    function confirmAktifkan() {
+        return confirm('Apakah Anda yakin ingin Aktifkan user ini?');
+    }
 </script>
 
 @endsection

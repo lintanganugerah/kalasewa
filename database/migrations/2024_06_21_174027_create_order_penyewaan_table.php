@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('id_penyewa');
             $table->unsignedBigInteger('id_produk');
             $table->string('ukuran');
-            $table->string('tujuan_pengiriman');
+            $table->text('tujuan_pengiriman');
             $table->string('metode_kirim');
             $table->dateTime('tanggal_mulai');
             $table->dateTime('tanggal_selesai');
@@ -32,6 +32,7 @@ return new class extends Migration {
             $table->json('additional')->nullable(); // 'Nama Additional' => 'Harga'
             $table->dateTime('tanggal_diterima')->nullable();
             $table->dateTime('tanggal_pengembalian')->nullable();
+            $table->text('alasan_pembatalan')->nullable();
             $table->enum('status', ['Menunggu di Proses', 'Dalam Pengiriman', 'Sedang Berlangsung', 'Retur', 'Retur Dikonfirmasi', 'Retur dalam Pengiriman', 'Retur Selesai', 'Telah Kembali', 'Penyewaan Selesai', 'Dibatalkan Pemilik Sewa', 'Dibatalkan Penyewa']);
             $table->timestamps();
 

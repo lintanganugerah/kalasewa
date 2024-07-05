@@ -24,6 +24,7 @@ return new class extends Migration {
             $table->enum('gender', ['Pria', 'Wanita', 'Semua Gender']);
             $table->unsignedBigInteger('berat_produk');
             $table->string('ukuran_produk');
+            $table->unsignedBigInteger('id_alamat')->nullable();
             $table->json('additional')->nullable();
             $table->bigInteger('id_series')->unsigned();
             $table->json('metode_kirim')->default(json_encode([]));
@@ -32,6 +33,7 @@ return new class extends Migration {
 
             $table->foreign('id_series')->references('id')->on('series')->onUpdate('cascade')->onDelete('cascade');
             $table->foreign('id_toko')->references('id')->on('tokos')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreign('id_alamat')->references('id')->on('alamat_tambahan')->onUpdate('cascade')->onDelete('cascade');
         });
     }
 

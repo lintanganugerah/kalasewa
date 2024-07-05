@@ -15,10 +15,6 @@ return new class extends Migration {
             $table->string('nama_toko')->unique();
             $table->text('bio_toko')->nullable();
             $table->boolean('isAlamatTambahan')->default(false);
-            // $table->string('rating_toko')->nullable();
-            // $table->string('no_rek')->nullable();
-            // $table->string('bank')->nullable();
-            // $table->unsignedInteger('saldo_penghasilan')->nullable()->default(0);
             $table->bigInteger('id_user')->unsigned();
             $table->timestamps();
 

@@ -147,6 +147,7 @@ class UserController extends Controller
     {
         $request->validate([
             'nama' => 'required|string|max:255',
+            'password' => 'required|string|min:8',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'no_telp' => 'nullable|string|max:15',
         ]);
@@ -187,6 +188,14 @@ class UserController extends Controller
 
         // Pastikan verifyIdentitas diatur dengan benar
         $data['verifyIdentitas'] = 'Sudah'; // atau sesuai kebutuhan aplikasi
+        $data['password'] = Hash::make($request->password);
+
+        // User::create($data);
+        $user = User::create($data);
+
+        // Update bagian verifyIdentitas menjadi 'sudah'
+        $user->verifyIdentitas = $request->verifyIdentitas;
+        $user->save();
 
         // Simpan data user baru
         $user = User::create($data);

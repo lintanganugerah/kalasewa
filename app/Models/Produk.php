@@ -17,6 +17,9 @@ class Produk extends Model
         'status_produk',
         'deskripsi_produk',
         'brand',
+        'biaya_cuci',
+        'brand_wig',
+        'keterangan_wig',
         'additional',
         'harga',
         'gender',
@@ -30,7 +33,7 @@ class Produk extends Model
 
     public function series()
     {
-        return $this->belongsTo(Series::class, 'id')->withDefault();
+        return $this->belongsTo(Series::class, 'id_series', 'id')->withDefault();
     }
 
     public function seriesDetail()
@@ -52,8 +55,55 @@ class Produk extends Model
         return $user->wishlist()->where('produk_id', $this->id)->exists();
     }
 
+    public function getFotoProdukFirst($id_produk)
+    {
+        $FotoProduk = FotoProduk::where('id_produk', $id_produk)->first();
+
+        return $FotoProduk;
+    }
+
     public function toko()
     {
         return $this->belongsTo(Toko::class, 'id_toko');
+    }
+
+    public function id_produk_order()
+    {
+        return $this->hasMany(OrderPenyewaan::class, 'id_produk');
+    }
+
+    public function id_review_produk()
+    {
+        return $this->belongsTo(Review::class, 'id_produk');
+    }
+
+    public function avg_nilai_produk($id_produk)
+    {
+        $nilai = Review::where('id_produk', $id_produk)->where('tipe', 'review_produk')->avg('nilai');
+
+        return $nilai;
+    }
+
+    public function cek_nilai($id_produk)
+    {
+        $nilai = Review::where('id_produk', $id_produk)->where('tipe', 'review_produk')->first();
+
+        if ($nilai) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public function total_review_produk($id_produk)
+    {
+        $total = Review::where('id_produk', $id_produk)->where('tipe', 'review_produk')->count();
+
+        return $total;
+    }
+
+    public function alamat()
+    {
+        return $this->belongsTo(AlamatTambahan::class, 'id_alamat');
     }
 }

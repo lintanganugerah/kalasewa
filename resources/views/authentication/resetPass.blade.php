@@ -11,7 +11,7 @@
                 <div class="d-md-block align-items-center">
                     <div class="card-body p-4 p-lg-5 text-black">
 
-                        <form action="{{ route('resetPassAction') }}" method="POST">
+                        <form action="{{ route('resetPassAction', $token) }}" method="POST">
                             @csrf
                             @if ($errors->any())
                                 <div class="alert alert-danger">
@@ -28,13 +28,13 @@
                             <h5 class="fw-bold mb-3 pb-3" style="letter-spacing: 1px;">Input Password Baru
                             </h5>
                             <div data-mdb-input-init class="form-outline mb-4">
-                                <label class="form-label" for="form2Example17">Password</label>
-                                <input type="password" id="form2Example17" class="form-control form-control-lg"
+                                <label class="form-label" for="validpassword">Password</label>
+                                <input type="password" id="validpassword" class="form-control form-control-lg"
                                     name="password" minlength="8" required />
                             </div>
                             <div data-mdb-input-init class="form-outline mb-4">
-                                <label class="form-label" for="form2Example17">Konfirmasi Password</label>
-                                <input type="password" id="form2Example17" class="form-control form-control-lg"
+                                <label class="form-label" for="password_confirmation">Konfirmasi Password</label>
+                                <input type="password" id="password_confirmation" class="form-control form-control-lg"
                                     name="password_confirmation" minlength="8" required />
                             </div>
 

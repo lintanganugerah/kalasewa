@@ -13,8 +13,8 @@ return new class extends Migration {
         Schema::create('saldo_user', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_user');
-            $table->unsignedBigInteger('tujuan_rek');
-            $table->string('nomor_rekening');
+            $table->unsignedBigInteger('tujuan_rek')->nullable();
+            $table->string('nomor_rekening')->nullable();
             $table->unsignedBigInteger('saldo');
             $table->timestamps();
 

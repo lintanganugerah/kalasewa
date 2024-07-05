@@ -241,8 +241,46 @@
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </div>
+                @endif
             </div>
-        </div>
-    </div>
 
+            @if ($user->role === 'admin')
+            <button type="submit" class="btn btn-primary btn-block mb-2">Update</button>
+            @endif
+        </form>
+
+        <!-- Tombol Delete -->
+        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger delete-btn btn-block mb-2" onclick="return confirmDelete()">Delete</button>
+        </form>
+        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary btn-block">Batal</a>
+    </div>
+</div>
+
+@endsection
+
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const togglePassword = document.querySelector('.toggle-password');
+        const password = document.getElementById('password');
+
+        if (togglePassword) {
+            togglePassword.addEventListener('click', function() {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
+        }
+    });
+
+
+    function confirmDelete() {
+        return confirm('Apakah Anda yakin ingin menghapus user ini?');
+    }
+
+</script>
 @endsection

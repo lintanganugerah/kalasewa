@@ -11778,7 +11778,7 @@ font-size: 0.75rem;
 color: rgba(255, 255, 255, 0.5);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 1050px) {
 .sidebar {
     width: 14rem !important;
     display: block;
@@ -12699,7 +12699,7 @@ background-color: #14496C;
 color: white !important;
 }
 
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 1300px) {
 
 /* Force table to not be like tables anymore */
 .no-more-tables table,

@@ -63,11 +63,10 @@ class UsersSeeder extends Seeder
 
         DB::table('users')->insert([
             'nama' => 'Penyewa 3',
-            'email' => 'green.project28@gmail.com',
+            'email' => 'penyewa3@example.com',
             'password' => Hash::make('12345678'),
             'no_telp' => '0812300012911',
             'no_darurat' => '0812340018273',
-            'ket_no_darurat' => 'Orang Tua',
             'kode_pos' => '12345',
             'alamat' => 'Jl. Disini kawan',
             'kota' => 'Kota Bandung',
@@ -78,7 +77,7 @@ class UsersSeeder extends Seeder
             'NIK' => '12345678019128211',
             'foto_profil' => 'storage/profiles/profil_default.jpg',
             'role' => 'penyewa',
-            'verifyIdentitas' => 'Tidak',
+            'verifyIdentitas' => 'Sudah',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
