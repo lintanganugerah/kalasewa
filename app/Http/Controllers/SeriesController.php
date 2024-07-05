@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Series;
 use Illuminate\Http\Request;
 
@@ -9,20 +10,21 @@ class SeriesController extends Controller
     // Metode untuk melakukan pencarian
     public function search(Request $request)
     {
-        if($request->has('search')) {
-            $series = Series::where('series', 'LIKE', "%".$request->search.'%')->get();
+        if ($request->has('search')) {
+            $searchQuery = $request->search;
+            $series = Series::where('series', 'LIKE', "%" . $searchQuery . '%')->paginate(10);
+        } else {
+            $series = Series::paginate(10);
         }
 
-        else {
-            $series = Series::all();
-        }
-
-        return view('admin.series.index', ['series' => $series]);
+        return view('admin.series.index', compact('series'));
     }
+
+
     public function index()
     {
-        $series = Series::all();
-    return view('admin.series.index', compact('series'));
+        $series = Series::orderBy('updated_at', 'desc')->paginate(10);
+        return view('admin.series.index', compact('series'));
     }
 
     public function create()
@@ -36,8 +38,15 @@ class SeriesController extends Controller
             'series' => 'required|string|max:255',
         ]);
 
+        $existingSeries = Series::where('series', $request->series)->first();
+        if ($existingSeries) {
+            return redirect()->back()->withErrors(['series' => 'Nama series sudah tersedia.'])->withInput();
+        }
+
         Series::create([
             'series' => $request->series,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
         return redirect()->route('admin.series.index')->with('success', 'Series berhasil ditambahkan.');
@@ -61,8 +70,14 @@ class SeriesController extends Controller
             'series' => 'required|string|max:255',
         ]);
 
+        $existingSeries = Series::where('series', $request->series)->first();
+        if ($existingSeries) {
+            return redirect()->back()->withErrors(['series' => 'Nama series sudah tersedia.'])->withInput();
+        }
+
         $series->update([
             'series' => $request->series,
+            'updated_at' => now(),
         ]);
 
         return redirect()->route('admin.series.index')->with('success', 'Series berhasil diperbarui.');
@@ -70,9 +85,9 @@ class SeriesController extends Controller
 
     public function destroy(Series $series)
     {
-    $series->delete();
+        $series->delete();
 
-    return redirect()->route('admin.series.index')
-        ->with('success', 'Series berhasil dihapus.');
+        return redirect()->route('admin.series.index')
+            ->with('success', 'Series berhasil dihapus.');
     }
 }

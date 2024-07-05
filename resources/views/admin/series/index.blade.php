@@ -11,51 +11,109 @@
         <li class="breadcrumb-item active" aria-current="page">Manajemen Series</li>
     </ol>
 </div>
-
-<!-- <form action="/admin/series/search" class="form-inline" method="GET">
-    <input type="search" name="search" class="form-control" placehsolder="Cari Series">
-    <div class="input-group-append">
-        <button type="submit" class="btn btn-default">
-            <i class="fas fa-search"></i>
-        </button>
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
     </div>
-</form> -->
+@endif
+@if (session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
 
-<div class="mb-3">
-    <a href="{{ route('admin.series.create') }}" class="btn btn-primary">Tambah Series</a>
+<div class="row">
+    <div class="col-md-6 mb-3">
+        <a href="{{ route('admin.series.create') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle mr-2"></i> Tambah Series
+        </a>
+    </div>
+    <div class="col-md-6 mb-3 d-flex justify-content-end">
+        <form action="{{ route('admin.series.search') }}" class="form-inline" method="GET">
+            <input type="search" name="search" class="form-control mr-2" placeholder="Search">
+            <button type="submit" class="btn btn-default">
+                <i class="fas fa-search"></i>
+            </button>
+        </form>
+    </div>
 </div>
 
 <div class="table-responsive">
-    <table class="table table-bordered" id="series-table">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nama Series</th>
-                <th></th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody id="series-table">
-            @foreach ($series as $seriesItem)
-            <tr>
-                <td>{{ $seriesItem->id }}</td>
-                <td>{{ $seriesItem->series }}</td>
-                <td>
-                    <!-- Tombol Edit -->
-                    <a href="{{ route('admin.series.edit', $seriesItem->id) }}" class="btn btn-warning">Edit</a>
-                </td>
-                <td>
-                    <!-- Tombol Delete -->
-                    <form action="{{ route('admin.series.destroy', $seriesItem->id) }}" method="POST" style="display: inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus series ini?')">Delete</button>
-                    </form>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+    @if ($series->isEmpty())
+        <div class="text-center mt-5">
+            <p class="text-muted">Series tidak ditemukan.</p>
+        </div>
+    @else
+        <table class="table table-data" id="series-table">
+            <thead>
+                <tr>
+                    <th>Nama Series</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="series-table">
+                @foreach ($series as $seriesItem)
+                    <tr>
+                        <td>{{ $seriesItem->series }}</td>
+                        <td width="8%">
+                            <a href="{{ route('admin.series.edit', $seriesItem->id) }}"
+                                class="btn btn-warning btn-block">Edit</a>
+                        </td>
+                        <td width="8%">
+                            <button class="btn btn-danger btn-block" data-toggle="modal"
+                                data-target="#confirmDeleteModal{{ $seriesItem->id }}">Delete</button>
+                        </td>
+                    </tr>
+
+                    <!-- Modal Konfirmasi Delete -->
+                    <div class="modal fade" id="confirmDeleteModal{{ $seriesItem->id }}" tabindex="-1" role="dialog"
+                        aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmDeleteModalLabel">Konfirmasi Delete Series</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Apakah Anda yakin ingin menghapus series ini?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                    <form id="deleteForm{{ $seriesItem->id }}"
+                                        action="{{ route('admin.series.destroy', $seriesItem->id) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+
+    <div style="display: flex; justify-content: center; margin: 20px 0;">
+        {{ $series->onEachSide(1)->links() }}
+    </div>
 </div>
 
+@endsection
+
+@section('scripts')
+<script>
+    $(document).ready(function () {
+        // Set action form delete saat tombol delete di modal diklik
+        $('.btn-danger').on('click', function () {
+            var seriesId = $(this).closest('tr').find('.series-id').text();
+            var action = $('#deleteForm' + seriesId).attr('action');
+            $('#deleteForm' + seriesId).attr('action', action + '/' + seriesId);
+        });
+    });
+</script>
 @endsection

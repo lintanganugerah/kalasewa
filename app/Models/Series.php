@@ -8,7 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class Series extends Model
 {
     use HasFactory;
-    public $timestamps = false;
-    protected $table = 'series'; // Nama tabel di database
-    protected $fillable = ['series']; // Kolom yang dapat diisi
+    public $timestamps = true;
+    protected $fillable = [
+        'series'
+    ];
+
+    public function series()
+    {
+        return $this->hasOne(Produk::class, 'id_series')->withDefault();
+    }
 }

@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -14,11 +13,12 @@ return new class extends Migration
         Schema::create('tokos', function (Blueprint $table) {
             $table->id()->index();
             $table->string('nama_toko')->unique();
-            $table->string('rating_toko')->nullable();
-            $table->string('no_rek')->nullable();
-            $table->string('bank')->nullable();
-            $table->json('metode_kirim')->default(json_encode([]));
-            $table->unsignedInteger('saldo_penghasilan')->nullable()->default(0);
+            $table->text('bio_toko')->nullable();
+            $table->boolean('isAlamatTambahan')->default(false);
+            // $table->string('rating_toko')->nullable();
+            // $table->string('no_rek')->nullable();
+            // $table->string('bank')->nullable();
+            // $table->unsignedInteger('saldo_penghasilan')->nullable()->default(0);
             $table->bigInteger('id_user')->unsigned();
             $table->timestamps();
 

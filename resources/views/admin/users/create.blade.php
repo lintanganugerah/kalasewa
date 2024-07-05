@@ -5,11 +5,11 @@
 @section('content')
 
 <div class="d-sm-flex align-items-center justify-content-between mb-4">
-    <h1 class="h3 mb-0 text-gray-800">Tambah User</h1>
+    <h1 class="h3 mb-0 text-gray-800">Tambah Admin</h1>
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
         <li class="breadcrumb-item"><a href="{{ route('admin.users.index') }}">Manajemen User</a></li>
-        <li class="breadcrumb-item active" aria-current="page">Tambah User</li>
+        <li class="breadcrumb-item active" aria-current="page">Tambah Admin</li>
     </ol>
 </div>
 
@@ -19,71 +19,67 @@
             @csrf
             <div class="form-group">
                 <label for="nama">Nama</label>
-                <input type="text" class="form-control" id="nama" name="nama" required>
+                <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama"
+                    required>
+                @error('nama')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
+                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email"
+                    required>
+                @error('email')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
+                <div class="input-group">
+                    <input type="password" class="form-control" id="password" name="password" required>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-outline-secondary" id="toggle-password"
+                            onclick="togglePassword()">
+                            <i class="fas fa-eye" id="toggle-icon"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
             <div class="form-group">
                 <label for="no_telp">No. Telepon</label>
-                <input type="text" class="form-control" id="no_telp" name="no_telp">
-            </div>
-            <!-- <div class="form-group">
-                <label for="badge">Badge</label>
-                <input type="text" class="form-control" id="badge" name="badge">
-            </div> -->
-            <div class="form-group">
-                <label for="role">Role</label>
-                <select class="form-control" id="role" name="role" required>
-                    <option value="penyewa">Penyewa</option>
-                    <option value="pemilik_sewa">Pemilik Sewa</option>
-                    <option value="admin">Admin</option>
-                </select>
+                <input type="text" class="form-control @error('no_telp') is-invalid @enderror" id="no_telp"
+                    name="no_telp" pattern="[0-9]{10,}" title="Hanya boleh angka dengan minimal 10 digit">
             </div>
             <div class="form-group">
-                <label for="verifyIdentitas">Verifikasi Identitas</label>
-                <select class="form-control" id="verifyIdentitas" name="verifyIdentitas" required>
-                    <option value="Sudah">Sudah</option>
-                    <option value="Tidak" selected>Tidak</option>
-                    <option value="Ditolak">Ditolak</option>
-                </select>
+                <label for="role" style="margin-right: 16px;">Role :</label>
+                <span class="badge badge-warning badge-pill px-5 py-2">Admin</span>
             </div>
-            <div class="form-group">
-                <label for="foto_profil">Foto Profil</label>
-                <input type="file" class="form-control-file" id="foto_profil" name="foto_profil">
-            </div>
-            <div class="form-group">
-                <label for="identitas">Identitas</label>
-                <input type="file" class="form-control-file" id="identitas" name="identitas">
-            </div>
-            <div class="form-group">
-                <label for="NIK">NIK</label>
-                <input type="text" class="form-control" id="NIK" name="NIK">
-            </div>
-            <div class="form-group">
-                <label for="alamat">Alamat</label>
-                <input type="text" class="form-control" id="alamat" name="alamat">
-            </div>
-            <div class="form-group">
-                <label for="provinsi">Provinsi</label>
-                <input type="text" class="form-control" id="provinsi" name="provinsi">
-            </div>
-            <div class="form-group">
-                <label for="kota">Kota</label>
-                <input type="text" class="form-control" id="kota" name="kota">
-            </div>
-            <div class="form-group">
-                <label for="kode_pos">Kode Pos</label>
-                <input type="text" class="form-control" id="kode_pos" name="kode_pos">
-            </div>
-            <button type="submit" class="btn btn-primary">Tambah User</button>
+            <button type="submit" class="btn btn-primary btn-block">Tambah User</button>
         </form>
     </div>
 </div>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('password');
+        const passwordConfirmInput = document.getElementById('password_confirmation');
+        const toggleIcon = document.getElementById('toggle-icon');
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            passwordConfirmInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            passwordConfirmInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+</script>
 
 @endsection

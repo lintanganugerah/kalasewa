@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class SeriesSeeder extends Seeder
 {
@@ -31,33 +31,26 @@ class SeriesSeeder extends Seeder
             "Sword Art Online",
             "Neon Genesis Evangelion",
             "JoJo no Kimyou na Bouken (JoJo's Bizarre Adventure)",
-            "Cowboy Bebop",
             "Hunter x Hunter",
-            "Dragon Ball Z",
             "Kuroshitsuji (Black Butler)",
             "Tengen Toppa Gurren Lagann",
             "Persona",
             "Shigatsu Wa Kimi No Uso (Your Lie in April)",
             "Suzumiya Haruhi no Yuuutsu (The Melancholy of Haruhi Suzumiya)",
             "Vocaloid",
-            "Fate/stay night",
+            "Fate Series",
             "Love Live!",
             "Code Geass",
             "Steins;Gate",
             "Gundam",
             "Berserk",
             "Trigun",
-            "Fate/Zero",
-            "Kidou Senshi Gundam (Mobile Suit Gundam)",
             "Final Fantasy",
             "Kingdom Hearts",
-            "Pokémon",
-            "Persona",
             "Valorant",
             "League of legends",
             "Fire Emblem",
             "Metal Gear Solid",
-            "Street Fighter",
             "Resident Evil",
             "Tales Series",
             "Monster Hunter",
@@ -100,7 +93,6 @@ class SeriesSeeder extends Seeder
             "Red Dead Redemption",
             "Call of Duty",
             "Grand Theft Auto",
-            "Batman: Arkham",
             "The Elder Scrolls",
             "BioShock",
             "Gears of War",
@@ -116,15 +108,11 @@ class SeriesSeeder extends Seeder
             "Marvel",
             "DC Comics",
             "Star Wars",
-            "The Avengers",
-            "Guardians of the Galaxy",
             "The Walking Dead",
             "Doctor Who",
             "Sherlock",
             "Breaking Bad",
             "Stranger Things",
-            "The Witcher",
-            "The Mandalorian",
             "Black Panther",
             "Wonder Woman",
             "Spider-Man",
@@ -143,7 +131,6 @@ class SeriesSeeder extends Seeder
             "Friends",
             "Sen to Chihiro no Kamikakushi (Spirited Away)",
             "Akira",
-            "Evangelion",
             "Cowboy Bebop",
             "Studio Ghibli",
             "Tonari no Totoro (My Neighbor Totoro)",
@@ -155,13 +142,8 @@ class SeriesSeeder extends Seeder
             "Grave of the Fireflies",
             "Tenki no Ko (Weathering with You)",
             "Koe no Katachi (A Silent Voice)",
-            "Kimetsu no Yaiba: Mugen Ressha-hen (Demon Slayer: Kimetsu no Yaiba the Movie)",
-            "Shin Seiki Evangelion Gekijouban: The End of Evangelion (Neon Genesis Evangelion: The End of Evangelion)",
-            "Pokemon: The First Movie",
             "Kaze no Tani no Nausicaä (Nausicaä of the Valley of the Wind)",
-            "Okami Kodomo no Ame to Yuki (Wolf Children)",
             "Kurenai no Buta (Porco Rosso)",
-            "Kaguya-hime no Monogatari (The Tale of the Princess Kaguya)",
             "Ponyo",
             "Mimi wo Sumaseba (Whisper of the Heart)",
             "Kaze Tachinu (The Wind Rises)",
@@ -197,11 +179,14 @@ class SeriesSeeder extends Seeder
             "Ookami Kodomo no Ame to Yuki (Wolf Children)",
             "Summer Wars",
             "Kokoro ga Sakebitagatterunda. (The Anthem of the Heart)",
-            "Mimi wo Sumaseba (Whisper of the Heart)",
-            "Kaze no Tani no Nausicaä (Nausicaä of the Valley of the Wind)",
             "Kaguya-hime no Monogatari (The Tale of the Princess Kaguya)",
             "Stranger: Mukou Hadan (Sword of the Stranger)",
             // New
+            "Hololive",
+            "Nijisanji",
+            "Gamers!",
+            "VSPO",
+            'MAHA 5',
             "Jujutsu Kaisen",
             "Tokyo Revengers",
             "To Your Eternity (Fumetsu no Anata e)",
@@ -246,11 +231,16 @@ class SeriesSeeder extends Seeder
             "I Chu: Halfway Through the Idol (I Chu: Halfway Through the Idol)",
             "Idoly Pride (Idoly Pride)",
             "Kai Byoui Ramune (Kai Byoui Ramune)",
+            "Spy X Family",
         ];
+
+        $now = Carbon::now();
 
         foreach ($cosplay_series as $cos) {
             DB::table('series')->insert([
                 'series' => $cos,
+                'created_at' => $now,
+                'updated_at' => $now,
             ]);
         }
     }

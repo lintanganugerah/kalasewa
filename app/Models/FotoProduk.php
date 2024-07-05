@@ -10,7 +10,7 @@ class FotoProduk extends Model
     use HasFactory;
 
     protected $fillable = [
-        'ID_produk', 'path',
+        'id_produk', 'path',
     ];
 
     public function FotoProduk()
