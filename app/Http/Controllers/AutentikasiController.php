@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
+use App\Events\PemilikSewaCreated;
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Toko;
 use App\Models\KodeOTP;
@@ -174,8 +176,8 @@ class AutentikasiController extends Controller
             'provinsi' => 'required|string',
             'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
             'kodePos' => 'required|numeric|min_digits:5|max_digits:5',
-            'foto_identitas' => 'file|mimes:jpg,jpeg,png,webp|max:5120',
-            'foto_diri' => 'file|mimes:jpg,jpeg,png,webp|max:5120',
+            'foto_identitas' => 'file|mimes:jpg,jpeg,png,webp|max:20480',
+            'foto_diri' => 'file|mimes:jpg,jpeg,png,webp|max:20480',
         ]);
 
         if (session()->has('email')) {
@@ -338,7 +340,7 @@ class AutentikasiController extends Controller
     {
         //SIMPAN INFORMASI AKUN BARU SAAT REGISTER
         $validator = Validator::make($request->all(), [
-            'password' => 'required|string|min:8',
+            'password' => 'required|confirmed|string|min:8',
             'nama' => 'required|string',
             'namaToko' => 'required|string|unique:tokos,nama_toko',
             'link_sosial_media' => 'required|url',
@@ -348,13 +350,13 @@ class AutentikasiController extends Controller
             'kota' => 'required|in:Kota Bandung,Kabupaten Bandung',
             'kodePos' => 'required|numeric|min_digits:5|max_digits:5',
             'nomor_identitas' => 'required|numeric|min_digits:16|max_digits:16|unique:users,NIK',
-            'foto_identitas' => 'image|mimes:jpg,jpeg,png,webp|max:5120',
+            'foto_identitas' => 'required|image|mimes:jpg,jpeg,png,webp|max:20480',
         ]);
 
         if (session()->has('email')) {
             $email = Session::get('email');
         } else {
-            return redirect()->route('registerViewPemilikSewa')->with('error', 'Silahkan coba daftar ulang');
+            return redirect()->route('registerViewPemilikSewa')->with('error', 'Email Telah Terdaftar! Silahkan Login');
         }
 
         if ($validator->fails()) {
@@ -383,27 +385,32 @@ class AutentikasiController extends Controller
             $toko = new Toko;
         }
 
-        $user->email = $email;
-        $user->nama = $request->nama;
-        $user->password = Hash::make($request->password);
-        $user->no_telp = $request->nomor_telpon;
-        $user->alamat = $request->AlamatToko;
-        $user->provinsi = $request->provinsi;
-        $user->link_sosial_media = $request->link_sosial_media;
-        $user->kota = $request->kota;
-        $user->kode_pos = $request->kodePos;
-        $user->nik = $request->nomor_identitas;
-        $user->foto_identitas = $photoPath;
-        $user->role = "pemilik_sewa";
-        $user->save();
+        $user = User::create([
+            'email' => $email,
+            'nama' => $request->nama,
+            'password' => Hash::make($request->password),
+            'no_telp' => $request->nomor_telpon,
+            'alamat' => $request->AlamatToko,
+            'provinsi' => $request->provinsi,
+            'link_sosial_media' => $request->link_sosial_media,
+            'kota' => $request->kota,
+            'kode_pos' => $request->kodePos,
+            'NIK' => $request->nomor_identitas,
+            'foto_identitas' => $photoPath,
+            'role' => 'pemilik_sewa',
+        ]);
         $toko->nama_toko = $request->namaToko;
         $toko->id_user = $user->id;
         $toko->save();
+
+
 
         $KODEOTP = KodeOTP::where('email', session('email'))->first();
         if ($KODEOTP) {
             $KODEOTP->delete();
         }
+
+        event(new PemilikSewaCreated($user));
 
         Session::forget('verify');
         Session::forget('email');
@@ -458,7 +465,7 @@ class AutentikasiController extends Controller
                     return redirect()->route('seller.dashboardtoko');
                 } else if ($user->role == "penyewa") {
                     return redirect()->route('viewHomepage');
-                } else if ($user->role == "admin") {
+                } else if ($user->role == "admin" || $user->role == "super_admin") {
                     session(['nama' => $user->nama]);
                     return redirect()->route('admin.dashboard');
                 }
@@ -524,10 +531,18 @@ class AutentikasiController extends Controller
                 return redirect()->route('viewHomepage');
             }
         }
-        return view('authentication.resetPass')->with(['token' => $token, 'email' => $request->email]);
+
+        $user = User::where('email', $request->email)->first();
+        $tokenExist = Password::tokenExists($user, $token);
+
+        if ($tokenExist) {
+            return view('authentication.resetPass')->with(['token' => $token, 'email' => $request->email]);
+        } else {
+            return redirect()->route('viewForgotPass')->with('error', 'Token Expired/Tidak Ditemukan. Silahkan Request Ulang! Jika sudah mengirimkan request sebelumnya, Mohon gunakan link terbaru dari email');
+        }
     }
 
-    public function resetPassAction(Request $request)
+    public function resetPassAction(Request $request, $token)
     {
         $validator = Validator::make($request->all(), [
             'token' => 'required',
@@ -566,5 +581,23 @@ class AutentikasiController extends Controller
         return view('authentication.infoBanned');
     }
 
-    // BANNED
+    // UBAH SANDI
+    public function ubahSandi()
+    {
+        $user = Auth::user();
+        return view('admin.ubahSandi', compact('user'));
+    }
+
+    public function updateSandi(Request $request)
+    {
+        $request->validate([
+            'password' => 'required|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+        $user->password = Hash::make($request->password);
+        $user->save();
+
+        return redirect()->route('admin.ubahSandi')->with('success', 'Kata sandi berhasil diubah');
+    }
 }

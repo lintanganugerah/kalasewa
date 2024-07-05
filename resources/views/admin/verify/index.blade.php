@@ -12,6 +12,17 @@
     </ol>
 </div>
 
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+@if (session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
+
 <div class="card mb-5">
     <div class="card-body">
         <h5 class="card-title">Pending Request</h5>
@@ -42,7 +53,8 @@
                                         @endif
                                     </td>
                                     <td style="width: 10%;">
-                                        <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-primary btn-block">Tampilkan</a>
+                                        <a href="{{ route('admin.users.show', $user->id) }}"
+                                            class="btn btn-primary btn-block">Tampilkan</a>
                                     </td>
                                 </tr>
                             @endif
@@ -53,44 +65,5 @@
         </div>
     </div>
 </div>
-<!-- 
-
-<div class="card mb-5">
-    <div class="card-body">
-        <h5 class="card-title">Pending Request</h5>
-        <div class="table-responsive">
-            <table class="table table-bordered" id="users-table">
-                <thead>
-                    <tr>
-                        <th>Nama</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @foreach ($users as $user)
-                    @if ($user->role !== 'admin' && $user->verifyIdentitas !== 'Ditolak')
-                        <tr>
-                            <td>{{ $user->nama }}</td>
-                            <td>{{ $user->email }}</td>
-                            <td>
-                                @if ($user->role === 'penyewa')
-                                    Penyewa
-                                @elseif ($user->role === 'pemilik_sewa')
-                                    Pemilik Sewa
-                                @endif
-                            </td>
-                            <td style="width: 10%;">
-                                <a href="{{ route('admin.users.show', $user->id) }}" class="btn btn-primary btn-block">Tampilkan</a>
-                            </td>
-                        </tr>
-                    @endif
-                @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div> -->
 
 @endsection

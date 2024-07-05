@@ -24,6 +24,11 @@
                                     {{ session('success') }}
                                 </div>
                             @endif
+                            @if (session('error'))
+                                <div class="alert alert-danger">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
                             <h5 class="fw-bold mb-3 pb-3" style="letter-spacing: 1px;">Masukan Email
                             </h5>
 

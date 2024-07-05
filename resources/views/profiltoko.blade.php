@@ -4,7 +4,7 @@
         <div class="col">
             <div class="text-left mb-5 mt-3">
                 <h1 class="fw-bold text-secondary">Profil Toko</h1>
-                <h4 class="fw-semibold text-secondary">Ubah Profil Toko Anda</h4>
+                <h4 class="fw-semibold text-secondary">Manajemen Informasi Toko Anda</h4>
             </div>
 
             <div class="row gx-5">
@@ -14,13 +14,20 @@
                         <!-- Nav tabs -->
                         <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="profil-tab" data-bs-toggle="tab"
-                                    data-bs-target="#profil" type="button" role="tab" aria-controls="profil"
-                                    aria-selected="true">Profil</button>
+                                <button class="nav-link active text-secondary fw-bold" id="profil-tab"
+                                    onclick="window.location.href='/profil/toko'" type="button" role="tab"
+                                    aria-controls="profil" aria-selected="true">Profil</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="contact-tab" onclick="window.location.href='#'" type="button"
-                                    role="tab" aria-controls="contact" aria-selected="false">Peraturan Sewa Toko
+                                <button class="nav-link text-secondary" id="profil-tab"
+                                    onclick="window.location.href='/profil/toko/AlamatTambahan'" type="button"
+                                    role="tab" aria-selected="false">Alamat Lainnya</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link text-secondary" id="contact-tab"
+                                    onclick="window.location.href='/profil/toko/peraturansewa'" type="button"
+                                    role="tab" aria-selected="false">Peraturan
+                                    Sewa Toko
                                     Anda</button>
                             </li>
                         </ul>
@@ -30,7 +37,6 @@
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="profil" role="tabpanel"
                                 aria-labelledby="profil-tab">
-                                <h5 class="card-title">Profil</h5>
                                 @if ($errors->any())
                                     <div class="alert alert-danger">
                                         {{ $errors->first() }}
@@ -41,7 +47,7 @@
                                         {{ session('success') }}
                                     </div>
                                 @endif
-                                <form action="{{ route('seller.profilTokoAction') }}" method="POST"
+                                <form action="{{ route('seller.profilTokoAction') }}" method="POST" id="formToko"
                                     enctype="multipart/form-data">
                                     @csrf
                                     <div class="mb-3">
@@ -99,7 +105,7 @@
                                             required>
                                     </div>
                                     <div class="mb-3">
-                                        <label for="exampleFormControlTextarea1" class="form-label">Alamat Toko<span
+                                        <label for="exampleFormControlTextarea1" class="form-label">Alamat Utama Toko<span
                                                 class="text-danger">*</span></label>
                                         <textarea class="form-control" id="exampleFormControlTextarea1" rows="5" name="AlamatToko" required>{{ $user->alamat }}</textarea>
                                     </div>
@@ -107,9 +113,10 @@
                                         <div data-mdb-input-init class="form-outline">
                                             <label class="form-label" for="kodePos">Kode Pos<span
                                                     class="text-danger">*</span></label>
-                                            <input type="text" id="kodePos" class="form-control" name="kodePos"
-                                                pattern="[0-9]*" minlength="5" maxlength="6"
+                                            <input type="text" class="form-control kodePos" name="kodePos"
+                                                id="kodePos" pattern="[0-9]*" minlength="5" maxlength="5"
                                                 value="{{ $user->kode_pos }}" required />
+                                            <div class="form-text error-message text-danger" id="kodePosError"></div>
                                         </div>
                                     </div>
                                     <div class="mb-3">
@@ -136,7 +143,16 @@
                                         </select>
                                     </div>
 
-
+                                    <hr class="border border-secondary border-3 my-5">
+                                    <!-- Informasi Alamat Lainnya -->
+                                    <h5>Informasi Alamat Lainnya</h5>
+                                    <div id="helpberat" class="mb-3" style="opacity: 75%;">Jika produk/kostum anda
+                                        tersebar di berbagai lokasi, anda bisa menambahkan alamat baru. Nantinya
+                                        anda bisa memilih lokasi produk/kostum anda berada di alamat yang mana. <a
+                                            id="addAlamat" style="color: #D44E4E; text-decoration: underline!important;"
+                                            href="{{ route('seller.profil.viewAlamatTambahanToko') }}">Klik disini untuk
+                                            tambah alamat</a></div>
+                                    <hr class="border border-secondary border-3 my-5">
                                     <div class="d-grid mb-5">
                                         <button class="btn btn-kalasewa btn-lg btn-block" type="submit">Simpan
                                             perubahan</button>
@@ -146,9 +162,9 @@
                         </div>
                     </div>
                 </div>
-
-
             </div>
         </div>
-        <script src="{{ asset('seller/inputangka.js') }}"></script>
-    @endsection
+    </div>
+    <script src="{{ asset('seller/validasiProfilToko.js') }}"></script>
+    <script src="{{ asset('seller/inputangka.js') }}"></script>
+@endsection

@@ -18,12 +18,9 @@ class pemilik_sewa
     public function handle(Request $request, Closure $next): Response
     {
         if (auth()->check() && auth()->user()->badge === "Banned") {
-            Auth::logout();
-            Session::flush();
-            Session::regenerate(true);
-            return redirect()->route('loginView')->with('error', 'Anda Telah Di Banned!');
+            return response()->view('authentication.infoBanned');
         }
-        
+
         if (auth()->check() && auth()->user()->role === 'pemilik_sewa') {
             return $next($request);
         }

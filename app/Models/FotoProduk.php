@@ -10,11 +10,12 @@ class FotoProduk extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id_produk', 'path',
+        'id_produk',
+        'path',
     ];
 
     public function FotoProduk()
     {
-        return $this->belongsTo(FotoProduk::class, 'id')->withDefault();
+        return $this->belongsTo(Produk::class, 'id')->withDefault();
     }
 }

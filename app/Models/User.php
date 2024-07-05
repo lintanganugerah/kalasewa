@@ -18,6 +18,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'no_telp',
         'no_darurat',
+        'ket_no_darurat',
         'link_sosial_media',
         'kota',
         'kode_pos',
@@ -71,6 +72,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $nilai;
     }
 
+    public function avg_nilai_toko()
+    {
+        $toko = Toko::where('id_user', $this->id)->first();
+        $nilai = Review::where('id_toko', $toko->id)->where('tipe', 'review_produk')->avg('nilai');
+
+        return $nilai;
+    }
+
     public function cek_nilai()
     {
         $nilai = Review::where('id_penyewa', $this->id)->where('tipe', 'review_penyewa')->first();
@@ -98,4 +107,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(OrderPenyewaan::class, 'id_penyewa');
     }
+    public function alasanPenolakan()
+    {
+        return $this->hasMany(AlasanPenolakan::class, 'id_user');
+    }
+
 }

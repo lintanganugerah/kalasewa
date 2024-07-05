@@ -12,7 +12,7 @@ return new class extends Migration {
     {
         Schema::create('series', function (Blueprint $table) {
             $table->id()->index();
-            $table->string("series");
+            $table->string("series")->unique();
             $table->timestamps();
         });
     }

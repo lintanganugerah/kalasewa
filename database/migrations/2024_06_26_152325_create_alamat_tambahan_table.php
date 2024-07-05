@@ -11,10 +11,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('alamat_tambahan', function (Blueprint $table) {
-            $table->id();
+            $table->unsignedBigInteger('id')->primary(); //id nya nanti unixTime + idToko
             $table->unsignedBigInteger('id_toko');
             $table->string('nama');
             $table->text('alamat');
+            $table->string('kode_pos');
+            $table->string('kota');
+            $table->string('provinsi');
             $table->timestamps();
 
             $table->foreign('id_toko')->references('id')->on('tokos')->onUpdate('cascade')->onDelete('cascade');

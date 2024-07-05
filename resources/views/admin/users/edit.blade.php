@@ -25,57 +25,98 @@
                         <!-- Common fields for all roles -->
                         <div class="form-group">
                             <label for="nama">Nama</label>
-                            <input type="text" class="form-control" id="nama" name="nama"
-                                value="{{ $user->nama }}" @if ($user->role !== 'admin') readonly @endif>
+                            <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama"
+                                value="{{ $user->nama }}"
+                                @if (Auth::check() && (
+                                    (Auth::user()->role === 'super_admin' && $user->role === 'admin') || 
+                                    Auth::user()->id === $user->id))
+                                @else
+                                    readonly
+                                @endif>
+                            @error('nama')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
+
                         <div class="form-group">
                             <label for="email">Email</label>
-                            <input type="email" class="form-control" id="email" name="email"
-                                value="{{ $user->email }}" @if ($user->role !== 'admin') readonly @endif>
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <div class="input-group">
-                                <input type="password" class="form-control" id="password" name="password"
-                                    @if ($user->role !== 'admin') value="{{ $user->password }}" readonly 
+                            <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email"
+                                value="{{ $user->email }}"
+                                @if (Auth::check() && (
+                                    (Auth::user()->role === 'super_admin' && $user->role === 'admin') || 
+                                    Auth::user()->id === $user->id))
                                 @else
-                                    placeholder="Masukkan Password Baru" @endif>
-                                @if ($user->role === 'admin')
-                                    <div class="input-group-append">
-                                        <button type="button" class="btn btn-outline-secondary" id="toggle-password"
-                                            onclick="togglePassword()">
-                                            <i class="fas fa-eye" id="toggle-icon"></i>
-                                        </button>
-                                    </div>
-                                @endif
-                            </div>
+                                    readonly
+                                @endif>
+                            @error('email')
+                                <span class="invalid-feedback" role="alert">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                            @enderror
                         </div>
                         <div class="form-group">
                             <label for="no_telp">No. Telepon</label>
-                            <input type="text" class="form-control" id="no_telp" name="no_telp"
-                                value="{{ $user->no_telp }}" @if ($user->role !== 'admin') readonly @endif>
+                            <input type="tel" class="form-control @error('no_telp') is-invalid @enderror" id="no_telp" name="no_telp"
+                                value="{{ $user->no_telp }}"
+                                @if (Auth::check() && (
+                                    (Auth::user()->role === 'super_admin' && $user->role === 'admin') || 
+                                    Auth::user()->id === $user->id))
+                                @else
+                                    readonly
+                                @endif
+                                pattern="[0-9]{10,}" title="Hanya boleh angka dengan minimal 10 digit">
                         </div>
-                        <div class="form-group">
-                            <label for="role">Role</label>
-                            <input type="text" class="form-control" id="role" name="role"
-                                value="{{ ['admin' => 'Admin', 'penyewa' => 'Penyewa', 'pemilik_sewa' => 'Pemilik Sewa'][$user->role] ?? $user->role }}"
-                                required readonly>
-                        </div>
-                        <div class="form-group">
-                            <label for="verifyIdentitas">Verifikasi Identitas</label>
-                            <input type="text" class="form-control" id="verifyIdentitas" name="verifyIdentitas"
-                                value="{{ $user->verifyIdentitas }}" readonly>
-                        </div>
-                        @if ($user->role !== 'admin')
+                        @if ($user->role == 'penyewa' || $user->role == 'pemilik_sewa')
                             <div class="form-group">
                                 <label for="no_darurat">No. Darurat</label>
                                 <input type="text" class="form-control" id="no_darurat" name="no_darurat"
-                                    value="{{ $user->no_darurat }}" readonly>
+                                    value="{{ $user->no_darurat }} ({{ $user->ket_no_darurat }})" readonly>
                             </div>
+                        @endif
+                        <div class="form-group">
+                            <label for="role" style="margin-right: 8px;">Role :</label>
+                                @if($user->role == 'super_admin')
+                                    <span class="badge badge-success badge-pill px-3 py-2">Super Admin</span>
+                                @elseif($user->role == 'admin')
+                                    <span class="badge badge-warning badge-pill px-3 py-2">Admin</span>
+                                @elseif($user->role == 'penyewa')
+                                    <span class="badge badge-primary badge-pill px-3 py-2">
+                                        <i class="fas fa-user"></i> Penyewa
+                                    </span>
+                                @elseif($user->role == 'pemilik_sewa')
+                                    <span class="badge badge-primary badge-pill px-3 py-2">
+                                        <i class="fas fa-store"></i> Pemilik Sewa
+                                    </span>
+                                @else
+                                    <input type="text" class="form-control" value="{{ $user->role }}" readonly>
+                                @endif                          
+                        </div>
+                        <div class="form-group">
+                            <label for="verifyIdentitas" style="margin-right: 8px;">Verifikasi Identitas :</label>
+                                @if($user->verifyIdentitas == 'Sudah')
+                                    <span class="badge badge-success badge-pill px-3 py-2">Verified</spa>
+                                @elseif($user->verifyIdentitas == 'Tidak')
+                                    <span class="badge badge-warning badge-pill px-3 py-2">Unverified</span>
+                                @elseif($user->verifyIdentitas == 'Ditolak')
+                                    <span class="badge badge-danger badge-pill px-3 py-2">Rejected</span>
+                                @else
+                                    <input type="text" class="form-control" value="{{ $user->verifyIdentitas }}" readonly>
+                                @endif
+                        </div>
+                        @if ($user->role == 'penyewa' || $user->role == 'pemilik_sewa')
                             <div class="form-group">
-                                <label for="badge">Badge</label>
-                                <input type="text" class="form-control" id="badge" name="badge"
-                                    value="{{ $user->badge }}" readonly>
+                                <label for="badge" style="margin-right: 8px;">Status :</label>
+                                    @if($user->badge == 'Aktif')
+                                        <span class="badge badge-success badge-pill px-3 py-2">
+                                        <i class="fas fa-check"></i> Aktif</span>
+                                    @elseif($user->badge == 'Banned')
+                                        <span class="badge badge-danger badge-pill px-3 py-2">
+                                        <i class="fas fa-ban"></i> Banned</span>
+                                    @else
+                                        <input type="text" class="form-control" value="{{ $user->badge }}" readonly>
+                                    @endif
                             </div>
                             <div class="form-group">
                                 <label for="link_sosial_media">Link Sosial Media</label>
@@ -86,7 +127,7 @@
                     </div>
 
                     <!-- Identitas User (hanya ditampilkan jika role bukan admin) -->
-                    @if ($user->role !== 'admin')
+                    @if ($user->role == 'penyewa' || $user->role == 'pemilik_sewa')
                         <div class="col-md-6">
                             <h4>Identitas User</h4>
                             <div class="row">
@@ -153,44 +194,93 @@
                     @endif
                 </div>
 
-                @if ($user->role === 'admin')
+                @if (Auth::check() && (
+                    (Auth::user()->role === 'super_admin' && $user->role === 'admin') || 
+                    Auth::user()->id === $user->id))
                     <button type="submit" class="btn btn-primary btn-block mb-2">Update</button>
+                @else
                 @endif
             </form>
 
             <!-- Tombol Delete -->
-            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn btn-danger delete-btn btn-block mb-2"
-                    onclick="return confirmDelete()">Delete</button>
-            </form>
-            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary btn-block">Batal</a>
+            @if (Auth::check())
+                @if (Auth::user()->role === 'super_admin' || Auth::user()->id === $user->id)
+                    <!-- Super Admin atau user yang bersangkutan -->
+                    <button type="button" class="btn btn-danger delete-btn btn-block mb-2"
+                            onclick="confirmDelete('{{ $user->id }}')" data-toggle="modal" data-target="#confirmDeleteModal">Delete</button>
+                @elseif (Auth::user()->role === 'admin' && ($user->role == 'penyewa' || $user->role == 'pemilik_sewa'))
+                    <!-- Admin yang mengedit penyewa atau pemilik sewa -->
+                    <button type="button" class="btn btn-danger delete-btn btn-block mb-2"
+                            onclick="confirmDelete('{{ $user->id }}')" data-toggle="modal" data-target="#confirmDeleteModal">Delete</button>
+                @endif
+            @endif
+
+
+            <a href="{{ route('admin.users.index') }}" class="btn btn-secondary btn-block">Kembali</a>
         </div>
     </div>
 
-    <script>
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const toggleIcon = document.getElementById('toggle-icon');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                toggleIcon.classList.remove('fa-eye');
-                toggleIcon.classList.add('fa-eye-slash');
-            } else {
-                passwordInput.type = 'password';
-                toggleIcon.classList.remove('fa-eye-slash');
-                toggleIcon.classList.add('fa-eye');
-            }
-        }
-    </script>
+    <!-- Modal Konfirmasi Delete -->
+    <div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmDeleteModalLabel">Konfirmasi Delete User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    Apakah Anda yakin ingin menghapus user ini?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+                @endif
+            </div>
+
+            @if ($user->role === 'admin')
+            <button type="submit" class="btn btn-primary btn-block mb-2">Update</button>
+            @endif
+        </form>
+
+        <!-- Tombol Delete -->
+        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger delete-btn btn-block mb-2" onclick="return confirmDelete()">Delete</button>
+        </form>
+        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary btn-block">Batal</a>
+    </div>
+</div>
 
 @endsection
 
 @section('scripts')
-    <script>
-        function confirmDelete() {
-            return confirm('Apakah Anda yakin ingin menghapus user ini?');
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const togglePassword = document.querySelector('.toggle-password');
+        const password = document.getElementById('password');
+
+        if (togglePassword) {
+            togglePassword.addEventListener('click', function() {
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+                this.querySelector('i').classList.toggle('fa-eye');
+                this.querySelector('i').classList.toggle('fa-eye-slash');
+            });
         }
-    </script>
+    });
+
+
+    function confirmDelete() {
+        return confirm('Apakah Anda yakin ingin menghapus user ini?');
+    }
+
+</script>
 @endsection

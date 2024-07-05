@@ -209,11 +209,28 @@
                                                 Wishlist</button>
                                         </div>
                                     @endif
-                                </div>
+                                    <form action="#" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-danger btn-block">Rental
+                                            Sekarang</button>
+                                    </form>
+                                @else
+                                    <form action="" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-danger btn-block" disabled>Tambah
+                                            Wishlist</button>
+                                    </form>
+                                    <form action="#" method="POST">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-danger btn-block" disabled>Rental
+                                            Sekarang</button>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>

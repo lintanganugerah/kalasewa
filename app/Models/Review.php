@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Review extends Model
 {
@@ -30,23 +31,41 @@ class Review extends Model
         return $this->belongsTo(User::class, 'id_penyewa');
     }
 
+
     public function id_review_penyewa()
     {
-        return $this->belongsTo(User::class, 'id');
+        return $this->belongsTo(User::class, 'id_penyewa', 'id');
     }
 
     public function id_review_toko()
     {
-        return $this->belongsTo(Toko::class, 'id');
+        return $this->belongsTo(Toko::class, 'id_toko', 'id');
     }
 
     public function id_review_produk()
     {
-        return $this->belongsTo(Produk::class, 'id');
+        return $this->belongsTo(Produk::class, 'id_produk', 'id');
     }
 
-    public function getFotoAttribute($value)
+    public function produk_series($id_series)
     {
-        return json_decode($value, true);
+        $series = Series::where('id', $id_series)->first();
+
+        return $series;
+    }
+
+    public function foto_produk_review($id_produk)
+    {
+        $foto = FotoProduk::where('id_produk', $id_produk)->first();
+
+        return $foto;
+    }
+
+    public function getFotoProfilToko($id_toko)
+    {
+        $toko = Toko::where('id', $id_toko)->first();
+        $foto = User::where('id', $toko->id_user)->first();
+
+        return $foto;
     }
 }
