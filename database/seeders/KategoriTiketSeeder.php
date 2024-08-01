@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\KategoriTiket;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class KategoriTiketSeeder extends Seeder
 {
@@ -13,12 +14,20 @@ class KategoriTiketSeeder extends Seeder
      */
     public function run(): void
     {
-        KategoriTiket::create([
-            'nama' => 'Penyewa Bermasalah'
-        ]);
+        $kategori = [
+            'Transaksi Bermasalah',
+            'Laporkan Penyewa / Pemilik Sewa',
+            'Proses Refund / Withdraw Bermasalah',
+            'Ajukan Banding',
+            'Lainnya'
+        ];
 
-        KategoriTiket::create([
-            'nama' => 'Lainnya'
-        ]);
+        foreach ($kategori as $nama) {
+            DB::table('kategori_tiket')->insert([
+                'nama' => $nama,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+        }
     }
 }

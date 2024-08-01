@@ -145,7 +145,6 @@
 
 <script src="{{ asset('Style/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
-//
 <script>
     //     function preserveToggledOnScroll() {
     //         var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;

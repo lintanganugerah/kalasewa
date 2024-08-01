@@ -77,7 +77,7 @@ class PublicController extends Controller
     public function viewDetail($id)
     {
         $produk = Produk::with('toko.user')->findOrFail($id);
-        $fotoproduk = FotoProduk::where('ID_produk', $id)->get();
+        $fotoproduk = FotoProduk::where('id_produk', $id)->get();
         $series = Series::all();
         $brand = Produk::select('brand')->distinct()->get();
         $toko = Toko::all();
@@ -90,7 +90,15 @@ class PublicController extends Controller
         // Hitung rata-rata nilai review toko
         $averageTokoRating = Review::where('id_toko', $produk->toko->id)->avg('nilai');
 
-        return view('detail', compact('produk', 'fotoproduk', 'series', 'brand', 'toko', 'review', 'averageRating', 'averageTokoRating', 'aturan'));
+        // Ambil produk-produk lain dari toko yang sama
+        $fotoProdukLain = FotoProduk::all();
+
+        $produkLain = Produk::where('id_toko', $produk->toko->id)
+            ->where('id', '!=', $id) // Exclude the current product
+            ->take(5)
+            ->get();
+
+        return view('detail', compact('produk', 'fotoproduk', 'series', 'brand', 'toko', 'review', 'averageRating', 'averageTokoRating', 'aturan', 'produkLain', 'fotoProdukLain'));
     }
 
     public function viewListToko(Request $request)
@@ -202,6 +210,10 @@ class PublicController extends Controller
             $query->where('brand', $request->brand);
         }
 
+        if ($request->filled('grade')) {
+            $query->where('grade', $request->grade);
+        }
+
         $produk = $query->get();
 
         return view('viewToko', compact('produk', 'fotoproduk', 'toko', 'user', 'series', 'brand', 'averageTokoRating'));
@@ -278,6 +290,10 @@ class PublicController extends Controller
 
         if ($request->filled('brand')) {
             $query->where('brand', $request->brand);
+        }
+
+        if ($request->filled('grade')) {
+            $query->where('grade', $request->grade);
         }
 
         $produk = $query->get();

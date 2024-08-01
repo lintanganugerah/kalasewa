@@ -37,6 +37,8 @@ use App\Http\Controllers\Pemilik\TiketController;
 use App\Http\Controllers\Pemilik\KeuanganController;
 
 
+use App\Http\Controllers\TicketingController;
+
 // HOMEPAGE
 Route::get('/', [PublicController::class, 'viewHomepage'])->name('viewHomepage');
 Route::get('/series', [PublicController::class, 'viewSeries'])->name('viewSeries');
@@ -118,8 +120,19 @@ Route::group(['middleware' => 'penyewa'], function () {
 
     //History
     Route::get('/user/history/semua', [HistoryController::class, 'viewHistory'])->name('viewHistory');
-    Route::get('/user/history/ongoing', [HistoryController::class, 'viewHistoryOngoing'])->name('viewHistoryOngoing');
-    Route::get('/user/history/selesai', [HistoryController::class, 'viewHistoryFinish'])->name('viewHistoryFinish');
+    Route::get('/user/history/menunggu-diproses', [HistoryController::class, 'viewHistoryMenungguDiproses'])->name('viewHistoryMenungguDiproses');
+    Route::get('/user/history/dalam-pengiriman', [HistoryController::class, 'viewHistoryDalamPengiriman'])->name('viewHistoryDalamPengiriman');
+    Route::get('/user/history/sedang-berlangsung', [HistoryController::class, 'viewHistorySedangBerlangsung'])->name('viewHistorySedangBerlangsung');
+    Route::get('/user/history/telah-kembali', [HistoryController::class, 'viewHistoryTelahKembali'])->name('viewHistoryTelahKembali');
+    Route::get('/user/history/penyewaan-selesai', [HistoryController::class, 'viewHistoryPenyewaanSelesai'])->name('viewHistoryPenyewaanSelesai');
+    Route::get('/user/history/dibatalkan', [HistoryController::class, 'viewHistoryDibatalkan'])->name('viewHistoryDibatalkan');
+    Route::get('/user/history/diretur', [HistoryController::class, 'viewHistoryDiretur'])->name('viewHistoryDiretur');
+
+    //Ticketing
+    Route::get('/kalasewa/ticketing', [TicketingController::class, 'viewTicketing'])->name('viewTicketing');
+    Route::get('/kalasewa/ticketing/create', [TicketingController::class, 'viewNewTicketing'])->name('viewNewTicketing');
+    Route::post('/kalasewa/ticketing/create/act', [TicketingController::class, 'createTicket'])->name('createTicket');
+
 
     // Tes route getTransaction midtrans
     // Route::post('/order/checkout/cekTransaksi', [OrderController::class, 'getTransaction'])->name('tesCekCheckout');

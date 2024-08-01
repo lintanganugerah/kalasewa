@@ -19,6 +19,7 @@ use App\Models\Produk;
 use App\Models\FotoProduk;
 use App\Models\Series;
 use App\Models\OrderPenyewaan;
+use App\Models\Review;
 use App\Models\TopSeries;
 use App\Models\Checkout;
 use Illuminate\Support\Facades\Log;
@@ -117,6 +118,7 @@ class OrderController extends Controller
         $order = new OrderPenyewaan();
         $order->nomor_order = $nomorOrder;
         $order->id_penyewa = auth()->user()->id;
+        $order->id_toko = $produk->toko->id;
         $order->id_produk = $produk->id;
         $order->ukuran = $request->size;
         $order->tujuan_pengiriman = "Atas Nama " . auth()->user()->nama . " " . auth()->user()->no_telp . ", " . $request->alamat . ", " . auth()->user()->kota . ", " . auth()->user()->provinsi . ", " . auth()->user()->kode_pos;
@@ -219,7 +221,7 @@ class OrderController extends Controller
                 ]);
             }
 
-            $redirectUrl = route('viewHistory'); // Assuming 'viewHistory' is the name of your route
+            $redirectUrl = route('viewHistoryMenungguDiproses'); // Assuming 'viewHistory' is the name of your route
             return response()->json(['success' => true, 'redirect_url' => $redirectUrl]);
         }
         return response()->json(['success' => false], 400);
@@ -270,7 +272,7 @@ class OrderController extends Controller
         $order->status = "Sedang Berlangsung";
         $order->save();
 
-        return redirect()->route('viewHistory')->with('success', 'Bukti Diterima berhasil di Update');
+        return redirect()->route('viewHistorySedangBerlangsung')->with('success', 'Bukti Diterima berhasil di Update');
     }
 
     public function viewPengembalianBarang($orderId)
@@ -299,25 +301,67 @@ class OrderController extends Controller
 
     public function returBarang(Request $request, $orderId)
     {
-
         $order = OrderPenyewaan::findOrFail($orderId);
 
-
         $validator = Validator::make($request->all(), [
+            'bukti_resi_penyewa' => 'required|max:5120',
             'nomor_resi' => 'required|string',
+            'rating' => 'required|integer|min:1|max:5',
+            'ulasankostum' => 'required|string',
+            'dokumentasi_kostum.*' => 'nullable|file|mimes:jpg,png,jpeg',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return redirect()->back()->withErrors($validator)->with('error');
         }
+
+        // Save Retur
+        $photoPath = $request->file('bukti_resi_penyewa')->store('public/bukti_foto');
+        $photoPath = Str::replaceFirst('public/', 'storage/', $photoPath);
 
         $order->nomor_resi = $request->nomor_resi;
         $order->tanggal_pengembalian = today();
+        $order->bukti_resi_pengembalian = $photoPath;
         $order->status = "Telah Kembali";
         $order->save();
 
-        return redirect()->route('viewPenyewaanSelesai', ['orderId' => $orderId])->with('success', 'Nomor Resi Berhasil di Update');
+        // Save review
+        $uploadedImages = [];
+        if ($request->hasFile('dokumentasi_kostum')) {
+            foreach ($request->file('dokumentasi_kostum') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $dokumentasiPath = $file->storeAs('public/review_foto', $filename);
+                $dokumentasiPath = Str::replaceFirst('public/', 'storage/', $dokumentasiPath);
+                $uploadedImages[] = $dokumentasiPath;
+            }
+        } else {
+            return redirect()->back()->with('error', 'Terjadi Error dengan foto');
+        }
 
+        $review = new Review();
+        $review->id_penyewa = $order->id_penyewa;
+        $review->id_toko = $order->id_toko;
+        $review->id_produk = $order->id_produk;
+        $review->komentar = $request->ulasankostum;
+        $review->nilai = $request->rating;
+        $review->foto = json_encode($uploadedImages); // Mengonversi array path menjadi JSON
+        $review->tipe = 'review_produk';
+
+        // if ($request->hasFile('foto_ulasan')) {
+        //     $file = $request->file('foto_ulasan');
+        //     $filename = time() . '_' . $file->getClientOriginalName();
+        //     $photoUlasanPath = $file->storeAs('public/review_foto', $filename);
+        //     $photoUlasanPath = Str::replaceFirst('public/', 'storage/', $photoUlasanPath);
+
+        //     // Simpan file path sebagai JSON di kolom foto_ulasan
+        //     $review->foto = json_encode([$photoUlasanPath]);
+        // } else {
+        //     return redirect()->back()->with('error', 'Foto review tidak ditemukan');
+        // }
+
+        $review->save();
+
+        return redirect()->route('viewHistoryTelahKembali')->with('success', 'Nomor Resi dan Review Berhasil di Update');
     }
 
     public function viewPenyewaanSelesai($orderId)
