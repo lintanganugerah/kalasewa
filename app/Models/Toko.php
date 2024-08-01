@@ -49,4 +49,24 @@ class Toko extends Model
     {
         return $this->hasMany(AlamatTambahan::class, 'id_toko');
     }
+
+    public function saldo_tertunda()
+    {
+        $produk = Produk::where('id_toko', $this->id)->get()->pluck('id')->toArray();
+        $order = OrderPenyewaan::whereIn('id_produk', $produk)->whereNotIn('status', ['Penyewaan Selesai', 'Retur Selesai', 'Retur Dikonfirmasi', 'Retur dalam Pengiriman', 'Retur', 'Dibatalkan Penyewa', 'Dibatalkan Pemilik Sewa'])->sum('total_penghasilan') ?? 0;
+
+        return $order;
+    }
+
+    public function penghasilan_bulan_ini()
+    {
+        $produk = Produk::where('id_toko', $this->id)->get()->pluck('id')->toArray();
+        $order = OrderPenyewaan::whereIn('id_produk', $produk)->where('status', 'Penyewaan Selesai')->sum('total_penghasilan') ?? 0;
+        return $order;
+    }
+
+    public function pengajuan_denda()
+    {
+        return $this->hasMany(PengajuanDenda::class, 'id_toko');
+    }
 }

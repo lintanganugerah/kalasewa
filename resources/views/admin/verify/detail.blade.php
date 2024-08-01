@@ -80,7 +80,6 @@
         </div>
     </div>
 
-
     <div class="col-md-6">
         @if ($user->role !== 'pemilik_sewa')
             <div class="text-center mb-4">
@@ -94,7 +93,6 @@
                 alt="Identitas" class="img-thumbnail">
         </div>
     </div>
-
 </div>
 
 <!-- Modal Verifikasi -->
@@ -117,84 +115,82 @@
                     @csrf
                     @method('PUT')
                     <input type="hidden" name="action" id="actionInput">
-                    <button type="submit" class="btn btn-danger" id="confirmButton">Lanjutkan</button>
+                    <button type="submit" class="btn btn-success" id="confirmButton">Verifikasi</button>
                 </form>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Modal Alasan Penolakan -->
-    <div class="modal fade" id="rejectReasonModal" tabindex="-1" role="dialog" aria-labelledby="rejectReasonModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="rejectReasonModalLabel">Alasan Penolakan</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="rejectReasonForm" action="{{ route('admin.users.updateVerification', $user->id) }}"
-                        method="POST">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="action" value="reject">
-                        <p>Pilih alasan penolakan:</p>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="reason" id="reason1"
-                                value="Data diri tidak sesuai dengan kartu identitas" required>
-                            <label class="form-check-label" for="reason1">
-                                Data diri tidak sesuai dengan kartu identitas
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="reason" id="reason2"
-                                value="Akun Instagram Private atau Tidak Aktif" required>
-                            <label class="form-check-label" for="reason2">
-                                Akun Instagram Private atau Tidak Aktif
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="reason" id="reason3"
-                                value="Nomor Telepon tidak ada di WhatsApp" required>
-                            <label class="form-check-label" for="reason3">
-                                Nomor Telepon tidak ada di WhatsApp
-                            </label>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                            <button type="submit" class="btn btn-danger">Tolak</button>
-                        </div>
-                    </form>
-                </div>
+<!-- Modal Alasan Penolakan -->
+<div class="modal fade" id="rejectReasonModal" tabindex="-1" role="dialog" aria-labelledby="rejectReasonModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rejectReasonModalLabel">Alasan Penolakan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="rejectReasonForm" action="" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <input type="hidden" name="action" value="reject">
+                    <p>Pilih alasan penolakan:</p>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="reason" id="reason1"
+                            value="Data diri tidak sesuai dengan kartu identitas" required>
+                        <label class="form-check-label" for="reason1">
+                            Data diri tidak sesuai dengan kartu identitas
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="reason" id="reason2"
+                            value="Akun Instagram Private atau Tidak Aktif" required>
+                        <label class="form-check-label" for="reason2">
+                            Akun Instagram Private atau Tidak Aktif
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="reason" id="reason3"
+                            value="Nomor Telepon tidak ada di WhatsApp" required>
+                        <label class="form-check-label" for="reason3">
+                            Nomor Telepon tidak ada di WhatsApp
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                <button type="submit" class="btn btn-danger" form="rejectReasonForm">Tolak</button>
             </div>
         </div>
     </div>
+</div>
 
+<script>
+    function confirmAction(url, action) {
+        if (action === 'reject') {
+            var rejectForm = document.getElementById('rejectReasonForm');
+            rejectForm.action = url;
+            $('#rejectReasonModal').modal('show'); // Show the reject reason modal
+        } else {
+            var actionForm = document.getElementById('actionForm');
+            actionForm.action = url; // Set the form action URL
+            document.getElementById('actionInput').value = action; // Set the action input value
 
-    <script>
-        function confirmAction(url, action) {
-            if (action === 'reject') {
-                var rejectForm = document.getElementById('rejectReasonForm');
-                rejectForm.action = url;
-                $('#rejectReasonModal').modal('show'); // Show the reject reason modal
-            } else {
-                var actionForm = document.getElementById('actionForm');
-                actionForm.action = url; // Set the form action URL
-                document.getElementById('actionInput').value = action; // Set the action input value
-
-                var confirmButton = document.getElementById('confirmButton'); // The submit button in the modal
-                if (action === 'verify') {
-                    confirmButton.classList.remove('btn-danger');
-                    confirmButton.classList.add('btn-success');
-                    confirmButton.textContent = 'Verifikasi';
-                }
-
-                $('#confirmActionModal').modal('show'); // Show the modal
+            var confirmButton = document.getElementById('confirmButton'); // The submit button in the modal
+            if (action === 'verify') {
+                confirmButton.classList.remove('btn-danger');
+                confirmButton.classList.add('btn-success');
+                confirmButton.textContent = 'Verifikasi';
             }
+
+            $('#confirmActionModal').modal('show'); // Show the modal
         }
-    </script>
+    }
+</script>
 
-
-    @endsection
+@endsection

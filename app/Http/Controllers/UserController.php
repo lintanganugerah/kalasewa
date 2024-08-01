@@ -40,10 +40,15 @@ class UserController extends Controller
         $totalPemilikSewaTerdaftar = User::where('role', 'pemilik_sewa')->where('verifyIdentitas', 'Sudah')->count();
         $totalPendingVerifikasi = User::where('role', '<>', 'admin')->where('verifyIdentitas', 'Tidak')->count();
 
+        $totalPendapatan = DB::table('order_penyewaan')
+            ->whereIn('status', ['Retur Selesai', 'Penyewaan Selesai', 'Dibatalkan Pemilik Sewa', 'Dibatalkan Penyewa'])
+            ->sum('fee_admin');
+
         return view('admin.dashboard', [
             'totalPenyewaTerdaftar' => $totalPenyewaTerdaftar,
             'totalPemilikSewaTerdaftar' => $totalPemilikSewaTerdaftar,
             'totalPendingVerifikasi' => $totalPendingVerifikasi,
+            'totalPendapatan' => $totalPendapatan,
         ]);
     }
     public function index(Request $request)
@@ -89,12 +94,12 @@ class UserController extends Controller
             $user->nik = null;
             $user->no_telp = null;
             $user->no_darurat = null;
+            $user->ket_no_darurat = null;
             $user->alamat = null;
             $user->provinsi = null;
             $user->link_sosial_media = null;
             $user->kota = null;
             $user->kode_pos = null;
-            $user->badge = 'Banned';
 
             // Hapus foto dari storage
             $path = $user->foto_diri;
@@ -146,9 +151,9 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'password' => 'required|string|min:8',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'nama' => 'string|max:255',
+            'password' => 'string|min:8',
+            'email' => 'string|email|max:255|unique:users,email,' . $id,
             'no_telp' => 'nullable|string|max:15',
         ]);
 
@@ -169,41 +174,24 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi data yang dikirimkan dari form
         // dd($request->all());
         $request->validate([
             'nama' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'no_telp' => 'nullable|string|max:15',
-            'role' => 'required|in:penyewa,pemilik_sewa,admin,super_admin',
             'verifyIdentitas' => 'required|in:Sudah,Tidak,Ditolak',
         ]);
 
-        // Ambil semua data yang dikirimkan dari form
         $data = $request->all();
-
-        // Enkripsi password sebelum disimpan
+        $data['verifyIdentitas'] = 'Sudah';
+        $data['role'] = 'admin';
         $data['password'] = Hash::make($request->password);
 
-        // Pastikan verifyIdentitas diatur dengan benar
-        $data['verifyIdentitas'] = 'Sudah'; // atau sesuai kebutuhan aplikasi
-        $data['password'] = Hash::make($request->password);
-
-        // User::create($data);
         $user = User::create($data);
 
-        // Update bagian verifyIdentitas menjadi 'sudah'
-        $user->verifyIdentitas = $request->verifyIdentitas;
         $user->save();
 
-        // Simpan data user baru
-        $user = User::create($data);
-
-        $user->verifyIdentitas = $request->verifyIdentitas;
-        $user->save();
-
-        // Redirect ke halaman index dengan pesan sukses
         return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan.');
     }
 

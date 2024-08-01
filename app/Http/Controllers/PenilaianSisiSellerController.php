@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\OrderPenyewaan;
 use App\Models\Review;
 use App\Models\SaldoUser;
-use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -18,7 +17,9 @@ use App\Models\User;
 use App\Models\Toko;
 use App\Models\Series;
 use App\Models\Produk;
+use Exception;
 use App\Models\FotoProduk;
+use Carbon\Carbon;
 
 class PenilaianSisiSellerController extends Controller
 {
@@ -33,7 +34,7 @@ class PenilaianSisiSellerController extends Controller
         $toko = Toko::where('id_user', Auth::id())->first();
         $produk = Produk::where('id_toko', $toko->id)->get();
 
-        return view('pemiliksewa.iterasi2.penilaian.penilaianProduk', compact('produk'));
+        return view('pemilikSewa.iterasi2.penilaian.penilaianProduk', compact('produk'));
     }
 
     public function viewdetailPenilaianProduk($id)
@@ -50,7 +51,7 @@ class PenilaianSisiSellerController extends Controller
             return redirect()->route('seller.view.penilaian.penilaianProduk')->with('error', 'Produk Tidak Ditemukan');
         }
 
-        return view('pemiliksewa.iterasi2.penilaian.detailPenilaianProduk', compact('penilaianProduk', 'produk'));
+        return view('pemilikSewa.iterasi2.penilaian.detailPenilaianProduk', compact('penilaianProduk', 'produk'));
     }
 
     public function viewReviewPenyewa($id)
@@ -66,7 +67,7 @@ class PenilaianSisiSellerController extends Controller
             return redirect()->route('seller.statuspenyewaan.belumdiproses');
         }
 
-        return view('pemiliksewa.iterasi2.penilaian.reviewPenyewa', compact('penyewa', 'penilaianPenyewa'));
+        return view('pemilikSewa.iterasi2.penilaian.reviewPenyewa', compact('penyewa', 'penilaianPenyewa'));
     }
 
     public function viewTambahReviewPenyewa($id, $nomor_order)
@@ -86,7 +87,11 @@ class PenilaianSisiSellerController extends Controller
             return redirect()->route('seller.statuspenyewaan.telahkembali')->with('error', "Penyewa Tidak Ditemukan!");
         }
 
-        return view('pemiliksewa.iterasi2.penilaian.tambahReviewPenyewa', compact('penyewa', 'order'));
+        if ($order->jaminan < 0) {
+            return redirect()->route('seller.statuspenyewaan.telahkembali')->with('error', 'Nilai Jaminan Penyewa Minus. Penyewa belum melunaskan denda nya. Tidak dapat memproses konfirmasi');
+        }
+
+        return view('pemilikSewa.iterasi2.penilaian.tambahReviewPenyewa', compact('penyewa', 'order'));
     }
 
     public function tambahReviewPenyewaAction($id, Request $request, $nomor_order)
@@ -94,6 +99,7 @@ class PenilaianSisiSellerController extends Controller
         $penyewa = User::where('id', $id)->first();
         $toko = Toko::where('id_user', Auth::id())->first();
         $order = OrderPenyewaan::where('nomor_order', $nomor_order)->first();
+        $produk = $order->produk;
 
         if ($penyewa) {
             if ($penyewa->role != "penyewa") {
@@ -119,37 +125,11 @@ class PenilaianSisiSellerController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $saldoPemilik = SaldoUser::where('id_user', Auth::id())->first();
-        $saldoPenyewa = SaldoUser::where('id_user', $order->id_penyewa)->first();
-
-        if ($saldoPemilik) {
-            $totalSaldo = $order->total_penghasilan + $saldoPemilik->saldo;
-            $saldoPemilik->saldo = $totalSaldo;
-            $saldoPemilik->save();
-        } else {
-            SaldoUser::create([
-                "id_user" => Auth::id(),
-                'tujuan_rek' => null,
-                'nomor_rekening' => null,
-                'saldo' => $order->total_penghasilan
-            ]);
-        }
-
-        if ($saldoPenyewa) {
-            $totalSaldo = $order->jaminan + $saldoPenyewa->saldo;
-            $saldoPenyewa->saldo = $totalSaldo;
-            $saldoPenyewa->save();
-        } else {
-            SaldoUser::create([
-                "id_user" => $order->id_penyewa,
-                'tujuan_rek' => null,
-                'nomor_rekening' => null,
-                'saldo' => $order->jaminan,
-            ]);
-        }
-
         try {
+            DB::beginTransaction();
             $fotoReview = NULL;
+            $saldoPemilik = SaldoUser::where('id_user', Auth::id())->first();
+            $saldoPenyewa = SaldoUser::where('id_user', $order->id_penyewa)->first();
 
             if ($request->hasFile('foto_produk')) {
                 $fotoReview = [];
@@ -172,10 +152,42 @@ class PenilaianSisiSellerController extends Controller
             ]);
 
             $order->status = "Penyewaan Selesai";
+            $produk->status_produk = "arsip";
+
+            $produk->save();
             $order->save();
+
+            if ($saldoPemilik) {
+                $totalSaldo = $order->total_penghasilan + $saldoPemilik->saldo;
+                $saldoPemilik->saldo = $totalSaldo;
+                $saldoPemilik->save();
+            } else {
+                SaldoUser::create([
+                    "id_user" => Auth::id(),
+                    'tujuan_rek' => null,
+                    'nomor_rekening' => null,
+                    'saldo' => $order->total_penghasilan
+                ]);
+            }
+
+            if ($saldoPenyewa) {
+                $totalSaldo = $order->jaminan + $saldoPenyewa->saldo;
+                $saldoPenyewa->saldo = $totalSaldo;
+                $saldoPenyewa->save();
+            } else {
+                SaldoUser::create([
+                    "id_user" => $order->id_penyewa,
+                    'tujuan_rek' => null,
+                    'nomor_rekening' => null,
+                    'saldo' => $order->jaminan,
+                ]);
+            }
+
+            DB::commit();
 
             return redirect()->route('seller.statuspenyewaan.riwayatPenyewaan')->with('success', 'Penyewaan Telah Selesai! Review berhasil ditambahkan');
         } catch (Exception $e) {
+            DB::rollBack();
             return redirect()->route('seller.statuspenyewaan.telahkembali')->with('error', 'Terjadi kesalahan saat menginputkan rating. Mohon coba lagi');
         }
     }

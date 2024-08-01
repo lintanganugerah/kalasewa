@@ -28,7 +28,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'badge',
         'NIK',
         'foto_identitas',
-        'foto_diri'
+        'foto_diri',
+        'verifyIdentitas',
     ];
 
     protected $hidden = [
@@ -112,4 +113,13 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(AlasanPenolakan::class, 'id_user');
     }
 
+    public function penarikan_saldo()
+    {
+        return $this->hasMany(PenarikanSaldo::class, 'id_user');
+    }
+
+    public function denda_penyewa()
+    {
+        return $this->hasMany(PenarikanSaldo::class, 'id_penyewa');
+    }
 }

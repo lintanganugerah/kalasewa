@@ -19,9 +19,13 @@ use App\Models\Produk;
 use App\Models\FotoProduk;
 use App\Models\Series;
 use App\Models\OrderPenyewaan;
+use App\Models\Review;
+use App\Models\TopSeries;
 use App\Models\Checkout;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Database\Eloquent\Collection;
+use Carbon\Carbon;
 
 class OrderController extends Controller
 {
@@ -33,6 +37,10 @@ class OrderController extends Controller
         $series = Series::all();
         $brand = Produk::select('brand')->distinct()->get();
         $toko = Toko::all();
+
+        if ($produk->status_produk == "tidak ready") {
+            return redirect()->route('viewHomepage')->with('error', 'Produk Sudah Dipesan Oleh Orang Lain');
+        }
 
         return view('penyewa.pemesanan.informasiPemesanan', compact('produk', 'fotoproduk', 'series', 'brand', 'toko'));
     }
@@ -65,6 +73,10 @@ class OrderController extends Controller
         // Ambil produk berdasarkan id
         $produk = Produk::findOrFail($id);
 
+        if ($produk->status_produk == "tidak ready") {
+            return redirect()->route('viewHomepage')->with('error', 'Produk Sudah Dipesan Oleh Orang Lain');
+        }
+
         // Hitung total harga
         $hargaKatalog = $produk->harga;
         $hargaCuci = $produk->biaya_cuci ? $produk->biaya_cuci : 0;
@@ -72,7 +84,8 @@ class OrderController extends Controller
         $biayaAdmin = ($hargaKatalog + $totalHargaAdditional) * 0.05;
         $totalKatalog = $hargaKatalog + $totalHargaAdditional + $hargaCuci;
         $biayaJaminan = 50000;
-        $totalHarga = $hargaKatalog + $totalHargaAdditional + $hargaCuci + $biayaAdmin + $biayaJaminan;
+        $biayaOngkir = 30000;
+        $totalHarga = $hargaKatalog + $totalHargaAdditional + $hargaCuci + $biayaAdmin + $biayaJaminan + $biayaOngkir;
 
         // Midtrans
         // Set your Merchant Server Key
@@ -84,40 +97,49 @@ class OrderController extends Controller
         // Set 3DS transaction for credit card to true
         \Midtrans\Config::$is3ds = true;
 
+        $nomorOrder = "ORS" . time() . auth()->user()->id . $produk->id . mt_rand(1, 100);
+
         $params = array(
             'transaction_details' => array(
-                'order_id' => rand(),
+                'order_id' => $nomorOrder,
                 'gross_amount' => $totalHarga,
-            )
+            ),
+            'expiry' => [
+                'start_time' => Carbon::now()->format('Y-m-d H:i:s T'), // waktu mulai
+                'unit' => 'minute', // satuan waktu
+                'duration' => 10 // durasi dalam satuan yang telah ditentukan
+            ],
         );
 
         $snapToken = \Midtrans\Snap::getSnapToken($params);
 
-        $randomNumber = '';
-
-        $randomNumber = mt_rand(100000, 999999);
 
         // Simpan ke tabel Order
         $order = new OrderPenyewaan();
-        $order->nomor_order = "ORS" . auth()->user()->id . $produk->id . $randomNumber;
+        $order->nomor_order = $nomorOrder;
         $order->id_penyewa = auth()->user()->id;
+        $order->id_toko = $produk->toko->id;
         $order->id_produk = $produk->id;
         $order->ukuran = $request->size;
-        $order->tujuan_pengiriman = $request->alamat;
+        $order->tujuan_pengiriman = "Atas Nama " . auth()->user()->nama . " " . auth()->user()->no_telp . ", " . $request->alamat . ", " . auth()->user()->kota . ", " . auth()->user()->provinsi . ", " . auth()->user()->kode_pos;
         $order->metode_kirim = $request->metodekirim;
         $order->tanggal_mulai = $request->mulaisewa;
         $order->tanggal_selesai = $request->akhirsewa;
-        $order->pembayaran_via = "BCA";
         $order->biaya_cuci = $hargaCuci;
+        $order->ongkir_default = 30000;
         $order->fee_admin = $biayaAdmin;
         $order->total_harga = $totalKatalog;
         $order->grand_total = $totalHarga;
         $order->jaminan = $biayaJaminan;
-        $order->total_penghasilan = $totalKatalog;
+        $order->total_penghasilan = $totalKatalog - $biayaAdmin;
         $order->additional = $additionalItems;
         $order->status = "Pending";
         $order->snapToken = $snapToken;
+
+        $produk->status_produk = 'tidak ready';
+
         $order->save();
+        $produk->save();
 
         return redirect()->route('viewCheckout')->with('success', 'Order berhasil dibuat.');
     }
@@ -133,13 +155,60 @@ class OrderController extends Controller
         return view('penyewa.pemesanan.checkout', compact('checkout'));
     }
 
+    public function getTransaction(Request $request)
+    {
+        $serverKey = config('midtrans.serverKey');
+
+        $response = Http::withHeaders([
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'Authorization' => 'Basic ' . base64_encode($serverKey . ':')
+        ])->get("https://app.sandbox.midtrans.com/snap/v1/transactions/" . $request->transactionId);
+
+        $data = $response->json();
+
+        if (isset($data['error_messages'])) {
+            $checkout = OrderPenyewaan::find($request->nomor_order);
+            if ($data['error_messages'][0] == "token is expired") {
+                $produk = Produk::where('id', $checkout->id_produk)->first();
+                $produk->status_produk = 'aktif';
+                $produk->save();
+                $checkout->delete();
+                $redirectUrl = route('viewCheckout');
+                return response()->json(['success' => false, 'message' => 'expired', 'redirect_url' => $redirectUrl]);
+            } else if ($data['error_messages'][0] == "transaction has been succeed") {
+                $order = OrderPenyewaan::where('nomor_order', $request->nomor_order)->first();
+                $order->status = "Menunggu di Proses";
+                $order->save();
+                $redirectUrl = route('viewHistory');
+                return response()->json(['success' => false, 'message' => 'success', 'redirect_url' => $redirectUrl]);
+            }
+            return response()->json(['success' => false, 'message' => 'error lain']);
+        }
+        return response()->json(['success' => true]);
+    }
+
     public function updateCheckout(Request $request)
     {
         $checkout = OrderPenyewaan::find($request->nomor_order);
         if ($checkout) {
             $checkout->status = "Menunggu di Proses";
             $checkout->save();
-            $redirectUrl = route('viewHistory'); // Assuming 'viewHistory' is the name of your route
+
+            //TAMBAH SERIES KE TOP SERIES
+            $idseries = $checkout->produk->id_series;
+            $topSeries = TopSeries::where('id_series', $idseries)->whereMonth('created_at', Carbon::now()->translatedFormat('m'))->whereYear('created_at', Carbon::now()->translatedFormat('Y'))->first();
+            if ($topSeries) {
+                $topSeries->banyak_dipesan += 1;
+                $topSeries->save();
+            } else {
+                TopSeries::create([
+                    'id_series' => $idseries,
+                    'banyak_dipesan' => 1
+                ]);
+            }
+
+            $redirectUrl = route('viewHistoryMenungguDiproses'); // Assuming 'viewHistory' is the name of your route
             return response()->json(['success' => true, 'redirect_url' => $redirectUrl]);
         }
         return response()->json(['success' => false], 400);
@@ -152,9 +221,11 @@ class OrderController extends Controller
             // Ambil nama produk dan foto produk
             $produk = Produk::findOrFail($order->id_produk);
             $user = User::findOrFail($order->id_penyewa);
+            $order->harga_katalog = $produk->harga;
             $order->nama_produk = $produk->nama_produk; // Tambahkan kolom nama_produk ke dalam objek order
             $order->foto_produk = $produk->fotoProduk->path; // Tambahkan kolom foto_produk ke dalam objek order
             $order->nama_penyewa = $user->nama;
+            $uangKembali = $order->jaminan + $order->ongkir_default;
 
             // Pastikan additional adalah array
             if (!is_array($order->additional)) {
@@ -162,9 +233,11 @@ class OrderController extends Controller
             }
         }
 
-        $order->total_tagihan = $order->total_harga + $order->biaya_cuci + $order->fee_admin + 50000;
+        if ($order->status == "Pending") {
+            return redirect()->route('viewCheckout');
+        }
 
-        return view('penyewa.transaksi.detailPemesanan', compact('order'));
+        return view('penyewa.transaksi.detailPemesanan', compact('order', 'uangKembali'));
     }
 
     public function terimaBarang(Request $request, $orderId)
@@ -186,7 +259,7 @@ class OrderController extends Controller
         $order->status = "Sedang Berlangsung";
         $order->save();
 
-        return redirect()->route('viewHistory')->with('success', 'Nomor Resi Berhasil di Update');
+        return redirect()->route('viewHistorySedangBerlangsung')->with('success', 'Bukti Diterima berhasil di Update');
     }
 
     public function viewPengembalianBarang($orderId)
@@ -196,9 +269,11 @@ class OrderController extends Controller
             // Ambil nama produk dan foto produk
             $produk = Produk::findOrFail($order->id_produk);
             $user = User::findOrFail($order->id_penyewa);
+            $order->harga_katalog = $produk->harga;
             $order->nama_produk = $produk->nama_produk; // Tambahkan kolom nama_produk ke dalam objek order
             $order->foto_produk = $produk->fotoProduk->path; // Tambahkan kolom foto_produk ke dalam objek order
             $order->nama_penyewa = $user->nama;
+            $uangKembali = $order->jaminan + $order->ongkir_default;
 
             // Pastikan additional adalah array
             if (!is_array($order->additional)) {
@@ -208,30 +283,72 @@ class OrderController extends Controller
 
         $order->total_tagihan = $order->total_harga + $order->biaya_cuci + $order->fee_admin + 50000;
 
-        return view('penyewa.transaksi.detailPengembalian', compact('order'));
+        return view('penyewa.transaksi.detailPengembalian', compact('order', 'uangKembali'));
     }
 
     public function returBarang(Request $request, $orderId)
     {
-
         $order = OrderPenyewaan::findOrFail($orderId);
 
-
         $validator = Validator::make($request->all(), [
+            'bukti_resi_penyewa' => 'required|max:5120',
             'nomor_resi' => 'required|string',
+            'rating' => 'required|integer|min:1|max:5',
+            'ulasankostum' => 'required|string',
+            'dokumentasi_kostum.*' => 'nullable|file|mimes:jpg,png,jpeg',
         ]);
 
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return redirect()->back()->withErrors($validator)->with('error');
         }
+
+        // Save Retur
+        $photoPath = $request->file('bukti_resi_penyewa')->store('public/bukti_foto');
+        $photoPath = Str::replaceFirst('public/', 'storage/', $photoPath);
 
         $order->nomor_resi = $request->nomor_resi;
         $order->tanggal_pengembalian = today();
+        $order->bukti_resi_pengembalian = $photoPath;
         $order->status = "Telah Kembali";
         $order->save();
 
-        return redirect()->route('viewPenyewaanSelesai', ['orderId' => $orderId])->with('success', 'Nomor Resi Berhasil di Update');
+        // Save review
+        $uploadedImages = [];
+        if ($request->hasFile('dokumentasi_kostum')) {
+            foreach ($request->file('dokumentasi_kostum') as $file) {
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $dokumentasiPath = $file->storeAs('public/review_foto', $filename);
+                $dokumentasiPath = Str::replaceFirst('public/', 'storage/', $dokumentasiPath);
+                $uploadedImages[] = $dokumentasiPath;
+            }
+        } else {
+            return redirect()->back()->with('error', 'Terjadi Error dengan foto');
+        }
 
+        $review = new Review();
+        $review->id_penyewa = $order->id_penyewa;
+        $review->id_toko = $order->id_toko;
+        $review->id_produk = $order->id_produk;
+        $review->komentar = $request->ulasankostum;
+        $review->nilai = $request->rating;
+        $review->foto = json_encode($uploadedImages); // Mengonversi array path menjadi JSON
+        $review->tipe = 'review_produk';
+
+        // if ($request->hasFile('foto_ulasan')) {
+        //     $file = $request->file('foto_ulasan');
+        //     $filename = time() . '_' . $file->getClientOriginalName();
+        //     $photoUlasanPath = $file->storeAs('public/review_foto', $filename);
+        //     $photoUlasanPath = Str::replaceFirst('public/', 'storage/', $photoUlasanPath);
+
+        //     // Simpan file path sebagai JSON di kolom foto_ulasan
+        //     $review->foto = json_encode([$photoUlasanPath]);
+        // } else {
+        //     return redirect()->back()->with('error', 'Foto review tidak ditemukan');
+        // }
+
+        $review->save();
+
+        return redirect()->route('viewHistoryTelahKembali')->with('success', 'Nomor Resi dan Review Berhasil di Update');
     }
 
     public function viewPenyewaanSelesai($orderId)
@@ -241,9 +358,11 @@ class OrderController extends Controller
             // Ambil nama produk dan foto produk
             $produk = Produk::findOrFail($order->id_produk);
             $user = User::findOrFail($order->id_penyewa);
+            $order->harga_katalog = $produk->harga;
             $order->nama_produk = $produk->nama_produk; // Tambahkan kolom nama_produk ke dalam objek order
             $order->foto_produk = $produk->fotoProduk->path; // Tambahkan kolom foto_produk ke dalam objek order
             $order->nama_penyewa = $user->nama;
+            $uangKembali = $order->jaminan + $order->ongkir_default;
 
             // Pastikan additional adalah array
             if (!is_array($order->additional)) {
@@ -253,7 +372,33 @@ class OrderController extends Controller
 
         $order->total_tagihan = $order->total_harga + $order->biaya_cuci + $order->fee_admin + 50000;
 
-        return view('penyewa.transaksi.detailSelesai', compact('order'));
+        return view('penyewa.transaksi.detailSelesai', compact('order', 'uangKembali'));
+    }
+
+    public function viewDibatalkanPemilikSewa($orderId)
+    {
+        $order = OrderPenyewaan::where('nomor_order', $orderId)->first(); // Mengambil satu order berdasarkan nomor order
+        if ($order) {
+            // Ambil nama produk dan foto produk
+            $produk = Produk::findOrFail($order->id_produk);
+            $user = User::findOrFail($order->id_penyewa);
+            $order->harga_katalog = $produk->harga;
+            $order->nama_produk = $produk->nama_produk; // Tambahkan kolom nama_produk ke dalam objek order
+            $order->foto_produk = $produk->fotoProduk->path; // Tambahkan kolom foto_produk ke dalam objek order
+            $order->nama_penyewa = $user->nama;
+            $uangKembali = $order->jaminan + $order->ongkir_default;
+
+            // Pastikan additional adalah array
+            if (!is_array($order->additional)) {
+                $order->additional = json_decode($order->additional, true);
+            }
+        }
+
+        if ($order->status == "Pending") {
+            return redirect()->route('viewCheckout');
+        }
+
+        return view('penyewa.transaksi.dibatalkanPemilikSewa', compact('order', 'uangKembali'));
     }
 
 

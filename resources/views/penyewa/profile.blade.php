@@ -6,6 +6,26 @@
         <div class="mb-3 pb-1">
             <span class="h1 fw-bold mb-0">Informasi Anda</span>
         </div>
+
+        <div class="card mb-3">
+            <div class="row">
+                <div class="d-md-block align-items-center">
+                    <div class="card-body p-4 p-lg-5 text-black">
+                        <h2><strong>Informasi Performa</strong></h2>
+                        <span>
+                            <p>Sejauh ini, anda memiliki rating sebesar:
+                                <strong>{{ number_format(auth()->user()->avg_nilai_penyewa(), 2) }}</strong> <br>dan
+                                baru
+                                pernah
+                                menyewa sebanyak:
+                                <strong>{{ number_format(auth()->user()->total_review_penyewa()) }}x</strong>
+                            </p>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="card" style="border-radius: 1rem;">
             <div class="row">
                 <div class="d-md-block align-items-center">
@@ -14,14 +34,14 @@
                         <form action="{{ route('updateProfilAction') }}" method="POST" enctype="multipart/form-data">
                             @csrf
                             @if (session('success'))
-                                <div class="alert alert-success">
-                                    {{ session('success') }}
-                                </div>
+                            <div class="alert alert-success">
+                                {{ session('success') }}
+                            </div>
                             @endif
                             @if ($errors->any())
-                                <div class="alert alert-danger">
-                                    {{ $errors->first() }}
-                                </div>
+                            <div class="alert alert-danger">
+                                {{ $errors->first() }}
+                            </div>
                             @endif
 
                             <div class="mb-3">

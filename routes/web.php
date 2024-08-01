@@ -30,7 +30,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\PenilaianSisiSellerController;
-
+use App\Http\Controllers\TicketingController;
 
 // HOMEPAGE
 Route::get('/', [PublicController::class, 'viewHomepage'])->name('viewHomepage');
@@ -97,6 +97,10 @@ Route::group(['middleware' => 'penyewa'], function () {
     Route::get('/produk/{id}/create/order', [OrderController::class, 'viewOrder'])->name('viewOrder');
     Route::post('/produk/{id}/create/order/act', [OrderController::class, 'createOrder'])->name('createOrder');
     Route::get('/order/checkout', [OrderController::class, 'viewCheckout'])->name('viewCheckout');
+
+    Route::post('/order/checkout/cek-status', [OrderController::class, 'cekStatusProduk'])->name('cekStatusProduk');
+    Route::post('/order/checkout/getTransaction', [OrderController::class, 'getTransaction'])->name('getTransaction');
+
     Route::post('/order/checkout/update-status', [OrderController::class, 'updateCheckout'])->name('updateCheckout');
     Route::get('/order/{orderId}/detail/pemesanan', [OrderController::class, 'viewDetailPemesanan'])->name('viewDetailPemesanan');
     Route::post('/order/{orderId}/detail/pemesanan/diterima/act', [OrderController::class, 'terimaBarang'])->name('terimaBarang');
@@ -104,12 +108,26 @@ Route::group(['middleware' => 'penyewa'], function () {
     Route::post('/order/{orderId}/detail/pemgembalian/act', [OrderController::class, 'returBarang'])->name('returBarang');
     Route::get('/order/{orderId}/detail/penyewaan/selesai', [OrderController::class, 'viewPenyewaanSelesai'])->name('viewPenyewaanSelesai');
 
+    Route::get('/order/{orderId}/detail/penyewaan/dibatalkan-toko', [OrderController::class, 'viewDibatalkanPemilikSewa'])->name('viewDibatalkanPemilikSewa');
+
     //History
     Route::get('/user/history/semua', [HistoryController::class, 'viewHistory'])->name('viewHistory');
-    Route::get('/user/history/ongoing', [HistoryController::class, 'viewHistoryOngoing'])->name('viewHistoryOngoing');
-    Route::get('/user/history/selesai', [HistoryController::class, 'viewHistoryFinish'])->name('viewHistoryFinish');
+    Route::get('/user/history/menunggu-diproses', [HistoryController::class, 'viewHistoryMenungguDiproses'])->name('viewHistoryMenungguDiproses');
+    Route::get('/user/history/dalam-pengiriman', [HistoryController::class, 'viewHistoryDalamPengiriman'])->name('viewHistoryDalamPengiriman');
+    Route::get('/user/history/sedang-berlangsung', [HistoryController::class, 'viewHistorySedangBerlangsung'])->name('viewHistorySedangBerlangsung');
+    Route::get('/user/history/telah-kembali', [HistoryController::class, 'viewHistoryTelahKembali'])->name('viewHistoryTelahKembali');
+    Route::get('/user/history/penyewaan-selesai', [HistoryController::class, 'viewHistoryPenyewaanSelesai'])->name('viewHistoryPenyewaanSelesai');
+    Route::get('/user/history/dibatalkan', [HistoryController::class, 'viewHistoryDibatalkan'])->name('viewHistoryDibatalkan');
+    Route::get('/user/history/diretur', [HistoryController::class, 'viewHistoryDiretur'])->name('viewHistoryDiretur');
+    
+    //Ticketing
+    Route::get('/kalasewa/ticketing', [TicketingController::class, 'viewTicketing'])->name('viewTicketing');
+    Route::get('/kalasewa/ticketing/create', [TicketingController::class, 'viewNewTicketing'])->name('viewNewTicketing');
+    Route::post('/kalasewa/ticketing/create/act', [TicketingController::class, 'createTicket'])->name('createTicket');
 
 
+    // Tes route getTransaction midtrans
+    // Route::post('/order/checkout/cekTransaksi', [OrderController::class, 'getTransaction'])->name('tesCekCheckout');
 });
 
 //Pemilik Sewa SEMUA ROUTE
@@ -164,7 +182,7 @@ Route::group(['middleware' => 'pemilik_sewa'], function () {
     Route::get('/status-sewa/dalampengiriman', [StatusPenyewaanController::class, 'viewDalamPengiriman'])->name('seller.statuspenyewaan.dalampengiriman');
     Route::get('/status-sewa/sedangberlangsung', [StatusPenyewaanController::class, 'viewSedangBerlangsung'])->name('seller.statuspenyewaan.sedangberlangsung');
     Route::get('/status-sewa/telahkembali', [StatusPenyewaanController::class, 'viewTelahKembali'])->name('seller.statuspenyewaan.telahkembali');
-    Route::get('/status-sewa/penyewaandiretur', [StatusPenyewaanController::class, 'viewPenyewaanDiretur'])->name('seller.statuspenyewaan.penyewaandiretur');
+    Route::get('/status-sewa/penyewaandiretur', [StatusPenyewaanController::class, 'viewHistoryDiretur'])->name('seller.statuspenyewaan.penyewaandiretur');
     Route::get('/status-sewa/riwayat', [StatusPenyewaanController::class, 'viewRiwayatPenyewaan'])->name('seller.statuspenyewaan.riwayatPenyewaan');
 
     //KONFIRMASI RETUR SELESAI
@@ -185,7 +203,7 @@ Route::group(['middleware' => 'pemilik_sewa'], function () {
     Route::get('/penilaian/penyewa/{id}', [PenilaianSisiSellerController::class, 'viewReviewPenyewa'])->name('seller.view.penilaian.reviewPenyewa');
 
     //TAMBAH REVIEW PENYEWA DAN KONFIRMASI PENYEWAAN SELESAI
-    Route::get('/tambah/penilaian/penyewa/{id}/{nomor_order}', [PenilaianSisiSellerController::class, 'viewTambahReviewPenyewa'])->name('seller.view.penilaian.TambahReviewPenyewa');
+    Route::post('/tambah/penilaian/penyewa/{id}/{nomor_order}', [PenilaianSisiSellerController::class, 'viewTambahReviewPenyewa'])->name('seller.view.penilaian.TambahReviewPenyewa');
     Route::post('/tambah/penilaian/penyewa/{id}/{nomor_order}/act', [PenilaianSisiSellerController::class, 'tambahReviewPenyewaAction'])->name('seller.view.penilaian.tambahReviewPenyewaAction');
 });
 
@@ -218,6 +236,12 @@ Route::group(['middleware' => 'admin'], function () {
     Route::put('/admin/users/{user}/verify', [UserController::class, 'updateVerification'])->name('admin.users.updateVerification');
     Route::get('/admin/users/{user}', [UserController::class, 'show'])->name('admin.users.show');
     Route::post('/admin/users/{user}/reject', [UserController::class, 'reject'])->name('admin.users.reject');
+
+    // Peraturan Platform
+    Route::get('/admin/regulations', [AdminController::class, 'indexRegulations'])->name('admin.regulations.index');
+    Route::post('/admin/regulations/update', [AdminController::class, 'updateRegulations'])->name('admin.regulations.update');
+    Route::get('/admin/regulations/{id}/edit', [AdminController::class, 'editRegulations'])->name('admin.regulations.edit');
+
     // Logout
     Route::get('/logout/admin', [AutentikasiController::class, 'logout'])->name('admin.logout');
     // Ubah Sandi

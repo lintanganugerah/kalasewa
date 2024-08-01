@@ -3,49 +3,50 @@
         <div class="sidebar-brand-icon">
             <img src="{{ asset('admincss/img/logo/Logo_Kalasewa.png') }}">
         </div>
-        
+
         <div class="sidebar-brand-text mx-3">Kalasewa</div>
     </a>
 
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable" aria-expanded="false"
-          aria-controls="collapseTable" id="dashboard">
-          <i class="fas fa-fw fa-atom"></i>
-          <span>Dashboard</span>
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable"
+            aria-expanded="false" aria-controls="collapseTable" id="dashboard">
+            <i class="fas fa-fw fa-atom"></i>
+            <span>Dashboard</span>
         </a>
     </li>
 
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable" aria-expanded="false"
-          aria-controls="collapseTable" id="manajemenSeries">
-          <i class="fas fa-fw fa-table"></i>
-          <span>Manajemen Series</span>
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable"
+            aria-expanded="false" aria-controls="collapseTable" id="manajemenSeries">
+            <i class="fas fa-fw fa-table"></i>
+            <span>Manajemen Series</span>
         </a>
     </li>
 
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable" aria-expanded="false"
-          aria-controls="collapseTable" id="manajemenPengguna">
-          <i class="fas fa-fw fa-user"></i>
-          <span>Manajemen User</span>
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable"
+            aria-expanded="false" aria-controls="collapseTable" id="manajemenPengguna">
+            <i class="fas fa-fw fa-user"></i>
+            <span>Manajemen User</span>
         </a>
     </li>
 
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable" aria-expanded="false"
-          aria-controls="collapseTable" id="verifikasiUser">
-          <i class="fas fa-fw fa-user-check"></i>
-          <span>Verifikasi User</span>
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable"
+            aria-expanded="false" aria-controls="collapseTable" id="verifikasiUser">
+            <i class="fas fa-fw fa-user-check"></i>
+            <span>Verifikasi User</span>
         </a>
     </li>
 
     <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable" aria-expanded="true"
-          aria-controls="collapseTable" id="peraturanPlatform">
-          <i class="fas fa-fw fa-book"></i>
-          <span>Peraturan Platform</span>
+        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTable"
+            aria-expanded="false" aria-controls="collapseTable" id="peraturanPlatform">
+            <i class="fas fa-fw fa-book"></i>
+            <span>Peraturan Platform</span>
         </a>
     </li>
+
 </ul>
 
 <script>
@@ -70,5 +71,10 @@
     document.getElementById('verifikasiUser').addEventListener('click', function(event) {
         event.preventDefault();
         window.location.href = '{{ route('admin.verify.index') }}';
+    });
+
+    document.getElementById('peraturanPlatform').addEventListener('click', function(event) {
+        event.preventDefault();
+        window.location.href = '{{ route('admin.regulations.index') }}';
     });
 </script>

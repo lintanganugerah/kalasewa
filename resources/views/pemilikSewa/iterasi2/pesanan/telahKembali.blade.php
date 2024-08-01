@@ -69,11 +69,13 @@
                                     </div>
                                 @endif
                                 <div class="text-dark rounded-3">
+                                    <div class="table-responsive">
                                     <table id="tabel" class="no-more-tables table w-100 tabel-data align-items-center"
                                         style="word-wrap: break-word;">
                                         @if ($order)
                                             <thead>
                                                 <tr>
+                                                    <th>#</th>
                                                     <th>Nomor Order</th>
                                                     <th class="col-2">Produk</th>
                                                     <th>Penyewa</th>
@@ -90,6 +92,8 @@
                                             <tbody>
                                                 @foreach ($order as $ord)
                                                     <tr>
+                                                        <td data-title="#" class="align-middle">
+                                                            {{ $loop->iteration }}</td>
                                                         <td data-title="No. Order" class="align-middle">
                                                             {{ $ord->nomor_order }}</td>
                                                         <td data-title="Produk" class="align-middle">
@@ -110,12 +114,21 @@
                                                         <td data-title="Additional" class="align-middle text-opacity-75">
                                                             @if ($ord->additional)
                                                                 <ul>
-                                                                    @foreach ($ord->additional as $nama => $harga)
-                                                                        <li>{{ $nama }} +{{ $harga }}</li>
+                                                                    @foreach ($ord->additional as $add)
+                                                                        <li>{{ $add['nama'] }} +
+                                                                            {{ number_format($add['harga'], 0, '', '.') }}
+                                                                        </li>
                                                                     @endforeach
                                                                 </ul>
                                                             @else
                                                                 <div class="text-opacity-25">-</div>
+                                                            @endif
+                                                            @if ($ord->id_produk_order->biaya_cuci)
+                                                                <ul>
+                                                                    <li>Biaya cuci +
+                                                                        {{ number_format($ord->id_produk_order->biaya_cuci, 0, '', '.') }}
+                                                                    </li>
+                                                                </ul>
                                                             @endif
                                                         </td>
                                                         <td data-title="Nomor Resi" class="align-middle">
@@ -152,10 +165,9 @@
                                                     <div class="modal fade" id="selesaikanPenyewaan-1" tabindex="-1"
                                                         aria-labelledby="inputResi-1Label" aria-hidden="true">
                                                         <div class="modal-dialog modal-dialog-centered">
-
                                                             <form
                                                                 action="{{ route('seller.view.penilaian.TambahReviewPenyewa', ['id' => $ord->id_penyewa, 'nomor_order' => $ord->nomor_order]) }}"
-                                                                method="get">
+                                                                method="POST">
                                                                 @csrf
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
@@ -178,17 +190,15 @@
                                                                             Ukuran
                                                                             {{ $ord->id_produk_order->ukuran_produk }}</small>
                                                                         <hr>
-                                                                        <p class="mt-2"><span
-                                                                                class="fw-bolder text-danger">Pastikan
-                                                                                bahwa anda telah cek kostum tersebut, dan
-                                                                                penyewa tidak ada melanggar peraturan sewa
-                                                                                toko anda
-                                                                            </span>. Jika telah selesai, maka
-                                                                            anda dapat klik submit
-                                                                            dibawah ini. Setelah itu anda akan diarahkan
-                                                                            untuk mengisi review penyewa, dan
-                                                                            dana penghasilan akan diserahkan kepada anda
-                                                                            setelah mengisi review penyewa.
+                                                                        <p> Anda akan diarahkan untuk mengisi review
+                                                                            penyewa. Setelah anda
+                                                                            menambahkan review dan penyewaan
+                                                                            selesai, status produk akan menjadi "arsip".
+                                                                            <span class="fw-bold text-danger">Mohon
+                                                                                aktifkan
+                                                                                Produk secara manual pada
+                                                                                menu produk </span> agar bisa disewa kembali
+                                                                            ketika sudah ready.
                                                                         </p>
                                                                     </div>
                                                                     <div class="modal-footer">
@@ -205,6 +215,7 @@
                                             </tbody>
                                         @endif
                                     </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>

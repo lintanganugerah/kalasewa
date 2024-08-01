@@ -35,9 +35,13 @@
                                 <div class="input-group">
                                     <input type="password" class="form-control" id="validpassword" name="password"
                                         minlength="8" required>
+                                    <button type="button" class="btn btn-outline-secondary" id="toggle-password"
+                                        onclick="togglePassword()">
+                                        <i class="fas fa-eye" id="toggle-icon"></i></button>
                                 </div>
                                 <div id="password" class="form-text">
-                                    Password harus memiliki panjang 8 karakter, kapital, angka, dan simbol
+                                    Password harus <strong>memiliki panjang 8 karakter, kapital, angka, dan
+                                        simbol</strong>
                                 </div>
                             </div>
 
@@ -45,8 +49,11 @@
                                 <label for="validpassword" class="form-label">Konfirmasi Password<span
                                         class="text-danger">*</span></label>
                                 <div class="input-group">
-                                    <input type="Password" class="form-control" id="validpassword" name="confPassword"
-                                        minlength="8" required>
+                                    <input type="Password" class="form-control" id="password_confirmation"
+                                        name="confPassword" minlength="8" required>
+                                    <button type="button" class="btn btn-outline-secondary" id="toggle-password"
+                                        onclick="konfirmasitogglePassword()">
+                                        <i class="fas fa-eye" id="toggle-icon-konfirmasi"></i></button>
                                 </div>
                                 <div id="password" class="form-text">
                                     Konfirmasi password anda!
@@ -110,7 +117,8 @@
                                 <input type="text" id="nomor_telpon_darurat" class="form-control form-control-lg"
                                     name="nomor_telpon_darurat" pattern="[0-9]*" minlength="10" maxlength="14"
                                     value="{{ old('nomor_telpon_darurat') }}" required />
-                                <div id="HELPER" class="form-text">Nomor darurat tidak dapat sama dengan nomor telpon
+                                <div id="HELPER" class="form-text">Nomor darurat <strong>tidak dapat sama</strong>
+                                    dengan nomor telpon
                                     anda!</div>
                             </div>
 
@@ -120,7 +128,8 @@
                                             class="text-danger">*</span></label>
                                     <input class="form-control" type="file" id="formFile" name="foto_diri"
                                         accept=".jpg,.png,.jpeg,.webp" required>
-                                    <div id="HELPER" class="form-text">Pastikan wajah anda terlihat dengan JELAS!</div>
+                                    <div id="HELPER" class="form-text">Pastikan <strong>wajah anda terlihat dengan
+                                            KTP</strong> secara JELAS!</div>
                                 </div>
                             </div>
 
@@ -193,4 +202,33 @@
     </div>
     <script src="{{ asset('seller/inputangka.js') }}"></script>
 </section>
+<script>
+function togglePassword() {
+    const passwordInput = document.getElementById('validpassword');
+    const toggleIcon = document.getElementById('toggle-icon');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+
+function konfirmasitogglePassword() {
+    const passwordInput = document.getElementById('password_confirmation');
+    const toggleIcon = document.getElementById('toggle-icon-konfirmasi');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+</script>
 @endsection

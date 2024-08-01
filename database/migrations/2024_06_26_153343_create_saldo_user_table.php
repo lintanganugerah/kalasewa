@@ -14,8 +14,9 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('id_user');
             $table->unsignedBigInteger('tujuan_rek')->nullable();
+            $table->string('nama_rekening')->nullable();
             $table->string('nomor_rekening')->nullable();
-            $table->unsignedBigInteger('saldo');
+            $table->unsignedBigInteger('saldo')->nullable();
             $table->timestamps();
 
             $table->foreign('id_user')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');

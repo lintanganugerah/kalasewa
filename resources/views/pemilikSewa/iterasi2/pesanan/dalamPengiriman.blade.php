@@ -69,74 +69,88 @@
                                     </div>
                                 @endif
                                 <div class="text-dark rounded-3">
-                                    <table id="tabel" class="no-more-tables table w-100 tabel-data align-items-center"
-                                        style="word-wrap: break-word;">
-                                        @if ($order)
-                                            <thead>
-                                                <tr>
-                                                    <th>Nomor Order</th>
-                                                    <th class="col-2">Produk</th>
-                                                    <th>Penyewa</th>
-                                                    <th>Ukuran</th>
-                                                    <th>Kurir</th>
-                                                    <th class="col-3">Tujuan Pengiriman</th>
-                                                    <th>Additional</th>
-                                                    <th>Periode Sewa</th>
-                                                    <th>Total Harga</th>
-                                                    <th>Nomor Resi</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                @foreach ($order as $ord)
-                                                    <tr class="mb-5">
-                                                        <td data-title="No. Order" class="align-middle">
-                                                            {{ $ord->nomor_order }}</td>
-                                                        <td data-title="Produk" class="align-middle">
-                                                            <h5 class="">{{ $ord->id_produk_order->nama_produk }}</h5>
-                                                            <small class="fw-light" href=""
-                                                                style="font-size:14px">{{ $ord->id_produk_order->brand }},
-                                                                Rp.{{ number_format($ord->id_produk_order->harga) }}/3hari</small>
-                                                        </td>
-                                                        <td data-title="Nama Penyewa" class="align-middle">
-                                                            <h5>{{ $ord->id_penyewa_order->nama }}</h5>
-                                                            <a class="fw-light"
-                                                                href="{{ route('seller.view.penilaian.reviewPenyewa', $ord->id_penyewa_order->id) }}"
-                                                                style="font-size:14px">Lihat Review
-                                                                Penyewa</a>
-                                                        </td>
-                                                        <td data-title="Ukuran" class="align-middle">
-                                                            {{ $ord->id_produk_order->ukuran_produk }}</td>
-                                                        <td data-title="Kurir" class="align-middle">
-                                                            {{ $ord->metode_kirim }}</td>
-                                                        <td data-title="Tujuan Pengiriman" class="align-middle">
-                                                            {{ $ord->tujuan_pengiriman }}
-                                                        </td>
-                                                        <td data-title="Additional" class="align-middle text-opacity-75">
-                                                            @if ($ord->additional)
-                                                                <ul>
-                                                                    @foreach ($ord->additional as $nama => $harga)
-                                                                        <li>{{ $nama }} +{{ $harga }}</li>
-                                                                    @endforeach
-                                                                </ul>
-                                                            @else
-                                                                <div class="text-opacity-25">-</div>
-                                                            @endif
-                                                        </td>
-                                                        <td data-title="Periode Sewa" class="align-middle">
-                                                            {{ $ord->tanggalFormatted($ord->tanggal_mulai) }} <span
-                                                                class="fw-bolder"> s.d. </span>
-                                                            {{ $ord->tanggalFormatted($ord->tanggal_selesai) }}
-                                                        </td>
-                                                        <td data-title="Total Harga" class="align-middle">
-                                                            Rp {{ number_format($ord->total_harga, 0, '', '.') }}</td>
-                                                        <td data-title="Nomor Resi" class="align-middle">
-                                                            {{ $ord->nomor_resi }}
-                                                        </td>
+                                    <div class="table-responsive">
+                                        <table id="tabel" class="no-more-tables table w-100 tabel-data align-items-center"
+                                            style="word-wrap: break-word;">
+                                            @if ($order)
+                                                <thead>
+                                                    <tr>
+                                                        <th>#</th>
+                                                        <th>Nomor Order</th>
+                                                        <th class="col-2">Produk</th>
+                                                        <th>Penyewa</th>
+                                                        <th>Ukuran</th>
+                                                        <th>Kurir</th>
+                                                        <th class="col-3">Tujuan Pengiriman</th>
+                                                        <th>Additional</th>
+                                                        <th>Periode Sewa</th>
+                                                        <th>Total Harga</th>
+                                                        <th>Nomor Resi</th>
                                                     </tr>
-                                                @endforeach
-                                            </tbody>
-                                        @endif
-                                    </table>
+                                                </thead>
+                                                <tbody>
+                                                    @foreach ($order as $ord)
+                                                        <tr class="mb-5">
+                                                            <td data-title="#" class="align-middle">
+                                                                {{ $loop->iteration }}</td>
+                                                            <td data-title="No. Order" class="align-middle">
+                                                                {{ $ord->nomor_order }}</td>
+                                                            <td data-title="Produk" class="align-middle">
+                                                                <h5 class="">{{ $ord->id_produk_order->nama_produk }}</h5>
+                                                                <small class="fw-light" href=""
+                                                                    style="font-size:14px">{{ $ord->id_produk_order->brand }},
+                                                                    Rp.{{ number_format($ord->id_produk_order->harga) }}/3hari</small>
+                                                            </td>
+                                                            <td data-title="Nama Penyewa" class="align-middle">
+                                                                <h5>{{ $ord->id_penyewa_order->nama }}</h5>
+                                                                <a class="fw-light"
+                                                                    href="{{ route('seller.view.penilaian.reviewPenyewa', $ord->id_penyewa_order->id) }}"
+                                                                    style="font-size:14px">Lihat Review
+                                                                    Penyewa</a>
+                                                            </td>
+                                                            <td data-title="Ukuran" class="align-middle">
+                                                                {{ $ord->id_produk_order->ukuran_produk }}</td>
+                                                            <td data-title="Kurir" class="align-middle">
+                                                                {{ $ord->metode_kirim }}</td>
+                                                            <td data-title="Tujuan Pengiriman" class="align-middle">
+                                                                {{ $ord->tujuan_pengiriman }}
+                                                            </td>
+                                                            <td data-title="Additional" class="align-middle text-opacity-75">
+                                                                @if ($ord->additional)
+                                                                    <ul>
+                                                                        @foreach ($ord->additional as $add)
+                                                                            <li>{{ $add['nama'] }} +
+                                                                                {{ number_format($add['harga'], 0, '', '.') }}
+                                                                            </li>
+                                                                        @endforeach
+                                                                    </ul>
+                                                                @else
+                                                                    <div class="text-opacity-25">-</div>
+                                                                @endif
+                                                                @if ($ord->id_produk_order->biaya_cuci)
+                                                                    <ul>
+                                                                        <li>Biaya cuci +
+                                                                            {{ number_format($ord->id_produk_order->biaya_cuci, 0, '', '.') }}
+                                                                        </li>
+                                                                    </ul>
+                                                                @endif
+                                                            </td>
+                                                            <td data-title="Periode Sewa" class="align-middle">
+                                                                {{ $ord->tanggalFormatted($ord->tanggal_mulai) }} <span
+                                                                    class="fw-bolder"> s.d. </span>
+                                                                {{ $ord->tanggalFormatted($ord->tanggal_selesai) }}
+                                                            </td>
+                                                            <td data-title="Total Harga" class="align-middle">
+                                                                Rp {{ number_format($ord->total_harga, 0, '', '.') }}</td>
+                                                            <td data-title="Nomor Resi" class="align-middle">
+                                                                {{ $ord->nomor_resi }}
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            @endif
+                                        </table>
+                                    </div>
                                 </div>
                             </div>
                         </div>

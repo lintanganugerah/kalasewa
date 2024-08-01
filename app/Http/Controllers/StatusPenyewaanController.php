@@ -18,6 +18,8 @@ use App\Models\OrderPenyewaan;
 use Carbon\Carbon;
 use App\Models\Produk;
 use Illuminate\Support\Facades\Mail;
+use App\Models\SaldoUser;
+use Exception;
 
 
 class StatusPenyewaanController extends Controller
@@ -27,7 +29,7 @@ class StatusPenyewaanController extends Controller
     {
         $toko = Toko::where('id_user', Auth::id())->first();
         $produk = Produk::where('id_toko', $toko->id)->get()->pluck('id')->toArray();
-        $order = OrderPenyewaan::whereIn('id_produk', $produk)->where('status', 'Menunggu di Proses')->get();
+        $order = OrderPenyewaan::whereIn('id_produk', $produk)->where('status', 'Menunggu di Proses')->orderBy('tanggal_mulai', 'ASC')->get();
 
         return view('pemilikSewa.iterasi2.pesanan.belumdiproses', compact('order'));
     }
@@ -36,7 +38,8 @@ class StatusPenyewaanController extends Controller
     {
         $toko = Toko::where('id_user', Auth::id())->first();
         $produk = Produk::where('id_toko', $toko->id)->get()->pluck('id')->toArray();
-        $order = OrderPenyewaan::whereIn('id_produk', $produk)->where('status', 'Dalam Pengiriman')->get();
+        $order = OrderPenyewaan::whereIn('id_produk', $produk)->where('status', 'Dalam Pengiriman')->orderBy('updated_at', 'DESC')->get();
+
         return view('pemilikSewa.iterasi2.pesanan.dalamPengiriman', compact('order'));
     }
 
@@ -44,7 +47,7 @@ class StatusPenyewaanController extends Controller
     {
         $toko = Toko::where('id_user', Auth::id())->first();
         $produk = Produk::where('id_toko', $toko->id)->get()->pluck('id')->toArray();
-        $order = OrderPenyewaan::whereIn('id_produk', $produk)->where('status', 'Sedang Berlangsung')->get();
+        $order = OrderPenyewaan::whereIn('id_produk', $produk)->where('status', 'Sedang Berlangsung')->orderBy('tanggal_mulai', 'ASC')->get();
         return view('pemilikSewa.iterasi2.pesanan.sedangBerlangsung', compact('order'));
     }
 
@@ -52,11 +55,11 @@ class StatusPenyewaanController extends Controller
     {
         $toko = Toko::where('id_user', Auth::id())->first();
         $produk = Produk::where('id_toko', $toko->id)->get()->pluck('id')->toArray();
-        $order = OrderPenyewaan::whereIn('id_produk', $produk)->where('status', 'Telah Kembali')->get();
+        $order = OrderPenyewaan::whereIn('id_produk', $produk)->where('status', 'Telah Kembali')->orderBy('updated_at', 'ASC')->get();
         return view('pemilikSewa.iterasi2.pesanan.telahKembali', compact('order'));
     }
 
-    public function viewPenyewaanDiretur(Request $request)
+    public function viewHistoryDiretur(Request $request)
     {
         $toko = Toko::where('id_user', Auth::id())->first();
         $produk = Produk::where('id_toko', $toko->id)->get()->pluck('id')->toArray();
@@ -68,7 +71,7 @@ class StatusPenyewaanController extends Controller
     {
         $toko = Toko::where('id_user', Auth::id())->first();
         $produk = Produk::where('id_toko', $toko->id)->get()->pluck('id')->toArray();
-        $order = OrderPenyewaan::whereIn('id_produk', $produk)->whereIn('status', ['Penyewaan Selesai', 'Retur Selesai', 'Dibatalkan Penyewa', 'Dibatalkan Pemilik Sewa'])->get();
+        $order = OrderPenyewaan::whereIn('id_produk', $produk)->whereIn('status', ['Penyewaan Selesai', 'Retur Selesai', 'Dibatalkan Penyewa', 'Dibatalkan Pemilik Sewa'])->orderBy('updated_at', 'DESC')->get();
 
         return view('pemilikSewa.iterasi2.pesanan.riwayatPenyewaan', compact('order'));
     }
@@ -79,7 +82,9 @@ class StatusPenyewaanController extends Controller
         $toko = Toko::where('id_user', Auth::id())->first();
 
         $validator = Validator::make($request->all(), [
-            'nomor_resi' => 'required|string'
+            'nomor_resi' => 'required|string',
+            'biaya_pengiriman' => 'required|numeric',
+            'foto_bukti_resi' => 'required|file|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         if (!$order) {
@@ -94,17 +99,37 @@ class StatusPenyewaanController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+
+        $photoPath = $request->file('foto_bukti_resi')->store('public/bukti_resi');
+        $photoPath = Str::replaceFirst('public/', 'storage/', $photoPath);
+        $ongkir = (int) str_replace('.', '', $request->biaya_pengiriman);
+        $ongkirTerpotong = $order->ongkir_default - $ongkir;
+
+        if ($ongkirTerpotong < 0) { //Ongkir_default kurang dari ongkir yang di inputkan
+            $order->ongkir_default = 0; //Bikin ongkir_default tidak bersisa
+            $order->jaminan += $ongkirTerpotong; //Potong jaminan
+            $order->total_harga -= $ongkirTerpotong; // Tambahin kurang nya ke total_harga (hargaKatalog + additional + biaya cuci)
+            $order->total_penghasilan -= $ongkirTerpotong; // Tambahin juga kurang nya ke penghasilan pemilik
+        } else {
+            $order->ongkir_default -= $ongkir; //Kalau ongkir default ga kurang, langsung potong aja ongkir_default dengan ongkir_pengiriman yang di inputkan
+        }
+
+        $order->total_harga += $request->biaya_pengiriman; //Tambahin ongkir_pengiriman yang di input ke total_harga
+        $order->total_penghasilan += $request->biaya_pengiriman; //Tambahin ongkir_pengiriman yang di input ke penghasilan pemilik sewa
         $order->nomor_resi = $request->nomor_resi;
+        $order->ongkir_pengiriman = $ongkir;
+        $order->bukti_resi = $photoPath;
         $order->status = "Dalam Pengiriman";
         $order->save();
 
-        return redirect()->route('seller.statuspenyewaan.belumdiproses')->with('success', 'Status Produk berhasil diubah! Silahkan klik tab "Dalam Pengiriman" untuk melihat');
+        return redirect()->route('seller.statuspenyewaan.dalampengiriman')->with('success', 'Status Produk berhasil diubah! Produk menjadi dalam pengiriman');
     }
 
     public function returSelesai($nomor_order)
     {
         $order = OrderPenyewaan::where('nomor_order', $nomor_order)->first();
         $toko = Toko::where('id_user', Auth::id())->first();
+        $produk = $order->produk;
 
         if (!$order) {
             return redirect()->back()->with('error', "Order Tidak ditemukan/Sudah dihapus");
@@ -114,16 +139,43 @@ class StatusPenyewaanController extends Controller
             return redirect()->back()->with('error', "Produk Invalid. Silahkan Refresh Halaman Anda");
         }
 
-        $order->status = "Retur Selesai";
-        $order->save();
+        try {
+            $saldoPenyewa = SaldoUser::where('id_user', $order->id_penyewa)->first();
 
-        return redirect()->route('seller.statuspenyewaan.penyewaandiretur')->with('success', 'Status Produk berhasil diubah! Penyewaan yang diretur telah diterima anda!');
+            if ($order->jaminan < 0) {
+                return redirect()->route('seller.statuspenyewaan.penyewaandiretur')->with('error', 'Nilai Jaminan Penyewa Minus. Penyewa belum melunaskan denda nya. Tidak dapat memproses');
+            }
+
+            $order->status = "Retur Selesai";
+            $produk->status_produk = "arsip";
+
+            $produk->save();
+            $order->save();
+
+            if ($saldoPenyewa) {
+                $totalSaldo = $order->grand_total - $order->fee_admin + $saldoPenyewa->saldo;
+                $saldoPenyewa->saldo = $totalSaldo;
+                $saldoPenyewa->save();
+            } else {
+                SaldoUser::create([
+                    "id_user" => $order->id_penyewa,
+                    'tujuan_rek' => null,
+                    'nomor_rekening' => null,
+                    'saldo' => $order->grand_total - $order->fee_admin,
+                ]);
+            }
+        } catch (Exception $e) {
+            return redirect()->route('seller.statuspenyewaan.penyewaandiretur')->with('error', 'Terjadi kesalahan. Mohon coba lagi nanti');
+        }
+
+        return redirect()->route('seller.statuspenyewaan.riwayatPenyewaan')->with('success', 'Status Produk berhasil diubah! Penyewaan yang diretur telah diterima anda!');
     }
 
     public function dibatalkanPemilikSewa(Request $request, $nomor_order)
     {
         $order = OrderPenyewaan::where('nomor_order', $nomor_order)->first();
         $toko = Toko::where('id_user', Auth::id())->first();
+        $produk = $order->produk;
 
         $validator = Validator::make($request->all(), [
             'alasan_batal' => 'required|string'
@@ -143,9 +195,13 @@ class StatusPenyewaanController extends Controller
 
         $order->status = "Dibatalkan Pemilik Sewa";
         $order->alasan_pembatalan = $request->alasan_batal;
+
+        $produk->status_produk = "arsip";
+
+        $produk->save();
         $order->save();
 
-        return redirect()->route('seller.statuspenyewaan.belumdiproses')->with('success', 'Penyewaan telah anda Batalkan!');
+        return redirect()->route('seller.statuspenyewaan.riwayatPenyewaan')->with('success', 'Penyewaan telah anda Batalkan!');
     }
 
     public function ingatkanPenyewa($nomor_order, $id_penyewa)

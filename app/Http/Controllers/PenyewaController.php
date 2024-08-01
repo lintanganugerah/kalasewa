@@ -99,7 +99,7 @@ class PenyewaController extends Controller
                 'required',
                 'string',
                 'min:8',
-                'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+                'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&.,^()]{8,}$/'
             ],
             'confNewPassword' => 'required|string', // Menambahkan aturan untuk memastikan konfirmasi password baru cocok dengan password baru
         ]);
