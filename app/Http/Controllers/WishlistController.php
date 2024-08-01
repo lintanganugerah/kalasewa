@@ -3,13 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Wishlist;
-use App\Models\Produk;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Toko;
+use App\Models\Penyewa;
+use App\Models\Produk;
 use App\Models\FotoProduk;
 use App\Models\Series;
+use App\Models\Wishlist;
+use Illuminate\Support\Facades\Log;
+
 
 class WishlistController extends Controller
 {

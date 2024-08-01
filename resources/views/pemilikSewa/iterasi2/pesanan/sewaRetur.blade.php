@@ -12,41 +12,7 @@
                 <div class="card">
                     <div class="card-header">
                         <!-- Nav tabs -->
-                        <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="Produkanda-tab" data-bs-toggle="tab"
-                                    onclick="window.location.href='/status-sewa/belumdiproses'" type="button"
-                                    role="tab" aria-controls="Produkanda" aria-selected="true">Belum Diproses</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/dalampengiriman'" type="button"
-                                    role="tab" aria-controls="tambahProduk" aria-selected="false">Dalam
-                                    Pengiriman</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/sedangberlangsung'" type="button"
-                                    role="tab" aria-controls="tambahProduk" aria-selected="false">Sedang
-                                    Berlangsung</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/telahkembali'" type="button" role="tab"
-                                    aria-controls="tambahProduk" aria-selected="false">Penyewaan Telah kembali</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active text-secondary fw-bold" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/penyewaandiretur'" type="button"
-                                    role="tab" aria-controls="tambahProduk" aria-selected="false">Penyewaan
-                                    diretur</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/riwayat'" type="button" role="tab"
-                                    aria-controls="tambahProduk" aria-selected="false">Riwayat Penyewaan</button>
-                            </li>
-                        </ul>
+                        @include('pemilikSewa.iterasi2.pesanan.navtabs')
                     </div>
                     <div class="card-body">
                         <!-- Tab panes -->
@@ -74,6 +40,7 @@
                                         @if ($order)
                                             <thead>
                                                 <tr>
+                                                    <th>#</th>
                                                     <th>Nomor Order</th>
                                                     <th class="col-2">Produk</th>
                                                     <th>Penyewa</th>
@@ -88,6 +55,8 @@
                                             <tbody>
                                                 @foreach ($order as $ord)
                                                     <tr>
+                                                        <td data-title="#" class="align-middle">
+                                                            {{ $loop->iteration }}</td>
                                                         <td data-title="No. Order" class="align-middle">
                                                             {{ $ord->nomor_order }}</td>
                                                         <td data-title="Produk" class="align-middle">
@@ -108,12 +77,21 @@
                                                         <td data-title="Additional" class="align-middle text-opacity-75">
                                                             @if ($ord->additional)
                                                                 <ul>
-                                                                    @foreach ($ord->additional as $nama => $harga)
-                                                                        <li>{{ $nama }} +{{ $harga }}</li>
+                                                                    @foreach ($ord->additional as $add)
+                                                                        <li>{{ $add['nama'] }} +
+                                                                            {{ number_format($add['harga'], 0, '', '.') }}
+                                                                        </li>
                                                                     @endforeach
                                                                 </ul>
                                                             @else
                                                                 <div class="text-opacity-25">-</div>
+                                                            @endif
+                                                            @if ($ord->id_produk_order->biaya_cuci)
+                                                                <ul>
+                                                                    <li>Biaya cuci +
+                                                                        {{ number_format($ord->id_produk_order->biaya_cuci, 0, '', '.') }}
+                                                                    </li>
+                                                                </ul>
                                                             @endif
                                                         </td>
                                                         <td data-title="Total Harga" class="align-middle">
@@ -130,8 +108,7 @@
                                                                 class="d-grid btn btn-success mb-2"
                                                                 id="proses">Konfirmasi
                                                                 Diterima</a>
-                                                            <a data-bs-toggle="modal"
-                                                                class="d-grid btn btn-outline-danger"
+                                                            <a data-bs-toggle="modal" class="d-grid btn btn-outline-danger"
                                                                 data-bs-target="#ajukanDendaSewa-1" id="denda">Ajukan
                                                                 Denda</a>
                                                         </td>
@@ -147,8 +124,8 @@
                                                                 @csrf
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h1 class="modal-title fs-5"
-                                                                            id="inputResi-1Label">Konfirmasi Barang
+                                                                        <h1 class="modal-title fs-5" id="inputResi-1Label">
+                                                                            Konfirmasi Barang
                                                                             Diterima</h1>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"
@@ -167,16 +144,15 @@
                                                                             Ukuran
                                                                             {{ $ord->id_produk_order->ukuran_produk }}</small>
                                                                         <hr>
-                                                                        <p class="mt-2"><span
-                                                                                class="fw-bolder text-danger">Pastikan
-                                                                                bahwa anda telah cek kostum tersebut, dan
-                                                                                penyewa tidak ada melanggar peraturan sewa
-                                                                                toko anda.
-                                                                            </span> Jika ada pelanggaran, anda
-                                                                            bisa tekan button ajukan denda sewa. Namun Jika
-                                                                            tidak ada pelanggaran, maka
-                                                                            anda dapat klik submit
-                                                                            dibawah ini
+                                                                        <p class="mt-2">
+                                                                            Setelah konfirmasi barang retur diterima, status
+                                                                            produk akan
+                                                                            menjadi "arsip". <span
+                                                                                class="fw-bold text-danger">Mohon
+                                                                                aktifkan
+                                                                                Produk secara manual pada
+                                                                                menu produk </span> agar bisa disewa kembali
+                                                                            ketika sudah ready. </p>
                                                                         </p>
                                                                     </div>
                                                                     <div class="modal-footer">

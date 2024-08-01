@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use App\Events\UserChangeProfile;
+use App\Models\User;
 
 class UsersSeeder extends Seeder
 {
@@ -17,12 +17,13 @@ class UsersSeeder extends Seeder
     public function run()
     {
         // Penyewa
-        DB::table('users')->insert([
+        $penyewa1 = User::create([
             'nama' => 'Penyewa 1',
             'email' => 'penyewa@example.com',
             'password' => Hash::make('12345678'),
             'no_telp' => '08123456789',
             'no_darurat' => '081234567222',
+            'ket_no_darurat' => 'Teman',
             'kode_pos' => '12345',
             'alamat' => 'Jl. Disini kawan',
             'kota' => 'Kota Bandung',
@@ -34,16 +35,17 @@ class UsersSeeder extends Seeder
             'foto_profil' => 'storage/profiles/profil_default.jpg',
             'role' => 'penyewa',
             'verifyIdentitas' => 'Sudah',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
-        DB::table('users')->insert([
+        event(new UserChangeProfile($penyewa1));
+
+        $penyewa2 = User::create([
             'nama' => 'Penyewa 2',
             'email' => 'penyewa2@example.com',
             'password' => Hash::make('12345678'),
             'no_telp' => '081234569999',
             'no_darurat' => '08123450000',
+            'ket_no_darurat' => 'Kerabat',
             'kode_pos' => '12345',
             'alamat' => 'Jl. Disini kawan',
             'kota' => 'Kota Bandung',
@@ -55,11 +57,11 @@ class UsersSeeder extends Seeder
             'foto_profil' => 'storage/profiles/profil_default.jpg',
             'role' => 'penyewa',
             'verifyIdentitas' => 'Sudah',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
-        DB::table('users')->insert([
+        event(new UserChangeProfile($penyewa2));
+
+        $penyewa3 = User::create([
             'nama' => 'Penyewa 3',
             'email' => 'penyewa3@example.com',
             'password' => Hash::make('12345678'),
@@ -76,29 +78,34 @@ class UsersSeeder extends Seeder
             'foto_profil' => 'storage/profiles/profil_default.jpg',
             'role' => 'penyewa',
             'verifyIdentitas' => 'Sudah',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
+        event(new UserChangeProfile($penyewa3));
+
         // Admin
-        DB::table('users')->insert([
+        $admin = User::create([
             'nama' => 'admin',
             'email' => 'admin@kalasewa.com',
             'password' => Hash::make('admin1234'),
             'no_telp' => '085161252804',
-            // 'no_darurat' => '081234567222',
-            // 'kode_pos' => '12345',
-            // 'alamat' => 'Jl. Disini kawan',
-            // 'kota' => 'Kota Bandung',
-            // 'provinsi' => 'Provinsi Jawa Barat',
-            // 'link_sosial_media' => 'https://www.instagram.com/',
-            // 'foto_identitas' => 'storage/identitas/9o20ME6FihM4UJHfSOpMrL9h8yA6vx5ucKktklug.png',
-            // 'NIK' => '1234567890123456',
             'foto_profil' => 'storage/profiles/profil_default.jpg',
             'role' => 'admin',
             'verifyIdentitas' => 'Sudah',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
+
+        event(new UserChangeProfile($admin));
+
+        // Super Admin
+        $superAdmin = User::create([
+            'nama' => 'Super Admin',
+            'email' => 'superadmin@kalasewa.com',
+            'password' => Hash::make('superadm'),
+            'no_telp' => '088800004444',
+            'foto_profil' => 'storage/profiles/profil_default.jpg',
+            'role' => 'super_admin',
+            'verifyIdentitas' => 'Sudah',
+        ]);
+
+        event(new UserChangeProfile($superAdmin));
     }
 }

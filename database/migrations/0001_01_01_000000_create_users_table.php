@@ -28,7 +28,7 @@ return new class extends Migration {
             $table->string('foto_diri')->nullable();
             $table->string('NIK')->nullable()->unique();
             $table->string('foto_profil')->default('storage/profiles/profil_default.jpg');
-            $table->enum('role', ['penyewa', 'pemilik_sewa', 'admin']);
+            $table->enum('role', ['penyewa', 'pemilik_sewa', 'admin', 'super_admin']);
             $table->enum('verifyIdentitas', ['Sudah', 'Tidak', 'Ditolak'])->default('Tidak');
             $table->timestamps();
         });

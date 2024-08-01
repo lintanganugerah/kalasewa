@@ -10,4 +10,7 @@ use Illuminate\Support\Facades\Schedule;
 
 // Schedule::command('cwd:cek-pengembalian-terlambat')->dailyAt('00:01');
 Schedule::command('cwd:cek-pengembalian-terlambat')->dailyAt('00:01');
-Schedule::command('auth:clear-resets')->everyFifteenMinutes();
+Schedule::command('cwd:cek-belum-di-proses')->dailyAt('00:01');
+Schedule::command('queue:work')->everyTenMinutes()->withoutOverlapping();
+Schedule::command('queue:restart')->everyThreeMinutes()->withoutOverlapping();
+Schedule::command('queue:queue:retry all')->everyMinute()->withoutOverlapping();

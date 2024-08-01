@@ -17,29 +17,53 @@
                                 {{ session('success') }}
                             </div>
                             @endif
-                            @if (session('error'))
+                            @if ($errors->any())
                             <div class="alert alert-danger">
-                                {{ session('error') }}
+                                {{ $errors->first() }}
                             </div>
                             @endif
                             <h5 class="fw-bold mb-3 pb-3" style="letter-spacing: 1px;">Ubah Password</h5>
 
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <label class="form-label" for="password">Password Lama</label>
-                                <input type="password" id="password" class="form-control form-control-lg"
-                                    name="password" required />
+                                <div class="input-group">
+                                    <input type="password" id="oldPassword" class="form-control form-control-lg"
+                                        name="password" required />
+                                    <button type="button" class="btn btn-outline-secondary" id="toggle-password"
+                                        onclick="toggleOldPassword()">
+                                        <i class="fas fa-eye" id="toggle-old-pass"></i></button>
+                                </div>
+                                <div id="password" class="form-text">
+                                    Silahkan input password anda saat ini!
+                                </div>
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <label class="form-label" for="password">Password Baru</label>
-                                <input type="password" id="newPassword" class="form-control form-control-lg"
-                                    name="newPassword" minlength="8" required />
+                                <div class="input-group">
+                                    <input type="password" id="newPassword" class="form-control form-control-lg"
+                                        name="newPassword" minlength="8" required />
+                                    <button type="button" class="btn btn-outline-secondary" id="toggle-password"
+                                        onclick="toggleNewPassword()">
+                                        <i class="fas fa-eye" id="toggle-new-pass"></i></button>
+                                </div>
+                                <div id="password" class="form-text">
+                                    Password harus memiliki panjang 8 karakter, kapital, angka, dan simbol
+                                </div>
                             </div>
 
                             <div data-mdb-input-init class="form-outline mb-4">
                                 <label class="form-label" for="password">Konfirmasi Password Baru</label>
-                                <input type="password" id="confNewPassword" class="form-control form-control-lg"
-                                    name="confNewPassword" minlength="8" required />
+                                <div class="input-group">
+                                    <input type="password" id="confNewPassword" class="form-control form-control-lg"
+                                        name="confNewPassword" minlength="8" required />
+                                    <button type="button" class="btn btn-outline-secondary" id="toggle-password"
+                                        onclick="toggleNewConfPassword()">
+                                        <i class="fas fa-eye" id="toggle-new-pass-konfirmasi"></i></button>
+                                </div>
+                                <div id="password" class="form-text">
+                                    Konfirmasi password anda!
+                                </div>
                             </div>
 
 
@@ -55,4 +79,49 @@
     </div>
     <script src="{{ asset('seller/inputangka.js') }}"></script>
 </section>
+
+<script>
+function toggleOldPassword() {
+    const passwordInput = document.getElementById('oldPassword');
+    const toggleIcon = document.getElementById('toggle-old-pass');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+
+function toggleNewPassword() {
+    const passwordInput = document.getElementById('newPassword');
+    const toggleIcon = document.getElementById('toggle-new-pass');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+
+function toggleNewConfPassword() {
+    const passwordInput = document.getElementById('confNewPassword');
+    const toggleIcon = document.getElementById('toggle-new-pass-konfirmasi');
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+</script>
+
 @endsection

@@ -2,123 +2,280 @@
 @extends('layout.navbar')
 
 @section('content')
-    <link rel="stylesheet" type="text/css" href="{{ asset('css/homepage.css') }}" />
+<link rel="stylesheet" type="text/css" href="{{ asset('css/searchbar.css') }}" />
 
-    <section>
-        <div class="main-container container">
-            <div class="row py-5">
-                <div class="header">
-                    <img src="{{ asset('images/kalasewa.png') }}" alt="kalasewa" class="header-image">
-                    <h1>K A L A S E W A</h1>
-                    <h4>Wujudkan impian cosplaymu bersama-sama!</h4>
-                </div>
+<style>
+.select2-container .select2-selection--single .select2-selection__clear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    padding-right: 125%;
+    cursor: pointer;
+}
+</style>
+
+<section>
+    <style>
+    .no-underline {
+        text-decoration: none;
+        /* Remove underline */
+        color: inherit;
+        /* Inherit the color from the parent element or set it explicitly */
+    }
+    </style>
+    <div class="container-fluid py-5 align-items-center">
+        <div class="container">
+            @csrf
+            @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
             </div>
-
-            @include('layout.searchbar')
-
-            <div class="row-spesial">
-                <div class="sidebar">
-                    <div class="category-column">
-                        <div class="sidebar-content list-group pb-4">
-                            <h3>Gender</h3>
-                            <a href="{{ route('search', ['gender' => 'Pria']) }}"
-                                class="list-group-item list-group-item-action {{ request('gender') == 'Pria' ? 'active' : '' }}">Pria</a>
-                            <a href="{{ route('search', ['gender' => 'Wanita']) }}"
-                                class="list-group-item list-group-item-action {{ request('gender') == 'Wanita' ? 'active' : '' }}">Wanita</a>
-                        </div>
-
-                        <div class="sidebar-content list-group pb-4">
-                            <h3>Size</h3>
-                            <a href="{{ route('search', ['ukuran_produk' => 'XS']) }}"
-                                class="list-group-item list-group-item-action {{ request('ukuran_produk') == 'XS' ? 'active' : '' }}">XS</a>
-                            <a href="{{ route('search', ['ukuran_produk' => 'S']) }}"
-                                class="list-group-item list-group-item-action {{ request('ukuran_produk') == 'S' ? 'active' : '' }}">S</a>
-                            <a href="{{ route('search', ['ukuran_produk' => 'M']) }}"
-                                class="list-group-item list-group-item-action {{ request('ukuran_produk') == 'M' ? 'active' : '' }}">M</a>
-                            <a href="{{ route('search', ['ukuran_produk' => 'L']) }}"
-                                class="list-group-item list-group-item-action {{ request('ukuran_produk') == 'L' ? 'active' : '' }}">L</a>
-                            <a href="{{ route('search', ['ukuran_produk' => 'XL']) }}"
-                                class="list-group-item list-group-item-action {{ request('ukuran_produk') == 'XL' ? 'active' : '' }}">XL</a>
-                            <a href="{{ route('search', ['ukuran_produk' => 'XXL']) }}"
-                                class="list-group-item list-group-item-action {{ request('ukuran_produk') == 'XXL' ? 'active' : '' }}">XXL</a>
-                        </div>
-
-                        <div class="sidebar-content list-group pb-4">
-                            <h3>Series</h3>
-                            @foreach ($series->take(10) as $seriesItem)
-                                <a href="{{ route('search', ['series' => $seriesItem->id]) }}"
-                                    class="list-group-item list-group-item-action {{ request('series') == $seriesItem->id ? 'active' : '' }}">{{ $seriesItem->series }}</a>
-                            @endforeach
-                            <a href="{{ route('viewSeries') }}" class="list-group-item list-group-item-action">Lihat
-                                Lengkap</a>
-                        </div>
+            @endif
+            @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+            @endif
+            <div class="row">
+                <div class="col-7">
+                    <div class="hero mt-5">
+                        <h1><strong>KALASEWA</strong></h1>
+                        <h4>Ayo mulai wujudkan impian cosplaymu</h4>
+                        <h4>bersama Kalasewa</h4>
                     </div>
-                </div>
-
-                <div class="content">
-                    <div class="card-column">
-                        @foreach ($produk->chunk(4) as $chunk)
-                            <div class="row-kartu d-flex">
-                                @foreach ($chunk as $prod)
-                                    <a href="{{ route('viewDetail', ['id' => $prod->id]) }}" class="card-link">
-                                        <div class="card custom-card text-bg-dark border-secondary"
-                                            style="width: 250px; height: 100%; margin-right: 5px; margin-bottom: 5px;">
-                                            @foreach ($fotoproduk->where('id_produk', $prod->id)->take(1) as $foto)
-                                                <img src="{{ asset($foto->path) }}" class="card-img-top img-fluid h-50"
-                                                    alt="fotoproduk" style="object-fit: cover;">
-                                            @endforeach
-                                            <div class=" card-body">
-                                                <div class="d-flex mb-1">
-                                                    <div class="avatar avatar-card me-2">
-                                                        @foreach ($toko->where('id', $prod->id_toko) as $tk)
-                                                            @foreach ($user->where('id', $tk->id_user) as $usr)
-                                                                <img class="avatar-img"
-                                                                    src="{{ asset($usr->foto_profil) }}" alt="User" />
-                                                            @endforeach
-                                                        @endforeach
-                                                    </div>
-                                                    <div class="fs-08-rem user-card">
-                                                        @foreach ($toko->where('id', $prod->id_toko)->take(1) as $tk)
-                                                            <div class="fw-bold text-truncate">
-                                                                {{ $tk->nama_toko }}
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                                <h5 class="card-title">{{ $prod->nama_produk }}</h5>
-                                                <p class="card-text">Rp{{ number_format($prod->harga) }} / 3 Hari</p>
-
-                                                <p class="card-text">
-                                                    <img src="{{ asset('storage/icon/box-seam.png') }}" alt="box-seam"
-                                                        style="width: 1em; height: 1em; vertical-align: middle; fill: white;">
-                                                    {{ $prod->brand }}
-                                                </p>
-
-                                                <p class="card-text">
-                                                    <img src="{{ asset('storage/icon/tv.png') }}" alt="tv"
-                                                        style="width: 1em; height: 1em; vertical-align: middle; fill: white;">
-                                                    {{ $prod->seriesDetail->series }}
-                                                </p>
-
-                                                <button type="button" class="btn btn-sm btn-outline-light" disabled>
-                                                    {{ $prod->ukuran_produk }}
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-outline-light" disabled>
-                                                    {{ $prod->gender }}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </a>
-                                @endforeach
+                    <form action="{{ route('searchProduk') }}" method="GET" class="">
+                        @csrf
+                        <div class="searchbar my-3">
+                            <div class="input-group">
+                                <input type="text" name="search" class="form-control form-search custom-search-bar"
+                                    placeholder="Mau cosplay apa hari ini?" aria-label="Search" />
+                                <button class="btn py-2 custom-search-button" type="submit" id="search-button">
+                                    <i class="fas fa-search"></i>
+                                </button>
                             </div>
-                        @endforeach
+                        </div>
+                        <div class="container">
+                            <div class="row" style="margin-left: -24px; margin-top: -10px;">
+                                <div class="col">
+                                    <div class="form-filter">
+                                        <select class="form-select select2" name="gender" id="selectGender"
+                                            aria-label="Default select example">
+                                            <option></option>
+                                            <option value="Pria">Pria</option>
+                                            <option value="Wanita">Wanita</option>
+                                            <option value="Semua Gender">Semua</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-filter">
+                                        <select class="form-select select2" name="size" id="selectSize"
+                                            aria-label="Default select example">
+                                            <option></option>
+                                            <option value="XS">XS</option>
+                                            <option value="S">S</option>
+                                            <option value="M">M</option>
+                                            <option value="L">L</option>
+                                            <option value="XL">XL</option>
+                                            <option value="XXL">XXL</option>
+                                            <option value="All_Size">All Size</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-filter">
+                                        <select class="form-select select2" name="series" id="selectSeries"
+                                            aria-label="Default select example">
+                                            <option></option>
+                                            @foreach ($series as $seri)
+                                            <option value="{{ $seri->id }}">{{ $seri->series }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="form-filter">
+                                        <select class="form-select select2" name="brand" id="selectBrand"
+                                            aria-label="Default select example">
+                                            <option></option>
+                                            @foreach ($brand as $brandItem)
+                                            <option value="{{ $brandItem }}">{{ $brandItem }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-5">
+                    <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+                        <div class="carousel-inner" style="object-fit: cover;">
+                            <div class="carousel-homepage carousel-item active">
+                                <img src="{{asset('images/carousel1.jpg')}}" class="d-block w-100" alt="Carousel image">
+                            </div>
+                            <div class="carousel-homepage carousel-item">
+                                <img src="{{asset('images/carousel2.jpg')}}" class="d-block w-100" alt="Carousel image">
+                            </div>
+                            <div class="carousel-homepage carousel-item">
+                                <img src="{{asset('images/carousel3.jpg')}}" class="d-block w-100" alt="Carousel image">
+                            </div>
+                        </div>
+                        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleAutoplaying"
+                            data-bs-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleAutoplaying"
+                            data-bs-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
                     </div>
                 </div>
             </div>
-
         </div>
-    </section>
-    <div style="background-color: white;">
-        @include('layout.footer')
     </div>
+
+    <div class="container-fluid mt-3">
+        <div class="container">
+            <div class="row align-items-end">
+                <div class="col-6">
+                    <h2><strong>KOSTUM TERBARU</strong></h2>
+                </div>
+                <div class="col-6 text-end">
+                    <a href="{{route('viewPencarian')}}" class="no-underline">
+                        <p style="color: #DC3545;"><strong>Lihat Semua</strong></p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="container">
+            <div class="row-kartu d-flex mb-3">
+                @foreach ($produk->take(5) as $prod)
+                <div class="col-2" style="margin-right: 43px;">
+                    <a href="{{ route('viewDetail', ['id' => $prod->id]) }}" class="card-link">
+                        <div class="card custom-card text-bg-dark border-secondary" style="width: 250px; height: 100%;">
+                            @foreach ($fotoproduk->where('id_produk', $prod->id)->take(1) as $foto)
+                            <img src="{{ asset($foto->path) }}" class="card-img-top img-fluid h-50" alt="fotoproduk"
+                                style="object-fit: cover;">
+                            @endforeach
+                            <div class="card-body">
+                                <div class="d-flex">
+                                    <div class="avatar avatar-card me-2">
+                                        @foreach ($toko->where('id', $prod->id_toko) as $tk)
+                                        @foreach ($user->where('id', $tk->id_user) as $usr)
+                                        <img class="avatar-img" src="{{ asset($usr->foto_profil) }}" alt="User"
+                                            style="border-radius: 30px;" />
+                                        @endforeach
+                                        @endforeach
+                                    </div>
+                                    <div class="fs-08-rem user-card">
+                                        @foreach ($toko->where('id', $prod->id_toko)->take(1) as $tk)
+                                        <div class="fw-bold text-truncate">
+                                            {{ $tk->nama_toko }}
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <h5 class="card-title" style="margin-bottom: 2px;">{{ $prod->nama_produk }}</h5>
+                                <p class="card-text" style="color: orange;"><strong>Rp{{ number_format($prod->harga) }}
+                                        / 3 Hari</strong></p>
+                                <p class="card-text">
+                                    <img src="{{ asset('storage/icon/box-seam.png') }}" alt="box-seam"
+                                        style="width: 1em; height: 1em; vertical-align: middle; fill: white;">
+                                    {{ $prod->brand }}
+                                </p>
+                                <p class="card-text">
+                                    <img src="{{ asset('storage/icon/tv.png') }}" alt="tv"
+                                        style="width: 1em; height: 1em; vertical-align: middle; fill: white;">
+                                    {{ $prod->seriesDetail->series }}
+                                </p>
+                                <button type="button" class="btn btn-sm btn-outline-light" disabled>
+                                    {{ $prod->ukuran_produk }}
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-light" disabled>
+                                    {{ $prod->gender }}
+                                </button>
+                                @if ($prod->additional)
+                                <button type="button" class="btn btn-sm btn-outline-light" disabled>
+                                    +Additional
+                                </button>
+                                @endif
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid mt-5">
+        <div class="container">
+            <div class="row align-items-end">
+                <div class="col-6">
+                    <h2><strong>DAFTAR TOKO</strong></h2>
+                </div>
+                <div class="col-6 text-end">
+                    <a href="{{route('viewListToko')}}" class="no-underline">
+                        <p style="color: #DC3545;"><strong>Lihat Semua</strong></p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+        <div class="container">
+            <div class="row-kartu d-flex mb-3">
+                @foreach ($toko as $tk)
+                <div class="col-2" style="margin-right: 43px;">
+                    <a href="{{ route('viewToko', ['id' => $tk->id]) }}" class="card-link">
+                        <div class="card custom-card text-bg-dark border-secondary" style="width: 250px; height: 100%;">
+                            <img src="{{ asset($tk->user->foto_profil) }}" class="card-img-top img-fluid h-100"
+                                alt="fotoproduk" style="object-fit: cover;">
+                            <div class="card-body">
+                                <h5><strong>{{ $tk->nama_toko }}</strong></h5>
+                                <p style="margin-bottom: 5px;">Rating Toko:
+                                    @if(isset($averageRatings[$tk->id]))
+                                    {{ number_format($averageRatings[$tk->id], 1) }}
+                                    @else
+                                    0
+                                    @endif
+                                    <i class="ri-star-line"></i>
+                                </p>
+                                @if (isset($averageRatings[$tk->id]) && $averageRatings[$tk->id] >= 4)
+                                <span class="badge text-white"
+                                    style="background: linear-gradient(to right, #EAD946, #D99C00);">Terpercaya</span>
+                                @elseif (isset($averageRatings[$tk->id]) && $averageRatings[$tk->id] > 0 &&
+                                $averageRatings[$tk->id] < 2.5) <span class="badge text-bg-danger">Bermasalah</span>
+                                    @elseif (isset($averageRatings[$tk->id]) && $averageRatings[$tk->id] >= 2.5 &&
+                                    $averageRatings[$tk->id] < 4) <span class="badge text-white"
+                                        style="background-color: #EB7F01;">Standar</span>
+                                        @else
+                                        <span class="badge text-white" style="background-color: 6DC0D0;">Pendatang
+                                            Baru</span>
+                                        @endif
+                                        <p class="card-text" style="color: orange;">
+                                            <i class="ri-t-shirt-line"></i>
+                                            {{ $tk->produks_count }} Kostum
+                                        </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                @endforeach
+            </div>
+        </div>
+    </div>
+
+    @include('layout.footer')
+
+</section>
+
 @endsection

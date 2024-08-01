@@ -7,7 +7,7 @@
         <div class="container text-center">
             <div class="row align-items-center">
                 <div class="col">
-                    <img class="logo-kalasewa" src="{{asset('images/kalasewa.png')}}" alt="Kalasewa">
+                    <!-- <img class="logo-kalasewa" src="{{asset('images/kalasewa.png')}}" alt="Kalasewa"> -->
                     <h1 class="display-3 fw-bold ls-tight text-light">
                         Anda telah di BANNED
                     </h1>
@@ -16,7 +16,7 @@
                     </h4>
                     <div class="fw-bold kalasewa-color">{{ session('email') }}</div>
                     <p class="fw-bold text-light">Mohon cek Email anda untuk informasi lebih lanjut</p>
-                    <a href="#" class=" btn btn-success">Log Out</a>
+                    <a href="/logout" class=" btn btn-success">Log Out</a>
                 </div>
             </div>
         </div>

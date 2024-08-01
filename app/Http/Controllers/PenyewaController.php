@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use App\Events\UserChangeProfile;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
@@ -51,6 +52,10 @@ class PenyewaController extends Controller
         $fotoPath = $user->foto_profil;
         $namaFile = basename($fotoPath);
 
+        if ($request->nomor_telpon == $request->nomor_telpon_darurat) {
+            return redirect()->back()->withErrors("Nomor darurat tidak boleh sama dengan nomor telepon pribadi")->withInput();
+        }
+
         if ($request->has('foto')) {
             if ($namaFile !== 'profil_default.jpg') {
                 Storage::delete(str_replace('storage/', 'public/', $fotoPath));
@@ -71,6 +76,9 @@ class PenyewaController extends Controller
         $user->kode_pos = $request->input('kodePos');
         $user->save();
 
+        $userChange = User::where('id', $user->id)->first(); //Get model User nya untuk di kirim ke event
+        event(new UserChangeProfile($userChange)); //Trigger event untuk mengubah kolom name, dan avatar chatify sesuai dengan data user
+
         session(['profilpath' => $user->foto_profil]);
 
         // Redirect ke halaman profil dengan pesan sukses
@@ -89,12 +97,16 @@ class PenyewaController extends Controller
     public function updatePassword(Request $request)
     {
         // Validasi data input
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'password' => 'required|string',
-            'newPassword' => 'required|string|min:8',
-            'confNewPassword' => 'required|string|min:8', // Menambahkan aturan untuk memastikan konfirmasi password baru cocok dengan password baru
+            'newPassword' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&.,^()]{8,}$/'
+            ],
+            'confNewPassword' => 'required|string', // Menambahkan aturan untuk memastikan konfirmasi password baru cocok dengan password baru
         ]);
-
 
         // Ambil user yang sedang login
         $user = auth()->user();
@@ -109,13 +121,17 @@ class PenyewaController extends Controller
             return redirect()->route('viewGantiPassword', ['id' => $user->id])->with('error', 'Error! Konfirmasi Password Baru Salah!');
         }
 
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         // Jika password lama sesuai, perbarui data user dengan password baru
         $user->password = Hash::make($request->input('newPassword'));
 
         $user->save();
 
         // Redirect ke halaman profil dengan pesan sukses
-        return redirect()->route('viewGantiPassword', ['id' => $user->id])->with('success', 'Password Berhasil Diganti!');
+        return redirect()->route('viewHomepage', ['id' => $user->id])->with('success', 'Password Berhasil Diganti!');
     }
 
 }

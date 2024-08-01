@@ -18,6 +18,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'no_telp',
         'no_darurat',
+        'ket_no_darurat',
         'link_sosial_media',
         'kota',
         'kode_pos',
@@ -27,7 +28,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'badge',
         'NIK',
         'foto_identitas',
-        'foto_diri'
+        'foto_diri',
+        'verifyIdentitas',
+        'name',
+        'avatar'
     ];
 
     protected $hidden = [
@@ -71,6 +75,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return $nilai;
     }
 
+    public function avg_nilai_toko()
+    {
+        $toko = Toko::where('id_user', $this->id)->first();
+        $nilai = Review::where('id_toko', $toko->id)->where('tipe', 'review_produk')->avg('nilai');
+
+        return $nilai;
+    }
+
     public function cek_nilai()
     {
         $nilai = Review::where('id_penyewa', $this->id)->where('tipe', 'review_penyewa')->first();
@@ -89,8 +101,37 @@ class User extends Authenticatable implements MustVerifyEmail
         return $total;
     }
 
+    public function chatPengirim()
+    {
+        return $this->hasMany(Toko::class, 'from_id');
+    }
+
+    public function chatPenerima()
+    {
+        return $this->hasMany(Toko::class, 'to_id');
+    }
+
     public function saldo_user()
     {
         return $this->hasOne(SaldoUser::class, 'id_user');
+    }
+
+    public function orders()
+    {
+        return $this->hasMany(OrderPenyewaan::class, 'id_penyewa');
+    }
+    public function alasanPenolakan()
+    {
+        return $this->hasMany(AlasanPenolakan::class, 'id_user');
+    }
+
+    public function penarikan_saldo()
+    {
+        return $this->hasMany(PenarikanSaldo::class, 'id_user');
+    }
+
+    public function denda_penyewa()
+    {
+        return $this->hasMany(PenarikanSaldo::class, 'id_penyewa');
     }
 }

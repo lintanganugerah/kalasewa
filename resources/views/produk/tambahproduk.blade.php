@@ -123,6 +123,9 @@
                                             @endforeach
                                         </select>
                                         <label for="selectSeries">Series</label>
+                                        <div id="namaProduk" class="form-text" style="opacity: 50%;">Jika series anda
+                                            tidak
+                                            ada. Silahkan ketik nama series lalu enter</div>
                                     </div>
                                     <label for="selectGender" class="form-label">Gender<span
                                             class="text-danger">*</span></label>
@@ -489,7 +492,7 @@
                                             selesai penyewaan, sehingga pasti akan ada rating untuk penyewa
                                         </li>
                                         <li>Penyewa baru atau newbie tidak dapat merental kostum dengan grade 3 ini.
-                                            Penyewa yang belum memiliki pengalaman setidaknya sebanyak 3x di kalasewa, dan
+                                            Penyewa yang belum memiliki pengalaman di kalasewa, dan
                                             memiliki rating dibawah 4 maka tidak dapat menyewa kostum grade ini.
                                         </li>
                                     </ul>

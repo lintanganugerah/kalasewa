@@ -6,7 +6,6 @@ body {
     background-color: #212631; /* Set the background color to black */
     color: #fff;
     overflow-x: hidden; /* Prevent horizontal overflow */
-    
 }
 
 .login-card {
@@ -20,7 +19,7 @@ body {
     border: 1px solid #495057;
 }
 
-.username::placeholder{
+.username::placeholder {
     color: #afafaf;
 }
 
@@ -37,7 +36,7 @@ body {
     border: 1px solid #495057;
 }
 
-.email::placeholder{
+.email::placeholder {
     color: #afafaf;
 }
 
@@ -54,7 +53,7 @@ body {
     border: 1px solid #495057;
 }
 
-.password::placeholder{
+.password::placeholder {
     color: #afafaf;
 }
 

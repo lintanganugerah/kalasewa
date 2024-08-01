@@ -20,6 +20,8 @@ class ingatkanPenyewa extends Mailable implements ShouldQueue
     public $namaToko;
     public $namaProduk;
 
+    public $tries = 5;
+
     public function __construct($nomorOrder, $tanggalSelesai, $tanggalSelesaiMax, $namaPenyewa, $namaToko, $namaProduk)
     {
         $this->nomorOrder = $nomorOrder;

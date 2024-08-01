@@ -55,15 +55,13 @@ class OrderSeeder extends Seeder
                     'ukuran' => 'Ukuran Produk', // Isi sesuai dengan ukuran produk
                     'tujuan_pengiriman' => "Atas Nama " . $penyewa->nama . " " . $penyewa->no_telp . " " . $penyewa->alamat . "," . $penyewa->kota . "," . $penyewa->provinsi . "," . $penyewa->kode_pos,
                     'metode_kirim' => ['JNE', 'Grab', 'Go Send'][array_rand(['JNE', 'Grab', 'Go Send'])], // Isi sesuai dengan metode pengiriman
-                    'tanggal_mulai' => now(),
+                    'tanggal_mulai' => now()->addDays(mt_rand(0, 2)),
                     'tanggal_selesai' => now()->addDays(2), // Tambah 2 hari dari tanggal mulai (Tanggal mulai adalah hari pertama sewa)
-                    'pembayaran_via' => 'BCA', // Isi sesuai dengan metode pembayaran
                     'fee_admin' => $fee_admin, // Fee admin 5%
                     'total_harga' => $totalHarga, // Menggunakan harga produk dari model Produk + additional jika ada
                     'jaminan' => rand(50000, 100000),
                     'denda_keterlambatan' => null,
                     'total_penghasilan' => $totalHarga - $fee_admin,
-                    'denda_lainnya' => null,
                     'additional' => $add ? json_encode($add) : null, // Encode additional ke format JSON jika ada
                     'tanggal_diterima' => null,
                     'tanggal_pengembalian' => null,

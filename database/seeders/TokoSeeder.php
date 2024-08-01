@@ -41,11 +41,10 @@ class TokoSeeder extends Seeder
         DB::table('tokos')->insert([
             'nama_toko' => 'Raidencos',
             'id_user' => $user->id,
-            'bio_toko' => 'by @caramellacilla
-                            𝘯𝘦𝘸𝘣𝘪𝘦 𝘣𝘰𝘭𝘦𝘩 𝘳𝘦𝘯𝘵𝘢𝘭 𝘥𝘪𝘴𝘪𝘯𝘪 💃
-                            📍Bandung - bisa se-indo
-                            ✨Repair and Styling @wigsbycilla
-                            💥 𝗥𝗲𝗻𝘁 𝟱𝘅, 𝗙𝗿𝗲𝗲 𝗥𝗲𝗻𝘁 𝟭𝘅',
+            'bio_toko' => 'by @raidenshogun
+𝘯𝘦𝘸𝘣𝘪𝘦 𝘣𝘰𝘭𝘦𝘩 𝘳𝘦𝘯𝘵𝘢𝘭 𝘥𝘪𝘴𝘪𝘯𝘪 💃
+📍Bandung
+✨Repair and Styling available!',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -77,9 +76,9 @@ class TokoSeeder extends Seeder
             'nama_toko' => 'Reservecos',
             'id_user' => $user->id,
             'bio_toko' => 'Ready to serve from Bandung❣️
-                            💛 DM for booking
-                            💛 Weekend slow response
-                            💛 CHECK HIGHLIGHT',
+💛 DM for booking
+💛 Weekend slow response
+💛 CHECK HIGHLIGHT',
             'created_at' => now(),
             'updated_at' => now(),
         ]);

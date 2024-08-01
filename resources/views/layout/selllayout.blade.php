@@ -50,6 +50,11 @@
             color: white;
         }
 
+        .btn-kalasewa-dark {
+            background-color: #aa1927;
+            color: white;
+        }
+
         .btn-kalasewa:hover {
             background-color: #CE2525;
             color: white;
@@ -57,6 +62,10 @@
 
         .kalasewa-color {
             color: #CE2525 !important;
+        }
+
+        .kalasewa-color-dark {
+            color: #aa1927 !important;
         }
 
         .btn-outline:hover {
@@ -68,6 +77,17 @@
             border-color: #EE1B2F;
             color: black;
         }
+
+        #topbar {
+            display: none;
+        }
+
+        /* menyembunyikan topbar jika lebar layar >= 768px */
+        @media (max-width: 768px) {
+            #topbar {
+                display: block;
+            }
+        }
     </style>
 </head>
 
@@ -75,8 +95,7 @@
     <nav class="navbar navbar-expand topbar shadow-lg kalasewa-color-topbar" id="topbar">
 
         <!-- Sidebar Toggle (Topbar) -->
-        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" id="sidebar-toggle-btn"
-            onclick="toggleSidebarVisibility()">
+        <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3" id="sidebar-toggle-btn">
             <i class="fa-solid fa-bars" style="color: #AA1927;"></i>
         </button>
     </nav>
@@ -98,21 +117,21 @@
         <!-- End of Page Wrapper -->
 
         <!-- Bootstrap core JavaScript-->
-        <script src="vendor/jquery/jquery.min.js"></script>
-        <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+        <!--<script src="vendor/jquery/jquery.min.js"></script>-->
+        <!--<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>-->
 
         <!-- Core plugin JavaScript-->
-        <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+        <!--<script src="vendor/jquery-easing/jquery.easing.min.js"></script>-->
 
         <!-- Custom scripts for all pages-->
-        <script src="js/sb-admin-2.min.js"></script>
+        <!--<script src="js/sb-admin-2.min.js"></script>-->
 
         <!-- Page level plugins -->
-        <script src="vendor/chart.js/Chart.min.js"></script>
+        <!--<script src="vendor/chart.js/Chart.min.js"></script>-->
 
         <!-- Page level custom scripts -->
-        <script src="js/demo/chart-area-demo.js"></script>
-        <script src="js/demo/chart-pie-demo.js"></script>
+        <!--<script src="js/demo/chart-area-demo.js"></script>-->
+        <!--<script src="js/demo/chart-pie-demo.js"></script>-->
 </body>
 
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
@@ -126,27 +145,30 @@
 
 <script src="{{ asset('Style/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
-<script src="{{ asset('Style/js/sb-admin-2.min.js') }}"></script>
-
+//
 <script>
-    //fungsi untuk mengatur visibilitas navbar berdasarkan lebar layar
-    function setNavbarVisibility() {
-        var navbar = document.getElementById("topbar");
-        var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-
-        if (width >= 768) {
-            navbar.classList.add("hidden");
-        } else {
-            navbar.classList.remove("hidden");
-        }
-    }
-
-    // Panggil fungsi saat halaman dimuat
-    window.onload = setNavbarVisibility;
-
-    // Tambahkan event listener untuk mendengarkan perubahan ukuran layar
-    window.addEventListener("resize", setNavbarVisibility);
+    //     function preserveToggledOnScroll() {
+    //         var width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    //         var sidebar = document.querySelector('.sidebar');
+    //         var body = document.getElementById('page-top');
+    //         console.log('yes 1');
+    //         if (width < 768) {
+    //             window.addEventListener('scroll', function() {
+    //                 if (!sidebar.classList.contains('toggled')) {
+    //                     sidebar.classList.remove('toggled');
+    //                     body.classList.remove('sidebar-toggled');
+    //                 }
+    //             });
+    //             console.log('yes');
+    //         }
+    //     }
+    //     window.onload = function() {
+    //         preserveToggledOnScroll();
+    //     };
+    // 
 </script>
+
+<script src="{{ asset('Style/js/sb-admin-2.min.js') }}"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>

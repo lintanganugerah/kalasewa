@@ -29,21 +29,36 @@
                                 <div class="form-outline mb-4">
                                     <label for="validpassword" class="form-label">Password<span
                                             class="text-danger">*</span></label>
-                                    <input type="password" class="form-control" id="validpassword" name="password"
-                                        minlength="8" value="{{ old('password') }}" required>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="validpassword" name="password"
+                                            minlength="8" value="{{ old('password') }}" required>
+                                        <button type="button" class="btn btn-outline-secondary" id="toggle-password"
+                                            onclick="togglePassword()">
+                                            <i class="fas fa-eye" id="toggle-icon"></i></button>
+                                    </div>
+                                    <div class="form-text">
+                                        Password harus memiliki panjang 8 karakter, memiliki huruf kapital, angka, dan
+                                        simbol
+                                    </div>
                                     <div class="form-text error-message text-danger" id="passwordError"></div>
                                 </div>
 
                                 <div class="form-outline mb-4">
                                     <label class="form-label" for="password_confirmation">Konfirmasi Password<span
                                             class="text-danger">*</span></label>
-                                    <input type="password" id="password_confirmation" class="form-control error-check"
-                                        name="password_confirmation" minlength="8"
-                                        value="{{ old('password_confirmation') }}" required />
+                                    <div class="input-group">
+                                        <input type="password" id="password_confirmation" class="form-control error-check"
+                                            name="password_confirmation" minlength="8"
+                                            value="{{ old('password_confirmation') }}" required />
+                                        <button type="button" class="btn btn-outline-secondary"
+                                            id="toggle-password-konfirmasi" onclick="konfirmasitogglePassword()">
+                                            <i class="fas fa-eye" id="toggle-icon-konfirmasi"></i></button>
+                                    </div>
                                     <div class="form-text error-message text-danger" id="konfirmasi_error"></div>
                                     @error('password')
                                         <div class="text-danger form-text error-message" data-milik="password_confirmation">
-                                            {{ $message }}</div>
+                                            {{ $message }}
+                                        </div>
                                     @enderror
                                 </div>
 
@@ -79,8 +94,7 @@
                                         name="nomor_identitas" pattern="[0-9]*" minlength="16"
                                         value="{{ old('nomor_identitas') }}" required
                                         @error('nomor_identitas')
-                                                            style="border-color:#D44E4E"
-                                                        @enderror />
+                                    style="border-color:#D44E4E" @enderror />
                                     <div id="HELP" class="form-text">Nomor Identitas harus sesuai dengan foto yang di
                                         upload!</div>
                                     <div class="form-text error-message text-danger" id="NIKError"></div>
@@ -100,8 +114,7 @@
                                     <input type="text" id="namaToko" class="form-control form-control-lg error-check"
                                         name="namaToko" value="{{ old('namaToko') }}" required
                                         @error('namaToko')
-                                                            style="border-color:#D44E4E"
-                                                        @enderror />
+                                    style="border-color:#D44E4E" @enderror />
                                     @error('namaToko')
                                         <div class="text-danger form-text error-message" data-milik="namaToko">
                                             {{ $message }}
@@ -115,10 +128,9 @@
                                     <input type="text" id="linkSosmed"
                                         class="form-control form-control-lg error-check" name="link_sosial_media"
                                         value="{{ old('link_sosial_media') }}" required
-                                        @error('link_sosial_media')
-                                                            style="border-color:#D44E4E"
-                                                        @enderror />
-                                    <div id="link_helper" class="form-text">Mohon masukkan Link Sosial Media Valid. Misal
+                                        @error('link_sosial_media') style="border-color:#D44E4E" @enderror />
+                                    <div id="link_helper" class="form-text">Link Sosial media valid lengkap dengan
+                                        "https://". Contoh
                                         https://www.instagram.com/akun_anda/
                                     </div>
                                     @error('link_sosial_media')
@@ -136,8 +148,7 @@
                                         pattern="[0-9]*" minlength="10" maxlength="13"
                                         value="{{ old('nomor_telpon') }}" required
                                         @error('nomor_telpon')
-                                                            style="border-color:#D44E4E"
-                                                        @enderror />
+                                    style="border-color:#D44E4E" @enderror />
                                     <div id="HELP" class="form-text">Harap masukkan nomor telpon toko yang dapat
                                         dihubungi!
                                     </div>
@@ -153,9 +164,8 @@
                                     <label class="form-label" for="form2Example27">Alamat Toko<span
                                             class="text-danger">*</span></label>
                                     <textarea type="text" id="alamat" class="form-control form-control-lg error-check" name="AlamatToko" required
-                                        @error('AlamatToko')
-                                                            style="border-color:#D44E4E"
-                                                        @enderror>{{ old('AlamatToko') }}</textarea>
+                                        @error('AlamatToko') style="border-color:#D44E4E"
+                                    @enderror>{{ old('AlamatToko') }}</textarea>
                                     <div id="HELP" class="form-text">Harap masukkan alamat toko secara valid untuk
                                         keperluan
                                         informasi pengiriman!</div>
@@ -170,11 +180,11 @@
                                     <select class="form-select error-check" id="provinsi" name="provinsi"
                                         aria-label="Floating label select example" required
                                         @error('provinsi')
-                                                            style="border-color:#D44E4E"
-                                                        @enderror>
+                                    style="border-color:#D44E4E" @enderror>
                                         <option selected> </option>
                                         <option value="Jawa Barat"
-                                            {{ old('provinsi') == 'Jawa Barat' ? 'selected' : '' }}>Jawa Barat
+                                            {{ old('provinsi') == 'Jawa Barat' ? 'selected' : '' }}>
+                                            Jawa Barat
                                         </option>
                                     </select>
                                     <label for="provinsi">Provinsi<span class="text-danger">*</span></label>
@@ -189,11 +199,11 @@
                                     <select class="form-select error-check" id="kota" name="kota"
                                         aria-label="Floating label select example" required
                                         @error('kota')
-                                                            style="border-color:#D44E4E"
-                                                        @enderror>
+                                    style="border-color:#D44E4E" @enderror>
                                         <option selected> </option>
                                         <option value="Kota Bandung"
-                                            {{ old('kota') == 'Kota Bandung' ? 'selected' : '' }}>Kota Bandung</option>
+                                            {{ old('kota') == 'Kota Bandung' ? 'selected' : '' }}>
+                                            Kota Bandung</option>
                                         <option value="Kabupaten Bandung"
                                             {{ old('kota') == 'Kabupaten Bandung' ? 'selected' : '' }}>Kabupaten
                                             Bandung
@@ -214,9 +224,7 @@
                                         <input type="text" id="kodePos" class="form-control error-check"
                                             name="kodePos" pattern="[0-9]*" minlength="5" maxlength="5"
                                             value="{{ old('kodePos') }}" required
-                                            @error('kodePos')
-                                                            style="border-color:#D44E4E"
-                                                        @enderror />
+                                            @error('kodePos') style="border-color:#D44E4E" @enderror />
                                     </div>
                                     <div class="form-text error-message text-danger" id="kodePosError"></div>
                                     @error('kodePos')
@@ -240,4 +248,33 @@
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="{{ asset('seller/validasiRegisPemilik.js') }}"></script>
     </section>
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('validpassword');
+            const toggleIcon = document.getElementById('toggle-icon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+
+        function konfirmasitogglePassword() {
+            const passwordInput = document.getElementById('password_confirmation');
+            const toggleIcon = document.getElementById('toggle-icon-konfirmasi');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
 @endsection

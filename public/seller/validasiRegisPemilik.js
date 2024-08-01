@@ -1,8 +1,18 @@
 $(document).ready(function () {
     $("#validpassword").on("input", function () {
         let password = $(this).val();
+        let regex =
+            /^(?=.*[A-Z])(?=.*\d)(?=.*[ -\/:-@\[-`{-~])[A-Za-z\d -\/:-@\[-`{-~]{8,}$/;
+        console.log(regex.test(password));
+
         if (password.length < 8) {
             $("#passwordError").text("Password minimal 8 karakter").show();
+        } else if (!regex.test(password)) {
+            $("#passwordError")
+                .text(
+                    "Password harus mengandung minimal satu huruf kapital, satu angka, dan satu simbol"
+                )
+                .show();
         } else {
             $("#passwordError").hide();
         }

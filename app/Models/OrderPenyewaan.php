@@ -39,6 +39,7 @@ class OrderPenyewaan extends Model
         'additional',
         'tanggal_diterima',
         'tanggal_pengembalian',
+        'ready_status',
         'status'
     ];
 
@@ -47,9 +48,13 @@ class OrderPenyewaan extends Model
         'tanggal_mulai' => 'datetime',
         'tanggal_selesai' => 'datetime',
         'tanggal_diterima' => 'datetime',
-        'tanggal_pengembalian' => 'datetime'
+        'tanggal_pengembalian' => 'datetime',
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_penyewa');
+    }
     public function id_penyewa_order()
     {
         return $this->belongsTo(User::class, 'id_penyewa', 'id');
@@ -57,7 +62,19 @@ class OrderPenyewaan extends Model
 
     public function id_produk_order()
     {
-        return $this->belongsTo(Produk::class, 'id_produk', 'id');
+        return $this->belongsTo(Produk::class, 'id_produk', 'id')->withTrashed();
+    }
+
+    public function cekDenda()
+    {
+        $denda = PengajuanDenda::where('nomor_order', $this->nomor_order)->first() ?? false;
+        return $denda;
+    }
+
+    public function cekDendaMasihBerjalan()
+    {
+        $denda = PengajuanDenda::where('nomor_order', $this->nomor_order)->whereIn('status', ['pending', 'diproses'])->first() ?? false;
+        return $denda;
     }
 
     public function tanggalFormatted($tanggal)
@@ -79,6 +96,21 @@ class OrderPenyewaan extends Model
         $hari = $tanggal->format('d');
         $bulan = (int) $tanggal->format('m');
 
-        return $hari . ' ' . $bulanTeks[$bulan];
+        return $hari . ' ' . $bulanTeks[$bulan] . ' ' . $tanggal->format('Y');
+    }
+
+    public function penyewa()
+    {
+        return $this->belongsTo(User::class, 'id_penyewa');
+    }
+
+    public function produk()
+    {
+        return $this->belongsTo(Produk::class, 'id_produk')->withTrashed();
+    }
+
+    public function denda()
+    {
+        return $this->hasMany(PengajuanDenda::class, 'nomor_order');
     }
 }

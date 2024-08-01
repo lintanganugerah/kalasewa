@@ -4,11 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Produk extends Model
 {
     use HasFactory;
 
+    use SoftDeletes;
     protected $fillable = [
         'nama_prouk',
         'id_toko',
@@ -25,6 +27,8 @@ class Produk extends Model
         'gender',
         'metode_kirim'
     ];
+
+    protected $dates = ['deleted_at'];
 
     public function FotoProduk()
     {
@@ -77,6 +81,10 @@ class Produk extends Model
         return $this->belongsTo(Review::class, 'id_produk');
     }
 
+    public function checkouts()
+    {
+        return $this->hasMany(Checkout::class, 'id_produk');
+    }
     public function avg_nilai_produk($id_produk)
     {
         $nilai = Review::where('id_produk', $id_produk)->where('tipe', 'review_produk')->avg('nilai');
@@ -105,5 +113,22 @@ class Produk extends Model
     public function alamat()
     {
         return $this->belongsTo(AlamatTambahan::class, 'id_alamat');
+    }
+
+    public function getalamatproduk($id_alamat, $id_user)
+    {
+        if ($id_alamat) {
+            $cek = AlamatTambahan::where('id', $id_alamat->id)->first();
+        } else {
+            $cek = User::where('id', $id_user)->first();
+        }
+        $alamat = $cek->alamat . ', ' . $cek->kota . ', ' . $cek->kode_pos;
+        return $alamat;
+    }
+
+    public function getLastOrderAttribute()
+    {
+        $Order = OrderPenyewaan::where('id_produk', $this->id)->whereNull('ready_status')->latest()->first();
+        return $Order;
     }
 }
