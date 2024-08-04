@@ -47,102 +47,73 @@
         <table class="table table-data" id="series-table">
             <thead>
                 <tr>
-                    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                        <h1 class="h3 mb-0 text-gray-800">Manajemen Series</h1>
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Home</a></li>
-                            <li class="breadcrumb-item active" aria-current="page">Manajemen Series</li>
-                    </div>
-                    @if (session('success'))
-                        <div class="alert alert-success">
-                            {{ session('success') }}
+                    <th>Nama Series</th>
+                    <th colspan="2" style="text-align: center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="series-table">
+                @foreach ($series as $seriesItem)
+                    <tr>
+                        <td>{{ $seriesItem->series }}</td>
+                        <td width="8%">
+                            <a href="{{ route('admin.series.edit', $seriesItem->id) }}"
+                                class="btn btn-warning btn-block">Edit</a>
+                        </td>
+                        <td width="8%">
+                            <button class="btn btn-danger btn-block" data-toggle="modal"
+                                data-target="#confirmDeleteModal{{ $seriesItem->id }}">Delete</button>
+                        </td>
+                    </tr>
+
+                    <!-- Modal Konfirmasi Delete -->
+                    <div class="modal fade" id="confirmDeleteModal{{ $seriesItem->id }}" tabindex="-1" role="dialog"
+                        aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmDeleteModalLabel">Konfirmasi Delete
+                                        Series</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Apakah Anda yakin ingin menghapus series ini?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                    <form id="deleteForm{{ $seriesItem->id }}"
+                                        action="{{ route('admin.series.destroy', $seriesItem->id) }}" method="POST"
+                                        class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
+                            </div>
                         </div>
-                    @endif
-                    @if (session('error'))
-                        <div class="alert alert-danger">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-                    </ol>
-
-                    <div class="mb-3">
-                        <a href="{{ route('admin.series.create') }}" class="btn btn-primary">Tambah Series</a>
                     </div>
-
-                    <div class="table-responsive">
-                        <table class="table table-data" id="series-table">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nama Series</th>
-                                    <th></th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="series-table">
-                                @foreach ($series as $seriesItem)
-                                    <tr>
-                                        <td>{{ $seriesItem->series }}</td>
-                                        <td width="8%">
-                                            <a href="{{ route('admin.series.edit', $seriesItem->id) }}"
-                                                class="btn btn-warning btn-block">Edit</a>
-                                        </td>
-                                        <td width="8%">
-                                            <button class="btn btn-danger btn-block" data-toggle="modal"
-                                                data-target="#confirmDeleteModal{{ $seriesItem->id }}">Delete</button>
-                                        </td>
-                                    </tr>
-
-                                    <!-- Modal Konfirmasi Delete -->
-                                    <div class="modal fade" id="confirmDeleteModal{{ $seriesItem->id }}" tabindex="-1"
-                                        role="dialog" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog" role="document">
-                                            <div class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="confirmDeleteModalLabel">Konfirmasi Delete
-                                                        Series</h5>
-                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                                        <span aria-hidden="true">&times;</span>
-                                                    </button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    Apakah Anda yakin ingin menghapus series ini?
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary"
-                                                        data-dismiss="modal">Batal</button>
-                                                    <form id="deleteForm{{ $seriesItem->id }}"
-                                                        action="{{ route('admin.series.destroy', $seriesItem->id) }}"
-                                                        method="POST" class="d-inline">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-danger">Delete</button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </tbody>
-                        </table>
+                @endforeach
+            </tbody>
+        </table>
     @endif
 
-                    <div style="display: flex; justify-content: center; margin: 20px 0;">
-                        {{ $series->onEachSide(1)->links() }}
-                    </div>
-                </div>
+    <div style="display: flex; justify-content: center; margin: 20px 0;">
+        {{ $series->onEachSide(1)->links() }}
+    </div>
+</div>
 
-                @endsection
+@endsection
 
-                @section('scripts')
-                <script>
-                    $(document).ready(function () {
-                        // Set action form delete saat tombol delete di modal diklik
-                        $('.btn-danger').on('click', function () {
-                            var seriesId = $(this).closest('tr').find('.series-id').text();
-                            var action = $('#deleteForm' + seriesId).attr('action');
-                            $('#deleteForm' + seriesId).attr('action', action + '/' + seriesId);
-                        });
-                    });
-                </script>
-                @endsection
+@section('scripts')
+<script>
+    $(document).ready(function () {
+        // Set action form delete saat tombol delete di modal diklik
+        $('.btn-danger').on('click', function () {
+            var seriesId = $(this).closest('tr').find('.series-id').text();
+            var action = $('#deleteForm' + seriesId).attr('action');
+            $('#deleteForm' + seriesId).attr('action', action + '/' + seriesId);
+        });
+    });
+</script>
+@endsection

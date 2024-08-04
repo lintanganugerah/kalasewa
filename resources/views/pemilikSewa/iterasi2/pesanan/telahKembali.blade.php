@@ -12,41 +12,7 @@
                 <div class="card">
                     <div class="card-header">
                         <!-- Nav tabs -->
-                        <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="Produkanda-tab" data-bs-toggle="tab"
-                                    onclick="window.location.href='/status-sewa/belumdiproses'" type="button"
-                                    role="tab" aria-controls="Produkanda" aria-selected="true">Belum Diproses</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/dalampengiriman'" type="button"
-                                    role="tab" aria-controls="tambahProduk" aria-selected="false">Dalam
-                                    Pengiriman</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/sedangberlangsung'" type="button"
-                                    role="tab" aria-controls="tambahProduk" aria-selected="false">Sedang
-                                    Berlangsung</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active text-secondary fw-bold" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/telahkembali'" type="button" role="tab"
-                                    aria-controls="tambahProduk" aria-selected="false">Penyewaan Telah kembali</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/penyewaandiretur'" type="button"
-                                    role="tab" aria-controls="tambahProduk" aria-selected="false">Penyewaan
-                                    diretur</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/riwayat'" type="button" role="tab"
-                                    aria-controls="tambahProduk" aria-selected="false">Riwayat Penyewaan</button>
-                            </li>
-                        </ul>
+                        @include('pemilikSewa.iterasi2.pesanan.navtabs')
                     </div>
                     <div class="card-body">
                         <!-- Tab panes -->
@@ -74,6 +40,7 @@
                                         @if ($order)
                                             <thead>
                                                 <tr>
+                                                    <th>#</th>
                                                     <th>Nomor Order</th>
                                                     <th class="col-2">Produk</th>
                                                     <th>Penyewa</th>
@@ -83,6 +50,7 @@
                                                     <th>Periode Sewa Tanggal</th>
                                                     <th>Dikembalikan Tanggal</th>
                                                     <th>Denda Keterlambatan</th>
+                                                    <th>Denda Lainnya</th>
                                                     <th>Total Harga + Denda</th>
                                                     <th>Aksi</th>
                                                 </tr>
@@ -90,6 +58,8 @@
                                             <tbody>
                                                 @foreach ($order as $ord)
                                                     <tr>
+                                                        <td data-title="#" class="align-middle">
+                                                            {{ $loop->iteration }}</td>
                                                         <td data-title="No. Order" class="align-middle">
                                                             {{ $ord->nomor_order }}</td>
                                                         <td data-title="Produk" class="align-middle">
@@ -110,12 +80,21 @@
                                                         <td data-title="Additional" class="align-middle text-opacity-75">
                                                             @if ($ord->additional)
                                                                 <ul>
-                                                                    @foreach ($ord->additional as $nama => $harga)
-                                                                        <li>{{ $nama }} +{{ $harga }}</li>
+                                                                    @foreach ($ord->additional as $add)
+                                                                        <li>{{ $add['nama'] }} +
+                                                                            {{ number_format($add['harga'], 0, '', '.') }}
+                                                                        </li>
                                                                     @endforeach
                                                                 </ul>
                                                             @else
                                                                 <div class="text-opacity-25">-</div>
+                                                            @endif
+                                                            @if ($ord->id_produk_order->biaya_cuci)
+                                                                <ul>
+                                                                    <li>Biaya cuci +
+                                                                        {{ number_format($ord->id_produk_order->biaya_cuci, 0, '', '.') }}
+                                                                    </li>
+                                                                </ul>
                                                             @endif
                                                         </td>
                                                         <td data-title="Nomor Resi" class="align-middle">
@@ -130,21 +109,37 @@
                                                             {{ $ord->tanggalFormatted($ord->tanggal_pengembalian) }}
                                                         </td>
                                                         <td data-title="Denda Keterlambatan" class="align-middle">
-                                                            {{ number_format($ord->denda_keterlambatan, 0, '', '.') }}
+                                                            Rp. {{ number_format($ord->denda_keterlambatan, 0, '', '.') }}
+                                                        </td>
+                                                        <td data-title="Denda Lainnya" class="align-middle">
+                                                            @if ($ord->cekDenda())
+                                                                <a class="fw-light"
+                                                                    href="{{ route('seller.viewDetailPengajuanDenda', $ord->nomor_order) }}"
+                                                                    style="font-size:14px">Lihat Denda Lainnya</a>
+                                                            @else
+                                                                <small>Tidak ada denda Lainnya</small>
+                                                            @endif
                                                         </td>
                                                         <td data-title="Total + Denda" class="align-middle">
-                                                            {{ number_format($ord->total_harga, 0, '', '.') }}</td>
+                                                            Rp. {{ number_format($ord->total_harga, 0, '', '.') }}</td>
                                                         <td data-title="aksi" class="align-middle">
-                                                            <a data-bs-toggle="modal"
-                                                                data-bs-target="#selesaikanPenyewaan-1"
-                                                                class="d-grid btn btn-success mb-2"
-                                                                id="konfirmasi">Konfirmasi
-                                                                Selesai</a>
-                                                            <a href="" class="d-grid btn btn-outline-success mb-2"
+                                                            @if ($ord->cekDendaMasihBerjalan())
+                                                                <a data-bs-toggle="modal" data-bs-target="#infoDenda-1"
+                                                                    class="d-grid btn btn-outline-secondary mb-2"
+                                                                    id="konfirmasi">Konfirmasi Selesai</a>
+                                                            @else
+                                                                <a data-bs-toggle="modal"
+                                                                    data-bs-target="#selesaikanPenyewaan-1"
+                                                                    class="d-grid btn btn-success mb-2"
+                                                                    id="konfirmasi">Konfirmasi
+                                                                    Selesai</a>
+                                                            @endif
+                                                            <a href="{{ url('/chat' . '/' . $ord->id_penyewa_order->id) }}"
+                                                                target="_blank" class="d-grid btn btn-outline-success mb-2"
                                                                 id="chat">Chat</a>
-                                                            <a data-bs-toggle="modal"
+                                                            <a href="{{ route('seller.pengajuanDendaAction', $ord->nomor_order) }}"
                                                                 class="d-grid btn btn-outline-danger mb-2"
-                                                                data-bs-target="#ajukanDendaSewa-1" id="denda">Ajukan
+                                                                id="denda">Ajukan
                                                                 Denda</a>
                                                         </td>
                                                     </tr>
@@ -152,15 +147,14 @@
                                                     <div class="modal fade" id="selesaikanPenyewaan-1" tabindex="-1"
                                                         aria-labelledby="inputResi-1Label" aria-hidden="true">
                                                         <div class="modal-dialog modal-dialog-centered">
-
                                                             <form
                                                                 action="{{ route('seller.view.penilaian.TambahReviewPenyewa', ['id' => $ord->id_penyewa, 'nomor_order' => $ord->nomor_order]) }}"
-                                                                method="get">
+                                                                method="POST">
                                                                 @csrf
                                                                 <div class="modal-content">
                                                                     <div class="modal-header">
-                                                                        <h1 class="modal-title fs-5"
-                                                                            id="inputResi-1Label">Konfirmasi Selesai</h1>
+                                                                        <h1 class="modal-title fs-5" id="inputResi-1Label">
+                                                                            Konfirmasi Selesai</h1>
                                                                         <button type="button" class="btn-close"
                                                                             data-bs-dismiss="modal"
                                                                             aria-label="Close"></button>
@@ -178,17 +172,15 @@
                                                                             Ukuran
                                                                             {{ $ord->id_produk_order->ukuran_produk }}</small>
                                                                         <hr>
-                                                                        <p class="mt-2"><span
-                                                                                class="fw-bolder text-danger">Pastikan
-                                                                                bahwa anda telah cek kostum tersebut, dan
-                                                                                penyewa tidak ada melanggar peraturan sewa
-                                                                                toko anda
-                                                                            </span>. Jika telah selesai, maka
-                                                                            anda dapat klik submit
-                                                                            dibawah ini. Setelah itu anda akan diarahkan
-                                                                            untuk mengisi review penyewa, dan
-                                                                            dana penghasilan akan diserahkan kepada anda
-                                                                            setelah mengisi review penyewa.
+                                                                        <p> Anda akan diarahkan untuk mengisi review
+                                                                            penyewa. Setelah anda
+                                                                            menambahkan review dan penyewaan
+                                                                            selesai, status produk akan menjadi "arsip".
+                                                                            <span class="fw-bold text-danger">Mohon
+                                                                                aktifkan
+                                                                                Produk secara manual pada
+                                                                                menu produk </span> agar bisa disewa kembali
+                                                                            ketika sudah ready.
                                                                         </p>
                                                                     </div>
                                                                     <div class="modal-footer">
@@ -206,68 +198,39 @@
                                         @endif
                                     </table>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Modal Denda Sewa -->
-                    <form action="" method="POST">
-                        <div class="modal fade" id="ajukanDendaSewa-1" tabindex="-1" aria-labelledby="inputResi-1Label"
-                            aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="inputResi-1Label">Ajukan Denda Sewa</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                            aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="m-2">
-                                            <label for="exampleFormControlInput1" class="form-label">Nama
-                                                Peraturan<span class="text-danger mb-3">*</span></label>
-                                            <select class="form-select" aria-label="Default select example" required>
-                                                <option selected>Pilih Peraturan yang dilanggar</option>
-                                                <option value="Jaring Wig Hilang">Jaring Wig Hilang</option>
-                                                <option value="2">Two</option>
-                                                <option value="3">Three</option>
-                                            </select>
-                                        </div>
-                                        <div class="m-2">
-                                            <label for="hargaInput" class="form-label">Nominal Denda<span
-                                                    class="text-danger mb-3">*</span></label>
-                                            <div class="input-group">
-                                                <span class="input-group-text" id="span_nominal">Rp.</span>
-                                                <input type="number" id="hargaInput" class="form-control"
-                                                    name="nominal_denda" placeholder="50000" aria-label="Denda"
-                                                    pattern="[0-9]*">
+                                <!-- Modal Info Denda -->
+                                <div class="modal fade" id="infoDenda-1" tabindex="-1"
+                                    aria-labelledby="inputResi-1Label" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5" id="inputResi-1Label"> Tidak Bisa
+                                                    Konfirmasi Pesanan Selesai
+                                                </h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p><strong>Mengapa saya tidak
+                                                        bisa konfirmasi pesanan selesai?</strong></p>
+                                                <p> Anda tidak bisa mengkonfirmasi pesanan dikarenakan pesanan ini masih
+                                                    memiliki Pengajuan Denda Sewa yang belum dibayarkan/masih dalam
+                                                    proses</p>
+                                                <p> Batalkan atau tunggu hingga dibayarkan oleh penyewa agar anda dapat
+                                                    menyelesaikan pesanan ini </p>
+                                                <p> Anda bisa lihat progress pengajuan denda tersebut dengan klik teks
+                                                    "Lihat denda lainnya" pada tabel</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-kalasewa"
+                                                    data-bs-dismiss="modal">Tutup</button>
                                             </div>
                                         </div>
-                                        <div class="m-2">
-                                            <label for="textArea" class="form-label">Penjelasan<span
-                                                    class="text-danger mb-3">*</span></label>
-                                            <textarea class="form-control" id="textArea" rows="3"></textarea>
-                                        </div>
-                                        <div class="m-2">
-                                            <label for="formFileSm" class="form-label">Bukti<span
-                                                    class="text-danger mb-3">*</span></label>
-                                            <input class="form-control form-control-sm" id="formFileSm" type="file"
-                                                accept=".jpg,.png,.jpeg,.webp" id="fotoInput-0" required>
-                                        </div>
-                                        <p class="m-2 mt-3">Setelah submit pengajuan denda, button "ajukan denda sewa" ini
-                                            akan
-                                            berubah
-                                            menjadi "detail". Anda dapat melihat detail hasil pengajuan sewa dengan button
-                                            tersebut
-                                        </p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Tutup</button>
-                                        <button type="submit" class="btn btn-kalasewa">Submit</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>

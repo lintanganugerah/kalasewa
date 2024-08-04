@@ -19,21 +19,23 @@
                     <a class="nav-link" aria-current="page" href="{{ route('viewHomepage') }}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ route('viewPencarian') }}">Pencarian</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ route('viewListToko') }}">Toko</a>
+                    <a class="nav-link" aria-current="page" href="{{ route('viewListToko') }}">Merchant</a>
                 </li>
                 @if (auth()->check() && auth()->user()->role === 'penyewa')
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('viewHistory') }}">History</a>
+                    <a class="nav-link" href="{{ route('viewHistoryMenungguDiproses') }}">History</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="{{ route('wishlist.view') }}">Wishlist</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="">Ticketing</a>
-
+                    <a class="nav-link" href="{{ route('viewTicketing') }}">Ticketing</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('viewPenarikan') }}">Withdrawal</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url('/chat') }}" target="_blank">Chat</a>
                 </li>
                 @endif
                 @else
@@ -41,14 +43,11 @@
                     <a class="nav-link" aria-current="page" href="{{ route('viewHomepage') }}">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ route('viewPencarian') }}">Pencarian</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ route('viewListToko') }}">Toko</a>
+                    <a class="nav-link" aria-current="page" href="{{ route('viewListToko') }}">Merchant</a>
                 </li>
                 @endif
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="{{ route('viewRules') }}">Aturan</a>
+                    <a class="nav-link" aria-current="page" href="{{ route('viewRules') }}">Regulation</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" aria-current="page" href="{{ route('viewAbout') }}">About</a>
@@ -62,10 +61,11 @@
                     {{ auth()->user()->nama }}
                 </button>
                 <ul class="dropdown-menu dropdown-menu">
-                    <li><a class="dropdown-item" href="{{ route('viewProfile', ['id' => auth()->user()->id]) }}">Ubah
-                            Profil</a></li>
+                    <li><a class="dropdown-item" href="{{ route('viewProfile', ['id' => auth()->user()->id]) }}">My
+                            Profile</a></li>
                     <li><a class="dropdown-item"
-                            href="{{ route('viewGantiPassword', ['id' => auth()->user()->id]) }}">Ubah Password</a>
+                            href="{{ route('viewGantiPassword', ['id' => auth()->user()->id]) }}">Change
+                            Password</a>
                     </li>
                     <li><a class="dropdown-item" href="{{ route('logout') }}">Logout</a></li>
                 </ul>
@@ -77,13 +77,13 @@
                         style="width: 30px; height: 30px; object-fit: cover; border-radius: 50%;">
                 </button>
                 <ul class="dropdown-menu dropdown-menu">
-                    <li><a class="dropdown-item" href="{{ route('seller.dashboardtoko') }}">Dashboard Toko</a></li>
+                    <li><a class="dropdown-item" href="{{ route('seller.dashboardtoko') }}">Dashboard</a></li>
                     <li><a class="dropdown-item" href="{{ route('logout') }}">Logout</a></li>
                 </ul>
             </div>
             @else
-            <a class="me-4" href="{{ route('jadiSellerView') }}" style="color: #EE1B2F; text-decoration:none">Buka
-                Toko</a>
+            <a class="me-4" href="{{ route('jadiSellerView') }}" style="color: #EE1B2F; text-decoration:none">Setup
+                Merch</a>
             <a class="me-4" href="{{ route('registerViewPenyewa') }}"
                 style="color: #EE1B2F; text-decoration:none">Register</a>
             <a class="me-5" href="{{ route('loginView') }}" style="color: #EE1B2F; text-decoration:none">Login</a>

@@ -58,9 +58,7 @@ class ProdukSellerController extends Controller
         $fotoProduk = FotoProduk::whereIn('id_produk', $produkIds)->get();
         session(['id_produk' => $produk->id]);
         $series = Series::all();
-        $decodeAdd = is_array($produk->additional) ? "aaa" : json_decode($produk->additional, true); //Menggubah menjadi array key value "nama" => "harga"
-
-        // dd($decodeAdd, $produk->additional);
+        $decodeAdd = json_decode($produk->additional, true); //Menggubah menjadi array key value "nama" => "harga"
 
         if ($toko->id == $produk->id_toko) {
 
@@ -87,7 +85,7 @@ class ProdukSellerController extends Controller
             'series' => 'required',
             'ukuran' => 'required',
             'harga' => 'required|numeric|min:100',
-            'brand' => 'required|string',
+            'brand' => 'required|string', //UBAH JADI STRING, HABIS CEK OLD DD
             'gender' => 'required|in:Pria,Wanita,Semua Gender',
             'foto_produk' => 'nullable|max:5120',
             'beratProduk' => 'required|numeric|min:10',
@@ -195,8 +193,8 @@ class ProdukSellerController extends Controller
                 $extension = $file->getClientOriginalExtension();
 
                 // Periksa ekstensi file sesuai
-                if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp'])) {
-                    return redirect()->back()->with('error', 'Foto harus berupa file dengan format jpg, jpeg, png, atau webp.');
+                if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'webp'])) {
+                    return redirect()->back()->with('error', 'Foto harus berupa file dengan format jpg, jpeg, png, atau webp.')->withInput();
                 }
             }
             foreach ($request->foto_produk as $foto) {
@@ -251,8 +249,8 @@ class ProdukSellerController extends Controller
             $extension = $file->getClientOriginalExtension();
 
             // Periksa ekstensi file sesuai
-            if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp'])) {
-                return redirect()->back()->with('error', 'Foto harus berupa file dengan format jpg, jpeg, png, atau webp.');
+            if (!in_array(strtolower($extension), ['jpg', 'jpeg', 'png', 'webp'])) {
+                return redirect()->back()->with('error', 'Foto harus berupa file dengan format jpg, jpeg, png, atau webp.')->withInput();
             }
         }
 
@@ -321,35 +319,6 @@ class ProdukSellerController extends Controller
         $produk->ukuran_produk = $request->ukuran;
         $produk->id_toko = $toko->id;
 
-        if ($request->has("additional")) {
-            $additionalData = [];
-
-            if (count($request->additional) % 2 == 0) { //Cek modulus/modolu kalau sisa total data itu 0 jika dibagi 2 artinya jumlah genap
-                // Mengambil index genap sebagai harga, dan ganjil menjadi nama, loncat 2 karena nama dan harga punya index sendiri
-                for ($i = 0; $i < count($request->additional); $i += 2) {
-                    $nama = $request->additional[$i]; //Simpan isi value index ganjil array $request->additional sebagai nama (key nya) 
-                    $harga = $request->additional[$i + 1]; //Simpan isi value index genap array $request->additionalsebagai harga (value nya)
-
-                    // Cek apakah isi string harga itu numeric
-                    if (is_numeric($harga)) {
-                        if ($additionalData != null) {
-                            foreach ($additionalData as $namaTerdaftar => $hargaTerdaftar) {
-                                if ($namaTerdaftar == $nama) {
-                                    return redirect()->back()->withErrors("Nama Additional Tidak Boleh Saling sama, ganti dengan nama yang lain");
-                                }
-                            }
-                        }
-                        $additionalData[$nama] = (int) $harga; // Ubah harga jadi integer, dan memasukkan harga menjadi value dari key $nama. Key nya adalah dari index ganjil nama
-                    } else {
-                        return redirect()->back()->withErrors("Tipe data Harga pada form additional tidak valid. Mohon Refresh Halaman"); // Menampilkan error jika harga tidak valid
-                    }
-                }
-            } else {
-                return redirect()->back()->withErrors("Ada kesalahan data pada Barang Additional, Mohon Refresh halaman");
-            }
-            $produk->additional = json_encode($additionalData);
-        }
-
         $produk->save();
         $id_produk = $produk->getKey();
         if ($request->has('biaya_cuci')) {
@@ -402,6 +371,11 @@ class ProdukSellerController extends Controller
             return redirect()->back()->with('error', 'Produk Invalid');
         }
         if ($toko->id == $produk->id_toko) {
+            if ($produk->LastOrder) {
+                if (!$produk->LastOrder->ready_status) {
+                    $produk->LastOrder->update(['ready_status' => 'done']);
+                }
+            }
             $produk->update(['status_produk' => 'aktif']);
             return redirect()->back()->with('success', 'Produk berhasil diaktifkan untuk ditampilkan pada marketplace.');
         } else {
@@ -414,9 +388,18 @@ class ProdukSellerController extends Controller
         $user = Auth::user();
         $toko = Toko::where('id_user', $user->id)->first();
         $produk = Produk::find($id);
+        $lastOrder = $produk->lastOrder;
         if (!$produk) {
             return redirect()->back()->with('error', 'Produk Invalid');
         }
+
+        if ($lastOrder) {
+            if (!in_array($produk->lastOrder->status, ['Penyewaan Selesai', 'Retur Selesai', 'Dibatalkan Pemilik Sewa'])) {
+                // Jika tidak termasuk, kembalikan response atau lakukan tindakan yang sesuai
+                return redirect()->back()->with('error', 'Tidak bisa menghapus produk yang sedang disewa');
+            }
+        }
+
         if ($toko->id == $produk->id_toko) {
             $fotoProduk = FotoProduk::where('id_produk', $produk->id)->get();
             if ($fotoProduk) {

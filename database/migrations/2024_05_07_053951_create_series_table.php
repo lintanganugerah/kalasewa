@@ -14,6 +14,7 @@ return new class extends Migration {
             $table->id()->index();
             $table->string("series")->unique();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

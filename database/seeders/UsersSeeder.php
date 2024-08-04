@@ -3,9 +3,10 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
+use App\Events\UserChangeProfile;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class UsersSeeder extends Seeder
 {
@@ -17,7 +18,7 @@ class UsersSeeder extends Seeder
     public function run()
     {
         // Penyewa
-        DB::table('users')->insert([
+        $penyewa1 = User::create([
             'nama' => 'Penyewa 1',
             'email' => 'penyewa@example.com',
             'password' => Hash::make('12345678'),
@@ -35,11 +36,11 @@ class UsersSeeder extends Seeder
             'foto_profil' => 'storage/profiles/profil_default.jpg',
             'role' => 'penyewa',
             'verifyIdentitas' => 'Sudah',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
-        DB::table('users')->insert([
+        event(new UserChangeProfile($penyewa1));
+
+        $penyewa2 = User::create([
             'nama' => 'Penyewa 2',
             'email' => 'penyewa2@example.com',
             'password' => Hash::make('12345678'),
@@ -61,7 +62,9 @@ class UsersSeeder extends Seeder
             'updated_at' => now(),
         ]);
 
-        DB::table('users')->insert([
+        event(new UserChangeProfile($penyewa2));
+
+        $penyewa3 = User::create([
             'nama' => 'Penyewa 3',
             'email' => 'penyewa3@example.com',
             'password' => Hash::make('12345678'),
@@ -78,12 +81,12 @@ class UsersSeeder extends Seeder
             'foto_profil' => 'storage/profiles/profil_default.jpg',
             'role' => 'penyewa',
             'verifyIdentitas' => 'Sudah',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
+        event(new UserChangeProfile($penyewa3));
+
         // Admin
-        DB::table('users')->insert([
+        $admin = User::create([
             'nama' => 'admin',
             'email' => 'admin@kalasewa.com',
             'password' => Hash::make('admin1234'),
@@ -91,12 +94,12 @@ class UsersSeeder extends Seeder
             'foto_profil' => 'storage/profiles/profil_default.jpg',
             'role' => 'admin',
             'verifyIdentitas' => 'Sudah',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
 
+        event(new UserChangeProfile($admin));
+
         // Super Admin
-        DB::table('users')->insert([
+        $superAdmin = User::create([
             'nama' => 'Super Admin',
             'email' => 'superadmin@kalasewa.com',
             'password' => Hash::make('superadm'),
@@ -104,8 +107,8 @@ class UsersSeeder extends Seeder
             'foto_profil' => 'storage/profiles/profil_default.jpg',
             'role' => 'super_admin',
             'verifyIdentitas' => 'Sudah',
-            'created_at' => now(),
-            'updated_at' => now(),
         ]);
+
+        event(new UserChangeProfile($superAdmin));
     }
 }

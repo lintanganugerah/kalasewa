@@ -96,3 +96,72 @@
 
     @include('layout.footer')
 @endsection
+
+
+<script type="text/javascript">
+    document.getElementById('pay-button').onclick = function() {
+        $.ajax({
+            url: '{{ route('createSnapTokenDendaRetur', $order->nomor_order) }}',
+            type: 'POST',
+            data: {
+                _token: '{{ csrf_token() }}',
+            },
+            success: function(response) {
+                console.log('Masuk');
+                if (response.success) {
+                    console.log('SUKSES RESPONSE NYA');
+                    snap.pay(response.snap, {
+                        onSuccess: function(result) {
+                            $.ajax({
+                                url: '{{ route('updatePenghasilanDendaRetur', $order->nomor_order) }}',
+                                type: 'POST',
+                                data: {
+                                    _token: '{{ csrf_token() }}',
+                                },
+                                success: function(response) {
+                                    if (response.success) {
+                                        window.location.href = response
+                                            .redirect_url;
+                                    } else {
+                                        alert(
+                                            'Pembayaran berhasil, tetapi gagal memperbarui data toko.'
+                                        );
+                                    }
+                                },
+                                error: function() {
+                                    alert(
+                                        'Terjadi Kesalahan'
+                                    );
+                                }
+                            });
+                        },
+                        // Optional
+                        onPending: function(result) {
+                            /* You may add your own js here, this is just example */
+                            document.getElementById('result-json').innerHTML += JSON.stringify(
+                                result, null, 2);
+                        },
+                        // Optional
+                        onError: function(result) {
+                            /* You may add your own js here, this is just example */
+                            document.getElementById('result-json').innerHTML += JSON.stringify(
+                                result, null, 2);
+                        }
+                    });
+                } else {
+                    if (response.message && response.message == 'terbayar') {
+                        window.location.href = response.redirect_url;
+                    } else {
+                        alert('Terjadi kesalahan, mohon refresh halaman');
+                    }
+                }
+            },
+            error: function() {
+                console.log(response);
+                alert(
+                    'Terjadi Kesahalah. Mohon Refresh halaman anda'
+                );
+            }
+        });
+    };
+</script>

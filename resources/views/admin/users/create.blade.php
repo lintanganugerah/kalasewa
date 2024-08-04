@@ -54,10 +54,7 @@
                 <input type="text" class="form-control @error('no_telp') is-invalid @enderror" id="no_telp"
                     name="no_telp" pattern="[0-9]{10,}" title="Hanya boleh angka dengan minimal 10 digit">
             </div>
-            <div class="form-group">
-                <label for="role" style="margin-right: 16px;">Role :</label>
-                <span class="badge badge-warning badge-pill px-5 py-2">Admin</span>
-            </div>
+            <input type="hidden" name="verifyIdentitas" value="Sudah">
             <button type="submit" class="btn btn-primary btn-block">Tambah User</button>
         </form>
     </div>

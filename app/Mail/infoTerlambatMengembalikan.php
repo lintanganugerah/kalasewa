@@ -21,6 +21,8 @@ class infoTerlambatMengembalikan extends Mailable implements ShouldQueue
     public $tanggalSelesaiMax;
     public $dendaPerHari;
 
+    public $tries = 5;
+
     public function __construct($totalDenda, $dendaPerHari, $jumlahHari, $nomorOrder, $tanggalSelesai, $tanggalSelesaiMax, $namaPenyewa)
     {
         $this->totalDenda = $totalDenda;

@@ -204,7 +204,10 @@
 
             <!-- Tombol Delete -->
             @if (Auth::check())
-                @if (Auth::user()->role === 'super_admin' || Auth::user()->id === $user->id)
+                @if (Auth::user()->role === 'super_admin' && ($user->role == 'super_admin'))
+                    <!-- Super Admin tidak dapat mengklik tombol delete -->
+                    <button type="button" class="btn btn-danger delete-btn btn-block mb-2" disabled>Delete</button>
+                @elseif (Auth::user()->role === 'super_admin' || Auth::user()->id === $user->id)
                     <!-- Super Admin atau user yang bersangkutan -->
                     <button type="button" class="btn btn-danger delete-btn btn-block mb-2"
                             onclick="confirmDelete('{{ $user->id }}')" data-toggle="modal" data-target="#confirmDeleteModal">Delete</button>
@@ -232,6 +235,8 @@
                 </div>
                 <div class="modal-body">
                     Apakah Anda yakin ingin menghapus user ini?
+                    <br>
+                <small style="color:red">Tindakan ini tidak dapat diurungkan!</small>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
@@ -241,21 +246,10 @@
                         <button type="submit" class="btn btn-danger">Delete</button>
                     </form>
                 </div>
-                @endif
             </div>
 
-            @if ($user->role === 'admin')
-            <button type="submit" class="btn btn-primary btn-block mb-2">Update</button>
-            @endif
         </form>
 
-        <!-- Tombol Delete -->
-        <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="d-inline">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="btn btn-danger delete-btn btn-block mb-2" onclick="return confirmDelete()">Delete</button>
-        </form>
-        <a href="{{ route('admin.users.index') }}" class="btn btn-secondary btn-block">Batal</a>
     </div>
 </div>
 

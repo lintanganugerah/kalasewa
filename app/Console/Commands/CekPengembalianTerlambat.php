@@ -42,25 +42,34 @@ class CekPengembalianTerlambat extends Command
 
         if ($orders) {
             foreach ($orders as $order) {
-                $tanggalSelesaiBatasMax = Carbon::parse($order->tanggal_selesai)->addDays()->startOfDay();
-                $tanggalSekarang = Carbon::now()->startOfDay();
-                // dd($tanggalSelesaiBatasMax, $tanggalSekarang);
+                $tanggalSelesaiBatasMax = Carbon::parse($order->tanggal_selesai)->setTimezone('Asia/Jakarta')->addDays()->startOfDay();
+                $tanggalSekarang = Carbon::now()->setTimezone('Asia/Jakarta')->startOfDay();
                 if ($tanggalSekarang->greaterThan($tanggalSelesaiBatasMax)) {
                     $hariKeterlambatan = ((int) round(Carbon::now()->startOfDay()->diffInDays($tanggalSelesaiBatasMax))) * -1;
                     $produk = Produk::where('id', $order->id_produk)->first();
                     $penyewa = User::where('id', $order->id_penyewa)->first();
                     $dendaDitetapkan = $produk->toko->peraturanSewaToko[0]->denda_pasti;
-                    $dendaTotal = $hariKeterlambatan * $dendaDitetapkan; // Denda Berdasarkan Nilai Yang ditetapkan oleh pemilik
+                    $dendaTerlambat = $hariKeterlambatan * $dendaDitetapkan; // Denda Berdasarkan Nilai Yang ditetapkan oleh pemilik
                     $tanggalSelesaiBatasMax = Carbon::parse($tanggalSelesaiBatasMax)->format('d-m-Y');
                     $tanggalSelesai = Carbon::parse($order->tanggal_selesai)->format('d-m-Y');
 
-                    if ($order->denda_keterlambatan) {
-                        $dendaTotal += $order->denda_keterlambatan;
+                    $dendaSebelumnya = $order->denda_keterlambatan ?? 0;
+                    $dendaTerlambatTotal = $dendaSebelumnya + $dendaTerlambat;
+                    $sisaJaminan = $order->jaminan - $dendaTerlambat;
+
+                    if ($sisaJaminan >= 0) {
+                        $totalPenghasilan = $order->total_penghasilan + $dendaTerlambat;
+                    } else {
+                        if ($order->jaminan >= 0) {
+                            $totalPenghasilan = $order->total_penghasilan + $order->jaminan;
+                        } else {
+                            $totalPenghasilan = $order->total_penghasilan;
+                        }
                     }
 
                     // Update denda_keterlambatan dan simpan perubahan
-                    OrderPenyewaan::where('nomor_order', $order->nomor_order)->update(['denda_keterlambatan' => $dendaTotal]);
-                    Mail::to($penyewa->email)->send(new \App\Mail\infoTerlambatMengembalikan($dendaTotal, $dendaDitetapkan, $hariKeterlambatan, $order->nomor_order, $tanggalSelesai, $tanggalSelesaiBatasMax, $penyewa->nama));
+                    OrderPenyewaan::where('nomor_order', $order->nomor_order)->update(['denda_keterlambatan' => $dendaTerlambatTotal, 'jaminan' => $sisaJaminan, 'total_penghasilan' => $totalPenghasilan]);
+                    Mail::to($penyewa->email)->send(new \App\Mail\infoTerlambatMengembalikan($dendaTerlambatTotal, $dendaDitetapkan, $hariKeterlambatan, $order->nomor_order, $tanggalSelesai, $tanggalSelesaiBatasMax, $penyewa->nama));
                     $this->info("Denda keterlambatan ditambahkan untuk pesanan dengan nomor order: {$order->nomor_order}");
                 } elseif ($tanggalSekarang->toDateString() == $tanggalSelesaiBatasMax->toDateString()) {
                     $produk = Produk::where('id', $order->id_produk)->first();

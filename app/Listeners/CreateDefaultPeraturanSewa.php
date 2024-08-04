@@ -5,6 +5,7 @@ namespace App\Listeners;
 use App\Events\PemilikSewaCreated;
 use App\Models\PeraturanSewa;
 use App\Models\Toko;
+use App\Events\UserChangeProfile;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
@@ -31,5 +32,7 @@ class CreateDefaultPeraturanSewa
             'denda_pasti' => 50000,
             'denda_kondisional' => null,
         ]);
+
+        event(new UserChangeProfile($user));
     }
 }

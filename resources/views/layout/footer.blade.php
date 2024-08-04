@@ -1,7 +1,9 @@
 <div class="container">
     <footer>
-        <div class="d-flex flex-column flex-sm-row justify-content-center py-4 my-4">
+        <div class="text-center my-4">
+            <hr>
             <p>Kalasewa © 2024. All rights reserved.</p>
+            <p class="text-secondary" style="margin-top: -15px;">admin@kalasewa.online</p>
         </div>
     </footer>
 </div>
