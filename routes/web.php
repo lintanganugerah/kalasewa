@@ -12,6 +12,7 @@
 |
 */
 
+use App\Http\Controllers\KeuanganPenyewaController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AutentikasiBuyerController;
 use App\Http\Controllers\BuyerController;
@@ -128,6 +129,18 @@ Route::group(['middleware' => 'penyewa'], function () {
     Route::get('/user/history/dibatalkan', [HistoryController::class, 'viewHistoryDibatalkan'])->name('viewHistoryDibatalkan');
     Route::get('/user/history/diretur', [HistoryController::class, 'viewHistoryDiretur'])->name('viewHistoryDiretur');
 
+    //Refund
+    Route::get('/user/penarikan', [KeuanganPenyewaController::class, 'viewPenarikan'])->name('viewPenarikan');
+    Route::post('/refund/set/rekening/act', [KeuanganPenyewaController::class, 'setRekening'])->name('setRekening');
+    Route::post('/refund/tarik/saldo/act', [KeuanganPenyewaController::class, 'tarikSaldo'])->name('tarikSaldo');
+    Route::get('/user/penarikan/ubah', [KeuanganPenyewaController::class, 'viewUbahRekening'])->name('viewUbahRekening');
+    Route::get('/user/penarikan/tarik', [KeuanganPenyewaController::class, 'viewTarikRekening'])->name('viewTarikRekening');
+
+    //Retur
+    Route::post('/order/{orderId}/detail/retur/act', [OrderController::class, 'ajukanRefund'])->name('ajukanRefund');
+    Route::post('/order/{orderId}/detail/refund/act', [OrderController::class, 'returBarangRefund'])->name('returBarangRefund');
+
+
     //Ticketing
     Route::get('/kalasewa/ticketing', [TicketingController::class, 'viewTicketing'])->name('viewTicketing');
     Route::get('/kalasewa/ticketing/create', [TicketingController::class, 'viewNewTicketing'])->name('viewNewTicketing');
@@ -136,6 +149,13 @@ Route::group(['middleware' => 'penyewa'], function () {
 
     // Tes route getTransaction midtrans
     // Route::post('/order/checkout/cekTransaksi', [OrderController::class, 'getTransaction'])->name('tesCekCheckout');
+
+    Route::post('/order/denda/createSnap/{orderId}', [OrderController::class, 'createSnapTokenDenda'])->name('createSnapTokenDenda');
+    Route::post('/order/denda/createSnap/updatePenghasilan/{orderId}', [OrderController::class, 'updatePenghasilan'])->name('updatePenghasilan');
+    Route::post('/order/denda-lain/createSnap/{orderId}', [OrderController::class, 'createSnapTokenDendaLain'])->name('createSnapTokenDendaLain');
+    Route::post('/order/denda-lain/createSnap/updatePenghasilan/{orderId}', [OrderController::class, 'updatePenghasilanDendaLain'])->name('updatePenghasilanDendaLain');
+    Route::post('/order/denda-retur/createSnap/{orderId}', [OrderController::class, 'createSnapTokenDendaRetur'])->name('createSnapTokenDendaRetur');
+    Route::post('/order/denda-retur/createSnap/updatePenghasilan/{orderId}', [OrderController::class, 'updatePenghasilanDendaRetur'])->name('updatePenghasilanDendaRetur');
 });
 
 //Pemilik Sewa SEMUA ROUTE

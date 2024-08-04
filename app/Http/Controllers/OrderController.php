@@ -22,6 +22,7 @@ use App\Models\OrderPenyewaan;
 use App\Models\Review;
 use App\Models\TopSeries;
 use App\Models\Checkout;
+use App\Models\PengajuanDenda;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Database\Eloquent\Collection;
@@ -278,25 +279,232 @@ class OrderController extends Controller
     public function viewPengembalianBarang($orderId)
     {
         $order = OrderPenyewaan::where('nomor_order', $orderId)->first(); // Mengambil satu order berdasarkan nomor order
-        if ($order) {
-            // Ambil nama produk dan foto produk
-            $produk = Produk::findOrFail($order->id_produk);
-            $user = User::findOrFail($order->id_penyewa);
-            $order->harga_katalog = $produk->harga;
-            $order->nama_produk = $produk->nama_produk; // Tambahkan kolom nama_produk ke dalam objek order
-            $order->foto_produk = $produk->fotoProduk->path; // Tambahkan kolom foto_produk ke dalam objek order
-            $order->nama_penyewa = $user->nama;
-            $uangKembali = $order->jaminan + $order->ongkir_default;
 
-            // Pastikan additional adalah array
-            if (!is_array($order->additional)) {
-                $order->additional = json_decode($order->additional, true);
+        $produk = Produk::findOrFail($order->id_produk);
+        $user = User::findOrFail($order->id_penyewa);
+        $nama_produk = $produk->nama_produk;
+        $nama_penyewa = $user->nama;
+        $harga_katalog = $produk->harga;
+
+        if ($order->jaminan < 0) {
+            $uangKembali = $order->ongkir_default;
+            $totalDenda = $order->jaminan;
+        } else {
+            $uangKembali = $order->jaminan + $order->ongkir_default;
+        }
+        $order->save();
+
+        return view('penyewa.transaksi.detailPengembalian', compact('order', 'uangKembali', 'nama_produk', 'nama_penyewa', 'harga_katalog'));
+    }
+
+    public function createSnapTokenDenda($orderId)
+    {
+        $order = OrderPenyewaan::where('nomor_order', $orderId)->first(); // Mengambil satu order berdasarkan nomor order
+        $totalDenda = $order->jaminan;
+
+        // Midtrans
+        // Set your Merchant Server Key
+        \Midtrans\Config::$serverKey = config('midtrans.serverKey');
+        // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
+        \Midtrans\Config::$isProduction = false;
+        // Set sanitization on (default)
+        \Midtrans\Config::$isSanitized = true;
+        // Set 3DS transaction for credit card to true
+        \Midtrans\Config::$is3ds = true;
+
+        $nomorDenda = $order->nomor_order . "_denda";
+
+        try {
+            $params = array(
+                'transaction_details' => array(
+                    'order_id' => $nomorDenda,
+                    'gross_amount' => abs($totalDenda),
+                ),
+                'expiry' => [
+                    'start_time' => Carbon::now()->format('Y-m-d H:i:s T'), // waktu mulai
+                    'unit' => 'minute', // satuan waktu
+                    'duration' => 15 // durasi dalam satuan yang telah ditentukan
+                ],
+            );
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            $order->snapToken = $snapToken;
+            $order->save();
+
+            return response()->json(['success' => true, 'snap' => $snapToken]);
+        } catch (\Exception $e) {
+            Log::error('Midtrans API error: ' . $e->getMessage());
+
+            $redirectUrl = route('viewHistorySedangBerlangsung');
+            if($order->jaminan == 0) {
+                return response()->json(['success' => false, 'message' => 'terbayar', 'redirect_url' => $redirectUrl]);
+            }
+
+            // Check if the error message indicates a duplicate order_id
+            if (strpos($e->getMessage(), 'transaction_details.order_id has already been taken') !== false) {
+                $order->total_penghasilan += abs($order->jaminan);
+                $order->jaminan = 0;
+                $order->save();
+                return response()->json(['success' => false, 'message' => 'terbayar', 'redirect_url' => $redirectUrl]);
+                // return redirect()->route('viewHistorySedangBerlangsung')->render();
+            } else {
+                return response()->json(['success' => false, 'message' => $e->getMessage()]);
             }
         }
+    }
 
-        $order->total_tagihan = $order->total_harga + $order->biaya_cuci + $order->fee_admin + 50000;
+    public function createSnapTokenDendaLain($orderId)
+    {
+        $order = OrderPenyewaan::where('nomor_order', $orderId)->first(); // Mengambil satu order berdasarkan nomor order
+        $totalDenda= PengajuanDenda::where('nomor_order', $orderId)->where('status', 'diproses')->sum('nominal_denda');
 
-        return view('penyewa.transaksi.detailPengembalian', compact('order', 'uangKembali'));
+        // Midtrans
+        // Set your Merchant Server Key
+        \Midtrans\Config::$serverKey = config('midtrans.serverKey');
+        // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
+        \Midtrans\Config::$isProduction = false;
+        // Set sanitization on (default)
+        \Midtrans\Config::$isSanitized = true;
+        // Set 3DS transaction for credit card to true
+        \Midtrans\Config::$is3ds = true;
+
+        $nomorDenda = $order->nomor_order . "_dendaLain";
+
+        try {
+            $params = array(
+                'transaction_details' => array(
+                    'order_id' => $nomorDenda,
+                    'gross_amount' => abs($totalDenda),
+                ),
+                'expiry' => [
+                    'start_time' => Carbon::now()->format('Y-m-d H:i:s T'), // waktu mulai
+                    'unit' => 'minute', // satuan waktu
+                    'duration' => 15 // durasi dalam satuan yang telah ditentukan
+                ],
+            );
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            $order->snapToken = $snapToken;
+            $order->save();
+
+            return response()->json(['success' => true, 'snap' => $snapToken]);
+        } catch (\Exception $e) {
+            Log::error('Midtrans API error: ' . $e->getMessage());
+
+            $redirectUrl = route('viewHistoryTelahKembali');
+
+            // Check if the error message indicates a duplicate order_id
+            if (strpos($e->getMessage(), 'transaction_details.order_id has already been taken') !== false) {
+                $order->total_penghasilan += abs($totalDenda);
+                $dendas = PengajuanDenda::where('nomor_order', $orderId)->where('status', 'diproses')->get();
+                foreach($dendas as $denda) {
+                    $denda->status = "lunas";
+                    $denda->save();
+                }
+                $order->save();
+                return response()->json(['success' => false, 'message' => 'terbayar', 'redirect_url' => $redirectUrl]);
+                // return redirect()->route('viewHistorySedangBerlangsung')->render();
+            } else {
+                return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            }
+        }
+    }
+
+    public function createSnapTokenDendaRetur($orderId)
+    {
+        $order = OrderPenyewaan::where('nomor_order', $orderId)->first(); // Mengambil satu order berdasarkan nomor order
+        $totalDenda = $order->jaminan;
+
+        // Midtrans
+        // Set your Merchant Server Key
+        \Midtrans\Config::$serverKey = config('midtrans.serverKey');
+        // Set to Development/Sandbox Environment (default). Set to true for Production Environment (accept real transaction).
+        \Midtrans\Config::$isProduction = false;
+        // Set sanitization on (default)
+        \Midtrans\Config::$isSanitized = true;
+        // Set 3DS transaction for credit card to true
+        \Midtrans\Config::$is3ds = true;
+
+        $nomorDenda = $order->nomor_order . "_dendaOngkirOnly";
+
+        try {
+            $params = array(
+                'transaction_details' => array(
+                    'order_id' => $nomorDenda,
+                    'gross_amount' => abs($totalDenda),
+                ),
+                'expiry' => [
+                    'start_time' => Carbon::now()->format('Y-m-d H:i:s T'), // waktu mulai
+                    'unit' => 'minute', // satuan waktu
+                    'duration' => 15 // durasi dalam satuan yang telah ditentukan
+                ],
+            );
+            $snapToken = \Midtrans\Snap::getSnapToken($params);
+            $order->snapToken = $snapToken;
+            $order->save();
+
+            return response()->json(['success' => true, 'snap' => $snapToken]);
+        } catch (\Exception $e) {
+            Log::error('Midtrans API error: ' . $e->getMessage());
+
+            $redirectUrl = route('viewDetailPemesanan');
+            if($order->jaminan == 0) {
+                return response()->json(['success' => false, 'message' => 'terbayar', 'redirect_url' => $redirectUrl]);
+            }
+
+            // Check if the error message indicates a duplicate order_id
+            if (strpos($e->getMessage(), 'transaction_details.order_id has already been taken') !== false) {
+                $order->total_penghasilan += abs($order->jaminan);
+                $order->jaminan = 0;
+                $order->save();
+                return response()->json(['success' => false, 'message' => 'terbayar', 'redirect_url' => $redirectUrl]);
+                // return redirect()->route('viewHistorySedangBerlangsung')->render();
+            } else {
+                return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            }
+        }
+    }
+
+    public function updatePenghasilan($orderId)
+    {
+        $order = OrderPenyewaan::where('nomor_order', $orderId)->first(); // Mengambil satu order berdasarkan nomor order
+
+        $order->total_penghasilan += abs($order->jaminan);
+        $order->jaminan = 0;
+        $order->save();
+
+        $redirectUrl = route('viewHistorySedangBerlangsung');
+
+        return response()->json(['success' => true, 'message' => 'success', 'redirect_url' => $redirectUrl]);
+    }
+
+    public function updatePenghasilanDendaLain($orderId)
+    {
+        $order = OrderPenyewaan::where('nomor_order', $orderId)->first(); // Mengambil satu order berdasarkan nomor order
+        $totalDenda= PengajuanDenda::where('nomor_order', $orderId)->where('status', 'diproses')->sum('nominal_denda');
+
+        $order->total_penghasilan += abs($totalDenda);
+        $dendas = PengajuanDenda::where('nomor_order', $orderId)->where('status', 'diproses')->get();
+        foreach($dendas as $denda) {
+            $denda->status = "lunas";
+            $denda->save();
+        }
+        $order->save();
+
+        $redirectUrl = route('viewHistoryTelahKembali');
+
+        return response()->json(['success' => true, 'message' => 'success', 'redirect_url' => $redirectUrl]);
+    }
+
+    public function updatePenghasilanDendaRetur($orderId)
+    {
+        $order = OrderPenyewaan::where('nomor_order', $orderId)->first(); // Mengambil satu order berdasarkan nomor order
+
+        $order->total_penghasilan += abs($order->jaminan);
+        $order->jaminan = 0;
+        $order->save();
+
+        $redirectUrl = route('viewDetailPemesanan');
+
+        return response()->json(['success' => true, 'message' => 'success', 'redirect_url' => $redirectUrl]);
     }
 
     public function returBarang(Request $request, $orderId)
@@ -367,6 +575,9 @@ class OrderController extends Controller
     public function viewPenyewaanSelesai($orderId)
     {
         $order = OrderPenyewaan::where('nomor_order', $orderId)->first(); // Mengambil satu order berdasarkan nomor order
+        $dendas = PengajuanDenda::where('nomor_order',$orderId)->where('status', 'diproses')->sum('nominal_denda');
+        $dendalunas = PengajuanDenda::where('nomor_order',$orderId)->where('status', 'lunas')->sum('nominal_denda');
+
         if ($order) {
             // Ambil nama produk dan foto produk
             $produk = Produk::findOrFail($order->id_produk);
@@ -383,9 +594,15 @@ class OrderController extends Controller
             }
         }
 
+        if ($order->jaminan < 0) {
+            $uangKembali = $order->ongkir_default;
+        } else {
+            $uangKembali = $order->jaminan + $order->ongkir_default;
+        }
+
         $order->total_tagihan = $order->total_harga + $order->biaya_cuci + $order->fee_admin + 50000;
 
-        return view('penyewa.transaksi.detailSelesai', compact('order', 'uangKembali'));
+        return view('penyewa.transaksi.detailSelesai', compact('order', 'uangKembali', 'dendas', 'dendalunas'));
     }
 
     public function viewDibatalkanPemilikSewa($orderId)
@@ -413,6 +630,42 @@ class OrderController extends Controller
 
         return view('penyewa.transaksi.dibatalkanPemilikSewa', compact('order', 'uangKembali'));
     }
+
+    public function ajukanRefund($orderId)
+    {
+        $order = OrderPenyewaan::findOrFail($orderId);
+        // Save Retur
+        $order->status = "Retur";
+        $order->save();
+
+        return redirect()->route('viewHistoryDiretur')->with('success', 'Berhasil mengajukan Retur');
+    }
+
+    public function returBarangRefund(Request $request, $orderId)
+    {
+        $order = OrderPenyewaan::findOrFail($orderId);
+
+        $validator = Validator::make($request->all(), [
+            'bukti_resi_penyewa' => 'required|max:5120',
+            'nomor_resi' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->with('error');
+        }
+
+        // Save Retur
+        $photoPath = $request->file('bukti_resi_penyewa')->store('public/bukti_foto');
+        $photoPath = Str::replaceFirst('public/', 'storage/', $photoPath);
+        $order->nomor_resi = $request->nomor_resi;
+        $order->tanggal_pengembalian = today();
+        $order->bukti_resi_pengembalian = $photoPath;
+        $order->status = "Retur Dalam Pengiriman";
+        $order->save();
+
+        return redirect()->route('viewHistoryDiretur')->with('success', 'Nomor Resi Pengembalian Berhasil di Update');
+    }
+
 
 
 }

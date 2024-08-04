@@ -60,6 +60,11 @@ class OrderPenyewaan extends Model
         return $this->belongsTo(User::class, 'id_penyewa', 'id');
     }
 
+    public function toko()
+    {
+        return $this->belongsTo(Toko::class, 'id_toko', 'id');
+    }
+
     public function id_produk_order()
     {
         return $this->belongsTo(Produk::class, 'id_produk', 'id')->withTrashed();
@@ -112,5 +117,11 @@ class OrderPenyewaan extends Model
     public function denda()
     {
         return $this->hasMany(PengajuanDenda::class, 'nomor_order');
+    }
+
+    public function cekDendaDiproses()
+    {
+        $denda = PengajuanDenda::where('nomor_order', $this->nomor_order)->where('status', 'diproses')->first() ?? false;
+        return $denda;
     }
 }

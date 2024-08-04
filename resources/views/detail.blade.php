@@ -48,27 +48,23 @@
                             <div id="carouselExampleIndicators" class="carousel slide">
                                 <div class="carousel-indicators">
                                     @foreach ($fotoproduk->where('id_produk', $produk->id) as $index => $foto)
-                                        <button type="button" data-bs-target="#carouselExampleIndicators"
-                                            data-bs-slide-to="{{ $index }}" class="{{ $index == 0 ? 'active' : '' }}"
-                                            aria-current="{{ $index == 0 ? 'true' : 'false' }}"
+                                        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ $index }}"
+                                            class="{{ $index == 0 ? 'active' : '' }}" aria-current="{{ $index == 0 ? 'true' : 'false' }}"
                                             aria-label="Slide {{ $index + 1 }}"></button>
                                     @endforeach
                                 </div>
                                 <div class="carousel-inner">
                                     @foreach ($fotoproduk->where('id_produk', $produk->id) as $index => $foto)
                                         <div class="carousel-item-detail carousel-item {{ $index == 0 ? 'active' : '' }}">
-                                            <img src="{{ asset($foto->path) }}" class="d-block w-100"
-                                                alt="{{ $produk->nama_produk }}">
+                                            <img src="{{ asset($foto->path) }}" class="d-block w-100" alt="{{ $produk->nama_produk }}">
                                         </div>
                                     @endforeach
                                 </div>
-                                <button class="carousel-control-prev" type="button"
-                                    data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+                                <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
                                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                                     <span class="visually-hidden">Previous</span>
                                 </button>
-                                <button class="carousel-control-next" type="button"
-                                    data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+                                <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
                                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                                     <span class="visually-hidden">Next</span>
                                 </button>
@@ -79,10 +75,8 @@
                                 <div class="d-flex flex-wrap">
                                     @foreach ($fotoproduk->where('id_produk', $produk->id) as $index => $foto)
                                         <div class="p-1">
-                                            <div class="thumbnail-container" data-bs-target="#carouselExampleIndicators"
-                                                data-bs-slide-to="{{ $index }}">
-                                                <img src="{{ asset($foto->path) }}" class="img-thumbnail thumbnail-image"
-                                                    alt="{{ $produk->nama_produk }}">
+                                            <div class="thumbnail-container" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ $index }}">
+                                                <img src="{{ asset($foto->path) }}" class="img-thumbnail thumbnail-image" alt="{{ $produk->nama_produk }}">
                                             </div>
                                         </div>
                                     @endforeach
@@ -177,10 +171,8 @@
                             <div class="container">
                                 <div class="card-body text-center">
                                     @if ($produk->toko && $produk->toko->user)
-                                        <img class="avatar-img" src="{{ asset($produk->toko->user->foto_profil) }}"
-                                            alt="User" style="border-radius: 30px; width: 60px;" />
-                                        <a href="{{ route('viewToko', ['id' => $produk->toko->id]) }}"
-                                            class="no-underline">
+                                        <img class="avatar-img" src="{{ asset($produk->toko->user->foto_profil) }}" alt="User" style="border-radius: 30px; width: 60px;" />
+                                        <a href="{{ route('viewToko', ['id' => $produk->toko->id]) }}" class="no-underline">
                                             <h5 class="card-title text-center">
                                                 <strong>{{ $produk->toko->nama_toko }}</strong>
                                             </h5>
@@ -195,8 +187,7 @@
                                             @endif
                                         </i>
                                         @if ($averageTokoRating >= 4)
-                                            <span class="badge text-white"
-                                                style="background: linear-gradient(to right, #EAD946, #D99C00);">Terpercaya</span>
+                                            <span class="badge text-white" style="background: linear-gradient(to right, #EAD946, #D99C00);">Terpercaya</span>
                                         @elseif ($averageTokoRating > 0 && $averageTokoRating < 2.5)
                                             <span class="badge text-bg-danger">
                                                 Bermasalah</span>
@@ -210,52 +201,63 @@
                                     <p class="card-text text-start mt-2">{!! nl2br(e($produk->toko->bio_toko)) !!}</p>
                                     <div class="pilihan-user mt-2">
                                         @if (auth()->check() && auth()->user()->role === 'penyewa')
-                                            <form action="{{ route('viewOrder', ['id' => $produk->id]) }}">
-                                                @csrf
-                                                @if (
-                                                    $produk->grade == 'Grade 3' &&
-                                                        auth()->user()->total_review_penyewa() >= 3 &&
-                                                        auth()->user()->avg_nilai_penyewa() >= 4)
-                                                    <button type="submit" class="btn btn-danger w-100">Rental
-                                                        Produk</button>
-                                                @elseif ($produk->grade == 'Grade 2' && auth()->user()->total_review_penyewa() > 0)
-                                                    <button type="submit" class="btn btn-danger w-100">Rental
-                                                        Produk</button>
-                                                @elseif ($produk->grade == 'Grade 1')
-                                                    <button type="submit" class="btn btn-danger w-100">Rental
-                                                        Produk</button>
-                                                @else
+                                            <div class="col">
+                                                @if ($produk->status_produk == 'tidak ready')
                                                     <button type="submit" class="btn btn-danger w-100" disabled>Rental
                                                         Produk</button>
-                                                    <span>Mengapa saya tidak bisa menyewa produk ini<a
-                                                            data-bs-toggle="modal" data-bs-target="#infoModalGrade"><i
-                                                                class="fa-solid fa-regular fa-circle-info ms-2"></i></a></span>
+                                                    <p>Produk ini sedang dirental!</p>
+                                                @else
+                                                    <form action="{{ route('viewOrder', ['id' => $produk->id]) }}">
+                                                        @csrf
+                                                        @if ($produk->grade == 'Grade 3' && auth()->user()->total_review_penyewa() >= 3 && auth()->user()->avg_nilai_penyewa() >= 4)
+                                                            <button type="submit" class="btn btn-danger w-100">Rental
+                                                                Produk</button>
+                                                        @elseif ($produk->grade == 'Grade 2' && auth()->user()->total_review_penyewa() > 0)
+                                                            <button type="submit" class="btn btn-danger w-100">Rental
+                                                                Produk</button>
+                                                        @elseif ($produk->grade == 'Grade 1')
+                                                            <button type="submit" class="btn btn-danger w-100">Rental
+                                                                Produk</button>
+                                                        @else
+                                                            <button type="submit" class="btn btn-danger w-100" disabled>Rental
+                                                                Produk</button>
+                                                            <span>Mengapa saya tidak bisa menyewa produk ini<a data-bs-toggle="modal" data-bs-target="#infoModalGrade"><i
+                                                                        class="fa-solid fa-regular fa-circle-info ms-2"></i></a></span>
+                                                        @endif
+                                                    </form>
                                                 @endif
-                                            </form>
-                                            @if ($produk->isInWishlist())
-                                                <form action="{{ route('wishlist.remove', ['id' => $produk->id]) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-danger w-100">Hapus
-                                                        Wishlist</button>
-                                                </form>
-                                            @else
-                                                <form action="{{ route('wishlist.add', ['id' => $produk->id]) }}"
-                                                    method="POST">
-                                                    @csrf
-                                                    <button type="submit" class="btn btn-outline-danger w-100">Tambah
-                                                        Wishlist</button>
-                                                </form>
-                                            @endif
+                                            </div>
+                                            <div class="col">
+                                                @if ($produk->isInWishlist())
+                                                    <form action="{{ route('wishlist.remove', ['id' => $produk->id]) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-danger w-100">Hapus
+                                                            Wishlist</button>
+                                                    </form>
+                                                @else
+                                                    <form action="{{ route('wishlist.add', ['id' => $produk->id]) }}" method="POST">
+                                                        @csrf
+                                                        <button type="submit" class="btn btn-outline-danger w-100">Tambah
+                                                            Wishlist</button>
+                                                    </form>
+                                                @endif
+                                            </div>
+                                            <div class="col">
+                                                <a href="{{ url('/chat' . '/' . $produk->toko->id_user) }}" target="_blank" class="no-underline"><button type="button"
+                                                        class="btn btn-outline-success w-100">Chat Toko</button></a>
+                                            </div>
                                         @else
                                             <div class="col my-2">
                                                 <button type="button" class="btn btn-danger w-100" disabled>Rental
                                                     Produk</button>
                                             </div>
                                             <div class="col">
-                                                <button type="button" class="btn btn-outline-danger w-100"
-                                                    disabled>Tambahkan
+                                                <button type="button" class="btn btn-outline-danger w-100" disabled>Tambahkan
                                                     Wishlist</button>
+                                            </div>
+                                            <div class="col">
+                                                <button type="button" class="btn btn-outline-success mt-2 w-100" disabled>Chat
+                                                    Toko</button>
                                             </div>
                                         @endif
                                     </div>
@@ -293,8 +295,7 @@
                                             @endfor
                                         </td>
                                         <td class="text-end">
-                                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
-                                                data-bs-target="#exampleModal-{{ $loop->index }}">
+                                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exampleModal-{{ $loop->index }}">
                                                 Lihat Foto Review
                                             </button>
                                         </td>
@@ -329,17 +330,14 @@
                     @foreach ($produkLain as $prod)
                         <div class="col-2" style="margin-right: 43px;">
                             <a href="{{ route('viewDetail', ['id' => $prod->id]) }}" class="card-link">
-                                <div class="card custom-card text-bg-dark border-secondary"
-                                    style="width: 250px; height: 100%;">
+                                <div class="card custom-card text-bg-dark border-secondary" style="width: 250px; height: 100%;">
                                     @foreach ($fotoProdukLain->where('id_produk', $prod->id)->take(1) as $foto)
-                                        <img src="{{ asset($foto->path) }}" class="card-img-top img-fluid h-50"
-                                            alt="fotoproduk" style="object-fit: cover;">
+                                        <img src="{{ asset($foto->path) }}" class="card-img-top img-fluid h-50" alt="fotoproduk" style="object-fit: cover;">
                                     @endforeach
                                     <div class="card-body">
                                         <div class="d-flex">
                                             <div class="avatar avatar-card me-2">
-                                                <img class="avatar-img" src="{{ asset($prod->toko->user->foto_profil) }}"
-                                                    alt="User" style="border-radius: 30px;" />
+                                                <img class="avatar-img" src="{{ asset($prod->toko->user->foto_profil) }}" alt="User" style="border-radius: 30px;" />
                                             </div>
                                             <div class="fs-08-rem user-card">
                                                 @foreach ($toko->where('id', $prod->id_toko)->take(1) as $tk)
@@ -352,15 +350,87 @@
                                         <h5 class="card-title" style="margin-bottom: 2px;">{{ $prod->nama_produk }}</h5>
                                         <p class="card-text" style="color: orange;">
                                             <strong>Rp{{ number_format($prod->harga) }}
-                                                / 3 Hari</strong></p>
+                                                / 3 Hari</strong>
+                                        </p>
                                         <p class="card-text">
                                             <img src="{{ asset('storage/icon/box-seam.png') }}" alt="box-seam"
                                                 style="width: 1em; height: 1em; vertical-align: middle; fill: white;">
                                             {{ $prod->brand }}
                                         </p>
                                         <p class="card-text">
-                                            <img src="{{ asset('storage/icon/tv.png') }}" alt="tv"
+                                            <img src="{{ asset('storage/icon/tv.png') }}" alt="tv" style="width: 1em; height: 1em; vertical-align: middle; fill: white;">
+                                            {{ $prod->seriesDetail->series }}
+                                        </p>
+                                        <button type="button" class="btn btn-sm btn-outline-light" disabled>
+                                            {{ $prod->ukuran_produk }}
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-light" disabled>
+                                            {{ $prod->gender }}
+                                        </button>
+                                        @if ($prod->additional)
+                                            <button type="button" class="btn btn-sm btn-outline-light" disabled>
+                                                +Additional
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid mt-5">
+            <div class="container">
+                <div class="row align-items-end">
+                    <div class="col-6">
+                        <h1><strong>{{ $produk->SeriesDetail->series }}</strong></h1>
+                    </div>
+                    <div class="col-6 text-end">
+                        <a href="{{ route('viewPencarian', ['id_series' => $produk->id_series]) }}" class="no-underline">
+                            <button class="btn btn-outline-danger mb-2">Lihat Semua</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container-fluid">
+            <div class="container">
+                <div class="row-kartu d-flex mb-3">
+                    @foreach ($produkSeriesSama as $prod)
+                        <div class="col-2" style="margin-right: 43px;">
+                            <a href="{{ route('viewDetail', ['id' => $prod->id]) }}" class="card-link">
+                                <div class="card custom-card text-bg-dark border-secondary" style="width: 250px; height: 100%;">
+                                    @foreach ($fotoProdukLain->where('id_produk', $prod->id)->take(1) as $foto)
+                                        <img src="{{ asset($foto->path) }}" class="card-img-top img-fluid h-50" alt="fotoproduk" style="object-fit: cover;">
+                                    @endforeach
+                                    <div class="card-body">
+                                        <div class="d-flex">
+                                            <div class="avatar avatar-card me-2">
+                                                <img class="avatar-img" src="{{ asset($prod->toko->user->foto_profil) }}" alt="User" style="border-radius: 30px;" />
+                                            </div>
+                                            <div class="fs-08-rem user-card">
+                                                @foreach ($toko->where('id', $prod->id_toko)->take(1) as $tk)
+                                                    <div class="fw-bold text-truncate">
+                                                        {{ $tk->nama_toko }}
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        <h5 class="card-title" style="margin-bottom: 2px;">{{ $prod->nama_produk }}</h5>
+                                        <p class="card-text" style="color: orange;">
+                                            <strong>Rp{{ number_format($prod->harga) }}
+                                                / 3 Hari</strong>
+                                        </p>
+                                        <p class="card-text">
+                                            <img src="{{ asset('storage/icon/box-seam.png') }}" alt="box-seam"
                                                 style="width: 1em; height: 1em; vertical-align: middle; fill: white;">
+                                            {{ $prod->brand }}
+                                        </p>
+                                        <p class="card-text">
+                                            <img src="{{ asset('storage/icon/tv.png') }}" alt="tv" style="width: 1em; height: 1em; vertical-align: middle; fill: white;">
                                             {{ $prod->seriesDetail->series }}
                                         </p>
                                         <button type="button" class="btn btn-sm btn-outline-light" disabled>
@@ -387,22 +457,19 @@
 
         @foreach ($review as $index => $rev)
             <!-- Modal -->
-            <div class="modal fade" id="exampleModal-{{ $index }}" tabindex="-1"
-                aria-labelledby="exampleModalLabel-{{ $index }}" aria-hidden="true">
+            <div class="modal fade" id="exampleModal-{{ $index }}" tabindex="-1" aria-labelledby="exampleModalLabel-{{ $index }}" aria-hidden="true">
                 <div class="modal-dialog">
                     <div class="modal-content text-center">
                         <div class="modal-header">
                             <h1 class="modal-title fs-5" id="exampleModalLabel-{{ $index }}">Review
                                 {{ $rev->user->nama }}
                             </h1>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
                             @if ($rev->foto)
                                 @foreach (json_decode($rev->foto) as $foto)
-                                    <img class="rounded img-fluid mb-3" src="{{ asset($foto) }}"
-                                        alt="Review {{ $rev->user->nama }}">
+                                    <img class="rounded img-fluid mb-3" src="{{ asset($foto) }}" alt="Review {{ $rev->user->nama }}">
                                 @endforeach
                             @else
                                 <p> Tidak ada Foto Review </p>
@@ -417,8 +484,7 @@
         @endforeach
 
         <!-- Modal Grade -->
-        <div class="modal fade" id="infoModalGrade" tabindex="-1" aria-labelledby="infoModalGradeLabel"
-            aria-hidden="true">
+        <div class="modal fade" id="infoModalGrade" tabindex="-1" aria-labelledby="infoModalGradeLabel" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
                 <div class="modal-content">
                     <div class="modal-header">

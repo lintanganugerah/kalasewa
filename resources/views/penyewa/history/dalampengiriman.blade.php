@@ -44,57 +44,58 @@
                         <ul class="nav nav-tabs card-header-tabs" id="historyTab" role="tablist">
                             <li class="nav-item">
                                 <a class="nav-link text-secondary"
-                                    href="{{route('viewHistoryMenungguDiproses')}}">Menunggu Konfirmasi
+                                    href="{{ route('viewHistoryMenungguDiproses') }}">Menunggu Konfirmasi
                                     @if ($countMenungguDiproses)
                                     <span class="position-top badge rounded-pill bg-danger">
-                                        {{$countMenungguDiproses}}
+                                        {{ $countMenungguDiproses }}
                                     </span>
                                     @endif
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link active" aria-current="page"
-                                    href="{{route('viewHistoryDalamPengiriman')}}">Dalam
+                                    href="{{ route('viewHistoryDalamPengiriman') }}">Dalam
                                     Pengiriman @if ($countDalamPengiriman)
                                     <span class="position-top badge rounded-pill bg-danger">
-                                        {{$countDalamPengiriman}}
+                                        {{ $countDalamPengiriman }}
                                     </span>
                                     @endif
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-secondary"
-                                    href="{{route('viewHistorySedangBerlangsung')}}">Sedang
+                                    href="{{ route('viewHistorySedangBerlangsung') }}">Sedang
                                     Digunakan @if ($countSedangBerlangsung)
                                     <span class="position-top badge rounded-pill bg-danger">
-                                        {{$countSedangBerlangsung}}
+                                        {{ $countSedangBerlangsung }}
                                     </span>
                                     @endif
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-secondary" href="{{route('viewHistoryTelahKembali')}}">Dikirim
+                                <a class="nav-link text-secondary" href="{{ route('viewHistoryTelahKembali') }}">Dikirim
                                     Kembali @if ($countTelahKembali)
                                     <span class="position-top badge rounded-pill bg-danger">
-                                        {{$countTelahKembali}}
+                                        {{ $countTelahKembali }}
                                     </span>
                                     @endif
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-secondary" href="{{route('viewHistoryDibatalkan')}}">Dibatalkan
+                                <a class="nav-link text-secondary"
+                                    href="{{ route('viewHistoryDibatalkan') }}">Dibatalkan
                                     @if ($countDibatalkan)
                                     <span class="position-top badge rounded-pill bg-danger">
-                                        {{$countDibatalkan}}
+                                        {{ $countDibatalkan }}
                                     </span>
                                     @endif
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-secondary" href="{{route('viewHistoryDiretur')}}">Diretur
+                                <a class="nav-link text-secondary" href="{{ route('viewHistoryDiretur') }}">Diretur
                                     @if ($countDiretur)
                                     <span class="position-top badge rounded-pill bg-danger">
-                                        {{$countDiretur}}
+                                        {{ $countDiretur }}
                                     </span>
                                     @endif
 
@@ -102,17 +103,14 @@
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-secondary"
-                                    href="{{route('viewHistoryPenyewaanSelesai')}}">Penyewaan
+                                    href="{{ route('viewHistoryPenyewaanSelesai') }}">Penyewaan
                                     Selesai</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-secondary" href="{{route('viewHistory')}}">Semua</a>
                             </li>
                         </ul>
                     </div>
                     <div class="card-body">
                         <div class="tab-content">
-                            @if($orders)
+                            @if ($orders)
                             <table class="table w-100" id="table-history">
                                 <thead>
                                     <tr>
@@ -131,7 +129,7 @@
                                 </thead>
                                 <tbody>
                                     @foreach ($orders as $order)
-                                    @if ($order->status == "Dalam Pengiriman")
+                                    @if ($order->status == 'Dalam Pengiriman')
                                     <tr>
                                         <td data-title="#" class="text-center">
                                             {{ $loop->iteration }}
@@ -169,32 +167,12 @@
                                         @endif
                                         <td>{{ $order->status }}</td>
                                         <td>
-                                            @if ($order->status == "Pending")
-                                            <a class="btn btn-danger w-100 mb-2"
-                                                href="{{ route('viewDetailPemesanan', ['orderId' => $order->nomor_order]) }}">Detail
-                                                Order</a>
-                                            @elseif ($order->status == "Dalam Pengiriman")
-                                            <a class="btn btn-danger w-100 mb-2"
-                                                href="{{ route('viewDetailPemesanan', ['orderId' => $order->nomor_order]) }}">Detail
-                                                Order</a>
-                                            @elseif ($order->status == "Sedang Berlangsung")
-                                            <a class="btn btn-danger w-100 mb-2"
-                                                href="{{ route('viewPengembalianBarang', ['orderId' => $order->nomor_order]) }}">Detail
-                                                Order</a>
-                                            @elseif (
-                                            $order->status == "Telah Kembali" or $order->status == "Penyewaan
-                                            Selesai"
-                                            )
-                                            <a class="btn btn-danger w-100 mb-2"
-                                                href="{{ route('viewPenyewaanSelesai', ['orderId' => $order->nomor_order]) }}">Detail
-                                                Order</a>
-                                            @elseif ($order->status == "Dibatalkan Pemilik Sewa")
-                                            <a class="btn btn-danger w-100 mb-2"
-                                                href="{{ route('viewDibatalkanPemilikSewa', ['orderId' => $order->nomor_order]) }}">Detail
-                                                Order</a>
-                                            @else
-                                            <button class="btn btn-danger w-100 mb-2" disabled>Detail Order</button>
-                                            @endif
+                                            <a class="btn btn-danger w-100"
+                                                href="{{ route('viewDetailPemesanan', ['orderId' => $order->nomor_order]) }}">Detail</a>
+
+                                            <a href="{{ url('/chat' . '/' . $order->toko->id_user) }}" target="_blank"
+                                                class="no-underline"><button type="button"
+                                                    class="btn btn-outline-success w-100 mt-1">Chat Toko</button></a>
                                         </td>
                                     </tr>
 
@@ -212,7 +190,7 @@
                                                         aria-label="Close"></button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    <p>Nomor Resi: <strong>{{$order->nomor_resi}}</strong></p>
+                                                    <p>Nomor Resi: <strong>{{ $order->nomor_resi }}</strong></p>
                                                     <p>Ongkos Kirim:
                                                         <strong>Rp{{ number_format($order->ongkir_pengiriman, 0, '', '.') }}</strong>
                                                     </p>

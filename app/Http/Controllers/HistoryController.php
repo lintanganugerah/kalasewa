@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SaldoUser;
+use App\Models\TujuanRekening;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -32,12 +34,14 @@ class HistoryController extends Controller
         $orders = OrderPenyewaan::where('id_penyewa', $user->id)->orderBy("updated_at", "desc")->get(); // Retrieve orders based on id_penyewa
 
         // Menghitung Status
-        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')->count();
+        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')
+        ->orWhere('status', 'Pending')
+        ->count();
         $countDalamPengiriman = OrderPenyewaan::where('status', 'Dalam Pengiriman')->count();
         $countSedangBerlangsung = OrderPenyewaan::where('status', 'Sedang Berlangsung')->count();
         $countTelahKembali = OrderPenyewaan::where('status', 'Telah Kembali')->count();
         $countDibatalkan = OrderPenyewaan::where('status', 'Dibatalkan Pemilik Sewa')
-            ->orWhere('status', 'Dibatalkan Penyewa')
+            ->orWhere('status', 'Refund di Ajukan')
             ->count();
         $countDiretur = OrderPenyewaan::where('status', 'Retur')
             ->orWhere('status', 'Retur Dikonfirmasi')
@@ -67,12 +71,14 @@ class HistoryController extends Controller
         $orders = OrderPenyewaan::where('id_penyewa', $user->id)->orderBy("updated_at", "desc")->get(); // Mengambil order berdasarkan id_penyewa
 
         // Menghitung Status
-        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')->count();
+        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')
+        ->orWhere('status', 'Pending')
+        ->count();
         $countDalamPengiriman = OrderPenyewaan::where('status', 'Dalam Pengiriman')->count();
         $countSedangBerlangsung = OrderPenyewaan::where('status', 'Sedang Berlangsung')->count();
         $countTelahKembali = OrderPenyewaan::where('status', 'Telah Kembali')->count();
         $countDibatalkan = OrderPenyewaan::where('status', 'Dibatalkan Pemilik Sewa')
-            ->orWhere('status', 'Dibatalkan Penyewa')
+            ->orWhere('status', 'Refund di Ajukan')
             ->count();
         $countDiretur = OrderPenyewaan::where('status', 'Retur')
             ->orWhere('status', 'Retur Dikonfirmasi')
@@ -102,12 +108,14 @@ class HistoryController extends Controller
         $orders = OrderPenyewaan::where('id_penyewa', $user->id)->orderBy("updated_at", "desc")->get(); // Mengambil order berdasarkan id_penyewa
 
         // Menghitung Status
-        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')->count();
+        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')
+        ->orWhere('status', 'Pending')
+        ->count();
         $countDalamPengiriman = OrderPenyewaan::where('status', 'Dalam Pengiriman')->count();
         $countSedangBerlangsung = OrderPenyewaan::where('status', 'Sedang Berlangsung')->count();
         $countTelahKembali = OrderPenyewaan::where('status', 'Telah Kembali')->count();
         $countDibatalkan = OrderPenyewaan::where('status', 'Dibatalkan Pemilik Sewa')
-            ->orWhere('status', 'Dibatalkan Penyewa')
+            ->orWhere('status', 'Refund di Ajukan')
             ->count();
         $countDiretur = OrderPenyewaan::where('status', 'Retur')
             ->orWhere('status', 'Retur Dikonfirmasi')
@@ -137,12 +145,14 @@ class HistoryController extends Controller
         $orders = OrderPenyewaan::where('id_penyewa', $user->id)->orderBy("updated_at", "desc")->get(); // Mengambil order berdasarkan id_penyewa
 
         // Menghitung Status
-        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')->count();
+        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')
+        ->orWhere('status', 'Pending')
+        ->count();
         $countDalamPengiriman = OrderPenyewaan::where('status', 'Dalam Pengiriman')->count();
         $countSedangBerlangsung = OrderPenyewaan::where('status', 'Sedang Berlangsung')->count();
         $countTelahKembali = OrderPenyewaan::where('status', 'Telah Kembali')->count();
         $countDibatalkan = OrderPenyewaan::where('status', 'Dibatalkan Pemilik Sewa')
-            ->orWhere('status', 'Dibatalkan Penyewa')
+            ->orWhere('status', 'Refund di Ajukan')
             ->count();
         $countDiretur = OrderPenyewaan::where('status', 'Retur')
             ->orWhere('status', 'Retur Dikonfirmasi')
@@ -172,12 +182,14 @@ class HistoryController extends Controller
         $orders = OrderPenyewaan::where('id_penyewa', $user->id)->orderBy("updated_at", "desc")->get(); // Mengambil order berdasarkan id_penyewa
 
         // Menghitung Status
-        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')->count();
+        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')
+        ->orWhere('status', 'Pending')
+        ->count();
         $countDalamPengiriman = OrderPenyewaan::where('status', 'Dalam Pengiriman')->count();
         $countSedangBerlangsung = OrderPenyewaan::where('status', 'Sedang Berlangsung')->count();
         $countTelahKembali = OrderPenyewaan::where('status', 'Telah Kembali')->count();
         $countDibatalkan = OrderPenyewaan::where('status', 'Dibatalkan Pemilik Sewa')
-            ->orWhere('status', 'Dibatalkan Penyewa')
+            ->orWhere('status', 'Refund di Ajukan')
             ->count();
         $countDiretur = OrderPenyewaan::where('status', 'Retur')
             ->orWhere('status', 'Retur Dikonfirmasi')
@@ -207,12 +219,14 @@ class HistoryController extends Controller
         $orders = OrderPenyewaan::where('id_penyewa', $user->id)->orderBy("updated_at", "desc")->get(); // Mengambil order berdasarkan id_penyewa
 
         // Menghitung Status
-        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')->count();
+        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')
+        ->orWhere('status', 'Pending')
+        ->count();
         $countDalamPengiriman = OrderPenyewaan::where('status', 'Dalam Pengiriman')->count();
         $countSedangBerlangsung = OrderPenyewaan::where('status', 'Sedang Berlangsung')->count();
         $countTelahKembali = OrderPenyewaan::where('status', 'Telah Kembali')->count();
         $countDibatalkan = OrderPenyewaan::where('status', 'Dibatalkan Pemilik Sewa')
-            ->orWhere('status', 'Dibatalkan Penyewa')
+            ->orWhere('status', 'Refund di Ajukan')
             ->count();
         $countDiretur = OrderPenyewaan::where('status', 'Retur')
             ->orWhere('status', 'Retur Dikonfirmasi')
@@ -238,18 +252,22 @@ class HistoryController extends Controller
 
     public function viewHistoryDibatalkan()
     {
+        $rekenings = TujuanRekening::all();
+        $saldos = SaldoUser::where('id_user', Auth()->user()->id)->first();
         $user = Auth::user(); // Mendapatkan user yang sedang login
         $orders = OrderPenyewaan::where('status', 'Dibatalkan Pemilik Sewa')
-            ->orWhere('status', 'Dibatalkan Penyewa')
+            ->orWhere('status', 'Refund di Ajukan')
             ->get();
 
         // Menghitung Status
-        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')->count();
+        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')
+        ->orWhere('status', 'Pending')
+        ->count();
         $countDalamPengiriman = OrderPenyewaan::where('status', 'Dalam Pengiriman')->count();
         $countSedangBerlangsung = OrderPenyewaan::where('status', 'Sedang Berlangsung')->count();
         $countTelahKembali = OrderPenyewaan::where('status', 'Telah Kembali')->count();
         $countDibatalkan = OrderPenyewaan::where('status', 'Dibatalkan Pemilik Sewa')
-            ->orWhere('status', 'Dibatalkan Penyewa')
+            ->orWhere('status', 'Refund di Ajukan')
             ->count();
         $countDiretur = OrderPenyewaan::where('status', 'Retur')
             ->orWhere('status', 'Retur Dikonfirmasi')
@@ -268,9 +286,8 @@ class HistoryController extends Controller
                 }
             }
         }
-
         // Pastikan additional adalah string sebelum memanggil json_decode
-        return view('penyewa.history.dibatalkan', compact('user', 'orders', 'countMenungguDiproses', 'countDalamPengiriman', 'countSedangBerlangsung', 'countTelahKembali', 'countDibatalkan', 'countDiretur'));
+        return view('penyewa.history.dibatalkan', compact('user', 'orders', 'countMenungguDiproses', 'countDalamPengiriman', 'countSedangBerlangsung', 'countTelahKembali', 'countDibatalkan', 'countDiretur', 'rekenings', 'saldos'));
     }
 
     public function viewHistoryDiretur()
@@ -279,12 +296,14 @@ class HistoryController extends Controller
         $orders = OrderPenyewaan::where('id_penyewa', $user->id)->orderBy("updated_at", "desc")->get(); // Mengambil order berdasarkan id_penyewa
 
         // Menghitung Status
-        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')->count();
+        $countMenungguDiproses = OrderPenyewaan::where('status', 'Menunggu di Proses')
+        ->orWhere('status', 'Pending')
+        ->count();
         $countDalamPengiriman = OrderPenyewaan::where('status', 'Dalam Pengiriman')->count();
         $countSedangBerlangsung = OrderPenyewaan::where('status', 'Sedang Berlangsung')->count();
         $countTelahKembali = OrderPenyewaan::where('status', 'Telah Kembali')->count();
         $countDibatalkan = OrderPenyewaan::where('status', 'Dibatalkan Pemilik Sewa')
-            ->orWhere('status', 'Dibatalkan Penyewa')
+            ->orWhere('status', 'Refund di Ajukan')
             ->count();
         $countDiretur = OrderPenyewaan::where('status', 'Retur')
             ->orWhere('status', 'Retur Dikonfirmasi')

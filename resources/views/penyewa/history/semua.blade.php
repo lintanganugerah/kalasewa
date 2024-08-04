@@ -43,8 +43,7 @@
                         <div class="card-header">
                             <ul class="nav nav-tabs card-header-tabs" id="historyTab" role="tablist">
                                 <li class="nav-item">
-                                    <a class="nav-link text-secondary"
-                                        href="{{ route('viewHistoryMenungguDiproses') }}">Menunggu Konfirmasi
+                                    <a class="nav-link text-secondary" href="{{ route('viewHistoryMenungguDiproses') }}">Menunggu Konfirmasi
                                         @if ($countMenungguDiproses)
                                             <span class="position-top badge rounded-pill bg-danger">
                                                 {{ $countMenungguDiproses }}
@@ -53,8 +52,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-secondary"
-                                        href="{{ route('viewHistoryDalamPengiriman') }}">Dalam
+                                    <a class="nav-link text-secondary" href="{{ route('viewHistoryDalamPengiriman') }}">Dalam
                                         Pengiriman @if ($countDalamPengiriman)
                                             <span class="position-top badge rounded-pill bg-danger">
                                                 {{ $countDalamPengiriman }}
@@ -63,8 +61,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-secondary"
-                                        href="{{ route('viewHistorySedangBerlangsung') }}">Sedang
+                                    <a class="nav-link text-secondary" href="{{ route('viewHistorySedangBerlangsung') }}">Sedang
                                         Digunakan @if ($countSedangBerlangsung)
                                             <span class="position-top badge rounded-pill bg-danger">
                                                 {{ $countSedangBerlangsung }}
@@ -82,8 +79,7 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-secondary"
-                                        href="{{ route('viewHistoryDibatalkan') }}">Dibatalkan
+                                    <a class="nav-link text-secondary" href="{{ route('viewHistoryDibatalkan') }}">Dibatalkan
                                         @if ($countDibatalkan)
                                             <span class="position-top badge rounded-pill bg-danger">
                                                 {{ $countDibatalkan }}
@@ -102,13 +98,8 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
-                                    <a class="nav-link text-secondary"
-                                        href="{{ route('viewHistoryPenyewaanSelesai') }}">Penyewaan
+                                    <a class="nav-link text-secondary" href="{{ route('viewHistoryPenyewaanSelesai') }}">Penyewaan
                                         Selesai</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link active" aria-current="page"
-                                        href="{{ route('viewHistory') }}">Semua</a>
                                 </li>
                             </ul>
                         </div>
@@ -154,8 +145,7 @@
                                                     <td>Rp{{ number_format($order->grand_total, 0, '', '.') }}</td>
                                                     @if ($order->bukti_resi)
                                                         <td>
-                                                            <button type="button" class="btn btn-outline-danger"
-                                                                data-bs-toggle="modal"
+                                                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal"
                                                                 data-bs-target="#resiModal-{{ $loop->iteration }}">
                                                                 Lihat Resi
                                                             </button>
@@ -170,53 +160,44 @@
                                                     <td>{{ $order->status }}</td>
                                                     <td>
                                                         @if ($order->status == 'Pending')
-                                                            <a class="btn btn-danger w-100 mb-2"
-                                                                href="{{ route('viewDetailPemesanan', ['orderId' => $order->nomor_order]) }}">Detail
+                                                            <a class="btn btn-danger w-100 mb-2" href="{{ route('viewDetailPemesanan', ['orderId' => $order->nomor_order]) }}">Detail
                                                                 Order</a>
                                                         @elseif ($order->status == 'Dalam Pengiriman')
-                                                            <a class="btn btn-danger w-100 mb-2"
-                                                                href="{{ route('viewDetailPemesanan', ['orderId' => $order->nomor_order]) }}">Detail
+                                                            <a class="btn btn-danger w-100 mb-2" href="{{ route('viewDetailPemesanan', ['orderId' => $order->nomor_order]) }}">Detail
                                                                 Order</a>
                                                         @elseif ($order->status == 'Sedang Berlangsung')
                                                             <a class="btn btn-danger w-100 mb-2"
                                                                 href="{{ route('viewPengembalianBarang', ['orderId' => $order->nomor_order]) }}">Detail
                                                                 Order</a>
                                                         @elseif ($order->status == 'Penyewaan Selesai')
-                                                            <a class="btn btn-danger w-100 mb-2"
-                                                                href="{{ route('viewPenyewaanSelesai', ['orderId' => $order->nomor_order]) }}">Detail
+                                                            <a class="btn btn-danger w-100 mb-2" href="{{ route('viewPenyewaanSelesai', ['orderId' => $order->nomor_order]) }}">Detail
                                                                 Order</a>
                                                         @elseif ($order->status == 'Dibatalkan Pemilik Sewa')
                                                             <a class="btn btn-danger w-100 mb-2"
                                                                 href="{{ route('viewDibatalkanPemilikSewa', ['orderId' => $order->nomor_order]) }}">Detail
                                                                 Order</a>
                                                         @else
-                                                            <button class="btn btn-danger w-100 mb-2"
-                                                                disabled>Detail</button>
+                                                            <button class="btn btn-danger w-100 mb-2" disabled>Detail</button>
                                                         @endif
                                                     </td>
                                                 </tr>
 
                                                 <!-- Modal for Resi -->
-                                                <div class="modal fade" id="resiModal-{{ $loop->iteration }}"
-                                                    tabindex="-1" aria-labelledby="resiModalLabel-{{ $loop->iteration }}"
+                                                <div class="modal fade" id="resiModal-{{ $loop->iteration }}" tabindex="-1" aria-labelledby="resiModalLabel-{{ $loop->iteration }}"
                                                     aria-hidden="true">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h1 class="modal-title fs-5"
-                                                                    id="resiModalLabel-{{ $loop->iteration }}">
+                                                                <h1 class="modal-title fs-5" id="resiModalLabel-{{ $loop->iteration }}">
                                                                     Bukti
                                                                     Resi</h1>
-                                                                <button type="button" class="btn-close"
-                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                                             </div>
                                                             <div class="modal-body">
-                                                                <img src="{{ asset($order->bukti_resi) }}" alt="Resi"
-                                                                    class="img-fluid">
+                                                                <img src="{{ asset($order->bukti_resi) }}" alt="Resi" class="img-fluid">
                                                             </div>
                                                             <div class="modal-footer">
-                                                                <button type="button" class="btn btn-secondary"
-                                                                    data-bs-dismiss="modal">Close</button>
+                                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                                                             </div>
                                                         </div>
                                                     </div>

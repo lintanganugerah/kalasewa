@@ -126,41 +126,43 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h5><strong>Ringkasan Belanja</strong></h5>
-                                    <p><strong>Total Barang</strong></p>
-                                    <div class="d-flex">
-                                        <div class="col text-start">
-                                            <p class="text-secondary">Harga Katalog</p>
-                                            <p class="text-secondary" id="harga-additional-label">Harga Additional</p>
-                                            <p class="text-secondary">Harga Cuci</p>
-                                            <p class="text-secondary">Jaminan Ongkir<span class="text-danger">*</span></p>
-                                        </div>
-                                        <div class="col text-end">
-                                            <p class="text-secondary" id="harga-katalog">
-                                                Rp{{ number_format($produk->harga, 0, '', '.') }}</p>
-                                            <p class="text-secondary" id="harga-additional-total">Rp0</p>
+                                    <table class="w-100">
+                                        <tr>
+                                            <td class="fw-bold" colspan="3">Total Barang</td>
+                                        </tr>
+                                        <tr class="text-secondary">
+                                            <td>Harga Katalog</td>
+                                            <td id="harga-katalog" class="text-end">Rp{{ number_format($produk->harga, 0, '', '.') }}</td>
+                                        </tr>
+                                        <tr class="text-secondary">
+                                            <td>Harga Additional</td>
+                                            <td id="harga-additional-total" class="text-end">Rp0</td>
+                                        </tr>
+                                        <tr class="text-secondary">
+                                            <td>Harga Cuci</td>
                                             @if ($produk->biaya_cuci)
-                                                <p class="text-secondary" id="harga-cuci">
-                                                    Rp{{ number_format($produk->biaya_cuci, 0, '', '.') }}</p>
+                                            <td id="harga-cuci" class="text-end">Rp{{ number_format($produk->biaya_cuci, 0, '', '.') }}</td>
                                             @else
-                                                <p class="text-secondary" id="harga-cuci">
-                                                    Rp{{ number_format(0) }}</p>
+                                            <td id="harga-cuci" class="text-end">Rp{{ number_format(0) }}</td>
                                             @endif
-                                            <p class="text-secondary" id="ongkos-kirim">
-                                                Rp{{ number_format(30000, 0, '', '.') }}</p>
-                                        </div>
-                                    </div>
-                                    <p class="mt-2"><strong>Biaya Transaksi</strong></p>
-                                    <div class="d-flex">
-                                        <div class="col text-start">
-                                            <p class="text-secondary">Jaminan Katalog<span class="text-danger">*</span>
-                                            </p>
-                                            <p class="text-secondary" id="biaya-admin-label">Biaya Admin</p>
-                                        </div>
-                                        <div class="col text-end">
-                                            <p class="text-secondary">Rp50.000</p>
-                                            <p class="text-secondary" id="biaya-admin-value">Rp0</p>
-                                        </div>
-                                    </div>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold" colspan="3">Biaya Transaksi</td>
+                                        </tr>
+                                        <tr class="text-secondary">
+                                            <td>Jaminan Ongkir</td>
+                                            <td id="ongkos-kirim" class="text-end">Rp{{ number_format(30000, 0, '', '.') }}</td>
+                                        </tr>
+                                        <tr class="text-secondary">
+                                            <td>Jaminan Kostum</td>
+                                            <td class="text-end">Rp50.000</td>
+                                        </tr>
+                                        <tr class="text-secondary">
+                                            <td id="biaya-admin-label">Biaya Admin</td>
+                                            <td id="biaya-admin-value" class="text-end">Rp0</td>
+                                        </tr>
+                                    </table>
+
                                     <h5 class="mt-2"><strong>Total Tagihan</strong></h5>
                                     <h4><strong id="total-tagihan">Rp0</strong>
                                     </h4>

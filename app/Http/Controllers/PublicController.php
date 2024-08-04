@@ -21,6 +21,7 @@ use App\Models\Series;
 use App\Models\Review;
 use App\Models\PeraturanSewa;
 use App\Models\Peraturan;
+use App\Models\TopSeries;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -34,7 +35,7 @@ class PublicController extends Controller
         $brand = Produk::select('brand')->distinct()->orderBy('brand', 'asc')->pluck('brand');
 
         // Ambil produk dengan status 'aktif'
-        $produkQuery = Produk::where('status_produk', 'aktif')->orderBy('updated_at', 'desc');
+        $produkQuery = Produk::whereIn('status_produk', ['aktif', 'tidak ready'])->orderBy('updated_at', 'desc');
 
         // Terapkan filter jika ada
         if ($request->has('brand')) {
@@ -55,9 +56,19 @@ class PublicController extends Controller
             ->groupBy('id_toko')
             ->pluck('average_rating', 'id_toko');
 
-        /* dd(session('profilpath')); */
-        return view('homepage', compact('produk', 'fotoproduk', 'toko', 'user', 'series', 'brand', 'averageRatings'));
+        // Ambil Top Series
+        $topSeries = TopSeries::orderBy('banyak_dipesan', 'desc')->first();
+
+        if($topSeries){
+            // Ambil produk dari Top Series
+            $topProduk = Produk::whereIn('status_produk', ['aktif', 'tidak ready'])->where('id_series', $topSeries->id_series)->get();
+            return view('homepage', compact('produk', 'fotoproduk', 'toko', 'user', 'series', 'brand', 'averageRatings', 'topSeries', 'topProduk'));
+
+        }
+
+        return view('homepage', compact('produk', 'fotoproduk', 'toko', 'user', 'series', 'brand', 'averageRatings', 'topSeries'));
     }
+
 
     // MARKETPLACE SERIES
     public function viewSeries(Request $request)
@@ -98,7 +109,11 @@ class PublicController extends Controller
             ->take(5)
             ->get();
 
-        return view('detail', compact('produk', 'fotoproduk', 'series', 'brand', 'toko', 'review', 'averageRating', 'averageTokoRating', 'aturan', 'produkLain', 'fotoProdukLain'));
+        $produkSeriesSama = Produk::where('id_series', $produk->id_series)
+            ->take(5)
+            ->get();
+
+        return view('detail', compact('produk', 'fotoproduk', 'series', 'brand', 'toko', 'review', 'averageRating', 'averageTokoRating', 'aturan', 'produkLain', 'fotoProdukLain', 'produkSeriesSama'));
     }
 
     public function viewListToko(Request $request)
@@ -107,7 +122,7 @@ class PublicController extends Controller
         $brand = Produk::select('brand')->distinct()->orderBy('brand', 'asc')->pluck('brand');
 
         // Ambil produk dengan status 'aktif'
-        $produkQuery = Produk::where('status_produk', 'aktif');
+        $produkQuery = Produk::whereIn('status_produk', ['aktif', 'tidak ready'])->orderBy('updated_at', 'desc');
 
         // Terapkan filter jika ada
         if ($request->has('brand')) {
@@ -140,7 +155,7 @@ class PublicController extends Controller
         $brand = Produk::select('brand')->distinct()->orderBy('brand', 'asc')->pluck('brand');
 
         // Ambil produk dengan status 'aktif' dan milik toko yang bersangkutan
-        $produkQuery = Produk::where('status_produk', 'aktif')->where('id_toko', $id);
+        $produkQuery = Produk::whereIn('status_produk', ['aktif', 'tidak ready'])->orderBy('updated_at', 'desc')->where('id_toko', $id);;
 
         // Terapkan filter jika ada
         if ($request->has('brand')) {
@@ -174,7 +189,7 @@ class PublicController extends Controller
         $averageTokoRating = Review::where('id_toko', $id)->avg('nilai');
 
         // Mulai query produk dengan id_toko
-        $query = Produk::where('status_produk', 'Aktif')->where('id_toko', $id);
+        $query = Produk::whereIn('status_produk', ['aktif', 'tidak ready'])->where('id_toko', $id);
 
         // Filter berdasarkan search term
         if ($request->filled('search')) {
@@ -236,11 +251,16 @@ class PublicController extends Controller
         $brand = Produk::select('brand')->distinct()->orderBy('brand', 'asc')->pluck('brand');
 
         // Ambil produk dengan status 'aktif'
-        $produkQuery = Produk::where('status_produk', 'aktif');
+        $produkQuery = Produk::whereIn('status_produk', ['aktif', 'tidak ready'])->orderBy('updated_at', 'desc');;
 
         // Terapkan filter jika ada
         if ($request->has('brand')) {
             $produkQuery->where('brand', $request->brand);
+        }
+
+        // Terapkan filter jika ada id_series
+        if ($request->has('id_series')) {
+            $produkQuery->where('id_series', $request->id_series);
         }
         $produk = $produkQuery->get();
 

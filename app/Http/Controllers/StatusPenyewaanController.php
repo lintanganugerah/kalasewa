@@ -141,8 +141,6 @@ class StatusPenyewaanController extends Controller
         }
 
         try {
-            $saldoPenyewa = SaldoUser::where('id_user', $order->id_penyewa)->first();
-
             if ($order->jaminan < 0) {
                 return redirect()->route('seller.statuspenyewaan.penyewaandiretur')->with('error', 'Nilai Jaminan Penyewa Minus. Penyewa belum melunaskan denda nya. Tidak dapat memproses');
             }
@@ -153,18 +151,10 @@ class StatusPenyewaanController extends Controller
             $produk->save();
             $order->save();
 
-            if ($saldoPenyewa) {
-                $totalSaldo = $order->grand_total - $order->fee_admin + $saldoPenyewa->saldo;
-                $saldoPenyewa->saldo = $totalSaldo;
-                $saldoPenyewa->save();
-            } else {
-                SaldoUser::create([
-                    "id_user" => $order->id_penyewa,
-                    'tujuan_rek' => null,
-                    'nomor_rekening' => null,
-                    'saldo' => $order->grand_total - $order->fee_admin,
-                ]);
-            }
+            SaldoUser::updateOrCreate(
+                ['id_user' => $order->id_penyewa],
+                ["saldo" => $order->grand_total - $order->fee_admin]
+            );
         } catch (Exception $e) {
             return redirect()->route('seller.statuspenyewaan.penyewaandiretur')->with('error', 'Terjadi kesalahan. Mohon coba lagi nanti');
         }
@@ -194,15 +184,33 @@ class StatusPenyewaanController extends Controller
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $order->status = "Dibatalkan Pemilik Sewa";
-        $order->alasan_pembatalan = $request->alasan_batal;
+        try {
+            DB::beginTransaction();
 
-        $produk->status_produk = "arsip";
+            $order->status = "Dibatalkan Pemilik Sewa";
+            $order->alasan_pembatalan = $request->alasan_batal;
 
-        $produk->save();
-        $order->save();
+            $produk->status_produk = "arsip";
 
-        return redirect()->route('seller.statuspenyewaan.riwayatPenyewaan')->with('success', 'Penyewaan telah anda Batalkan!');
+            $produk->save();
+            $order->save();
+
+            $saldo = SaldoUser::where("id_user", $order->id_penyewa)->first();
+            $saldo_yang_ada = $saldo->saldo ?? 0;
+            $totalDikembalikan = $order->grand_total + $saldo_yang_ada;
+
+            SaldoUser::updateOrCreate(
+                ['id_user' => $order->id_penyewa],
+                ["saldo" => $totalDikembalikan]
+            );
+
+            DB::commit();
+
+            return redirect()->route('seller.statuspenyewaan.riwayatPenyewaan')->with('success', 'Penyewaan telah anda Batalkan!');
+        } catch (Exception $e) {
+            DB::rollBack();
+            return redirect()->route('seller.statuspenyewaan.belumdiproses')->with('error', 'Terjadi kesalahan. Mohon coba lagi');
+        }
     }
 
     public function ingatkanPenyewa($nomor_order, $id_penyewa)
