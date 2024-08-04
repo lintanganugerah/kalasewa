@@ -24,8 +24,10 @@ class DatabaseSeeder extends Seeder
             TokoSeeder::class,
             ProdukSeeder::class,
             ReviewProdukSeeder::class,
-            OrderSeeder::class,
             TujuanRekeningSeeder::class,
+            PeraturanSeeder::class,
+            KategoriTiketSeeder::class,
+            AboutUsSeeder::class,
         ]);
 
     }

@@ -20,6 +20,8 @@ class infoBatasAkhirPengembalian extends Mailable implements ShouldQueue
     public $tanggalSelesaiMax;
     public $dendaPerHari;
 
+    public $tries = 5;
+
     public function __construct($dendaPerHari, $nomorOrder, $tanggalSelesai, $tanggalSelesaiMax, $namaPenyewa)
     {
         $this->nomorOrder = $nomorOrder;

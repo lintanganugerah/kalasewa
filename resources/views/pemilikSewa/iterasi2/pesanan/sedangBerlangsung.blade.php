@@ -12,41 +12,7 @@
                 <div class="card">
                     <div class="card-header">
                         <!-- Nav tabs -->
-                        <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="Produkanda-tab" data-bs-toggle="tab"
-                                    onclick="window.location.href='/status-sewa/belumdiproses'" type="button"
-                                    role="tab" aria-controls="Produkanda" aria-selected="true">Belum Diproses</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/dalampengiriman'" type="button"
-                                    role="tab" aria-controls="tambahProduk" aria-selected="false">Dalam
-                                    Pengiriman</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active text-secondary fw-bold" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/sedangberlangsung'" type="button"
-                                    role="tab" aria-controls="tambahProduk" aria-selected="false">Sedang
-                                    Berlangsung</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/telahkembali'" type="button" role="tab"
-                                    aria-controls="tambahProduk" aria-selected="false">Penyewaan Telah kembali</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/penyewaandiretur'" type="button"
-                                    role="tab" aria-controls="tambahProduk" aria-selected="false">Penyewaan
-                                    diretur</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link text-secondary" id="tambahProduk-tab"
-                                    onclick="window.location.href='/status-sewa/riwayat'" type="button" role="tab"
-                                    aria-controls="tambahProduk" aria-selected="false">Riwayat Penyewaan</button>
-                            </li>
-                        </ul>
+                        @include('pemilikSewa.iterasi2.pesanan.navtabs')
                     </div>
                     <div class="card-body">
                         <!-- Tab panes -->
@@ -75,6 +41,7 @@
                                             <thead>
                                                 <tr>
                                                     <th>#</th>
+                                                    <th>Nomor Order</th>
                                                     <th class="col-2">Produk</th>
                                                     <th>Penyewa</th>
                                                     <th>Ukuran</th>
@@ -89,6 +56,8 @@
                                             <tbody>
                                                 @foreach ($order as $ord)
                                                     <tr>
+                                                        <td data-title="#" class="align-middle">
+                                                            {{ $loop->iteration }}</td>
                                                         <td data-title="No. Order" class="align-middle">
                                                             {{ $ord->nomor_order }}</td>
                                                         <td data-title="Produk" class="align-middle">
@@ -109,12 +78,21 @@
                                                         <td data-title="Additional" class="align-middle text-opacity-75">
                                                             @if ($ord->additional)
                                                                 <ul>
-                                                                    @foreach ($ord->additional as $nama => $harga)
-                                                                        <li>{{ $nama }} +{{ $harga }}</li>
+                                                                    @foreach ($ord->additional as $add)
+                                                                        <li>{{ $add['nama'] }} +
+                                                                            {{ number_format($add['harga'], 0, '', '.') }}
+                                                                        </li>
                                                                     @endforeach
                                                                 </ul>
                                                             @else
                                                                 <div class="text-opacity-25">-</div>
+                                                            @endif
+                                                            @if ($ord->id_produk_order->biaya_cuci)
+                                                                <ul>
+                                                                    <li>Biaya cuci +
+                                                                        {{ number_format($ord->id_produk_order->biaya_cuci, 0, '', '.') }}
+                                                                    </li>
+                                                                </ul>
                                                             @endif
                                                         </td>
                                                         <td data-title="Nomor Resi" class="align-middle">
@@ -131,14 +109,9 @@
                                                         <td data-title="Total Harga" class="align-middle">
                                                             Rp {{ number_format($ord->total_harga, 0, '', '.') }}</td>
                                                         <td data-title="Aksi" class="align-middle">
-                                                            <form
-                                                                action="{{ route('seller.statuspenyewaan.ingatkanPenyewa', ['nomor_order' => $ord->nomor_order, 'id_penyewa' => $ord->id_penyewa_order->id]) }}"
-                                                                method="POST">
-                                                                @csrf
-                                                                <button type="submit" class="d-grid btn btn-success mb-2"
-                                                                    id="proses">Ingatkan
-                                                                    Penyewa</button>
-                                                            </form>
+                                                            <a href="{{ url('/chat' . '/' . $ord->id_penyewa_order->id) }}"
+                                                                target="_blank" class="d-grid btn btn-outline-success m-2"
+                                                                id="proses">Chat</a>
                                                         </td>
                                                     </tr>
                                                 @endforeach

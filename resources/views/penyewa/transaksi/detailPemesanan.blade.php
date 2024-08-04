@@ -43,11 +43,11 @@
                         @if (!empty($order->additional) && is_array($order->additional))
                         @foreach ($order->additional as $additionalItem)
                         @if (is_array($additionalItem) && isset($additionalItem['nama']))
-                        <button class="btn btn-outline-dark" type="button">{{$additionalItem['nama']}}</button>
+                        <button class="btn btn-outline-dark" type="button">{{ $additionalItem['nama'] }}</button>
                         @endif
                         @endforeach
                         @endif
-                        <button class="btn btn-outline-dark" type="button">{{$order->ukuran}}</button>
+                        <button class="btn btn-outline-dark" type="button">{{ $order->ukuran }}</button>
                         <div id="emailHelp" class="form-text">Berikut adalah pilihan additional dan ukuran yang kamu
                             pilih</div>
 
@@ -55,14 +55,14 @@
                             <div class="col mx-1">
                                 <label for="exampleInputEmail1" class="form-label">Tanggal Mulai</label>
                                 <input type="text" name="infomulai" placeholder="Tanggal Mulai Sewa"
-                                    class="form-control form-control-lg w-100" value="{{$order->tanggal_mulai}}"
+                                    class="form-control form-control-lg w-100" value="{{ $order->tanggal_mulai }}"
                                     readonly />
                                 <div id="emailHelp" class="form-text">Tanggal mulai sewa anda!</div>
                             </div>
                             <div class="col mx-1">
                                 <label for="exampleInputEmail1" class="form-label">Tanggal Selesai</label>
                                 <input type="text" name="infoselesai" placeholder="Tanggal Akhir Sewa"
-                                    class="form-control form-control-lg w-100" value="{{$order->tanggal_selesai}}"
+                                    class="form-control form-control-lg w-100" value="{{ $order->tanggal_selesai }}"
                                     readonly />
                                 <div id="emailHelp" class="form-text">Tanggal akhir sewa anda! (3 hari penyewaan)</div>
                             </div>
@@ -87,7 +87,7 @@
                         </div>
 
                         <div class="metodekirim-ctner mt-3">
-                            <label for="exampleInputEmail1" class="form-label">Nama Penyewa</label>
+                            <label for="exampleInputEmail1" class="form-label">Metode Kirim</label>
                             <input type="text" name="metodekirim" placeholder="Metode Kirim"
                                 class="form-control form-control-lg w-100" value="{{ $order->metode_kirim }}"
                                 readonly />
@@ -117,26 +117,31 @@
                                     <p class="text-secondary">Harga Katalog</p>
                                     <p class="text-secondary" id="harga-additional-label">Harga Additional</p>
                                     <p class="text-secondary">Harga Cuci</p>
+                                    <p class="text-secondary">Jaminan Ongkir</p>
                                 </div>
                                 <div class="col text-end">
                                     <p class="text-secondary" id="harga-katalog">
-                                        Rp{{ number_format($order->total_harga, 0, '', '.') }}</p>
+                                        Rp{{ number_format($order->harga_katalog, 0, '', '.') }}</p>
 
                                     @if ($order->additional)
                                     @foreach ($order->additional as $additionalItem)
                                     <p class="text-secondary" id="harga-additional-total">
                                         Rp{{ number_format($additionalItem['harga'], 0, '', '.') }}</p>
                                     @endforeach
+                                    @else
+                                    <p class="text-secondary" id="harga-additional-total"> - </p>
                                     @endif
 
                                     <p class="text-secondary" id="harga-cuci">
                                         Rp{{ number_format($order->biaya_cuci ?? 0, 0, '', '.') }}</p>
+                                    <p class="text-secondary" id="harga-cuci">
+                                        Rp30.000</p>
                                 </div>
                             </div>
                             <p class="mt-2"><strong>Biaya Transaksi</strong></p>
                             <div class="d-flex">
                                 <div class="col text-start">
-                                    <p class="text-secondary">Biaya Jaminan</p>
+                                    <p class="text-secondary">Jaminan Katalog</p>
                                     <p class="text-secondary" id="biaya-admin-label">Biaya Admin</p>
                                 </div>
                                 <div class="col text-end">
@@ -147,8 +152,34 @@
                             </div>
                             <h5 class="mt-2"><strong>Total Tagihan</strong></h5>
                             <h4><strong
-                                    id="total-tagihan">Rp{{ number_format($order->total_tagihan, 0, '', '.') }}</strong>
+                                    id="total-tagihan">Rp{{ number_format($order->grand_total, 0, '', '.') }}</strong>
                             </h4>
+
+                            <hr>
+
+                            <p class="mt-2"><strong>Catatan Pembayaran</strong></p>
+                            <div class="d-flex">
+                                <div class="col text-start">
+                                    <p class="text-secondary">Ongkos Kirim</p>
+                                    <p class="text-secondary" id="harga-additional-label">Jaminan Ongkir</p>
+                                    <p class="text-secondary">Jaminan Katalog</p>
+                                </div>
+                                <div class="col text-end">
+                                    <p><strong>Rp{{ number_format($order->ongkir_pengiriman ?? 0, 0, '', '.') }}</strong>
+                                    </p>
+                                    <p><strong>Rp{{ number_format($order->ongkir_default ?? 0, 0, '', '.') }}</strong>
+                                    </p>
+                                    <p><strong>Rp{{ number_format($order->jaminan ?? 0, 0, '', '.') }}</strong></p>
+                                </div>
+                            </div>
+                            @if ($uangKembali >= 0)
+                            <h5 class="mt-2"><strong>Total Uang Kembali</strong></h5>
+                            <h4><strong id="total-tagihan">Rp{{ number_format($uangKembali, 0, '', '.') }}</strong></h4>
+                            @elseif ($uangKembali < 0) <h5 class="mt-2 text-danger"><strong>Total Hutang</strong></h5>
+                                <h4 class="text-danger"><strong
+                                        id="total-tagihan">Rp{{ number_format($uangKembali, 0, '', '.') }}</strong></h4>
+                                @endif
+
                         </div>
 
                     </div>
@@ -176,7 +207,7 @@
                     <h1 class="modal-title fs-5" id="exampleModalLabel">Bukti Barang Diterima</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{route('terimaBarang', ['orderId' => $order->nomor_order])}}" method="POST"
+                <form action="{{ route('terimaBarang', ['orderId' => $order->nomor_order]) }}" method="POST"
                     enctype="multipart/form-data">
                     @csrf
                     <div class="modal-body">
@@ -184,7 +215,8 @@
                                 class="text-danger">*</span></label>
                         <input class="form-control" type="file" id="formFile" name="bukti_diterima"
                             accept=".jpg,.png,.jpeg,.webp" required>
-                        <div id="emailHelp" class="form-text text-danger">Pastikan gambar yang dikirim mencakup seluruh
+                        <div id="emailHelp" class="form-text text-danger">Pastikan gambar yang dikirim mencakup
+                            seluruh
                             barang yang diterima!</div>
                     </div>
                     <div class="modal-footer">
@@ -204,7 +236,7 @@
                     <h1 class="modal-title fs-5" id="exampleModalLabel">Pengajuan Refund</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{route('viewHistory')}}">
+                <form action="{{ route('viewHistory') }}">
                     <div class="modal-body">
                         <div class="deskripsi-bukti">
                             <label for="formFile" class="form-label">Deskripsi Ketidaksesuaian<span

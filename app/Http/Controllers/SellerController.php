@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\AlamatTambahan;
+use App\Models\ChMessage;
+use App\Models\OrderPenyewaan;
 use App\Models\PeraturanSewa;
+use App\Models\PengajuanDenda;
+use App\Models\TopSeries;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -12,10 +16,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Events\UserChangeProfile;
 use App\Models\User;
 use App\Models\Toko;
 use App\Models\Produk;
-use Exception;
+use carbon\Carbon;
 
 class SellerController extends Controller
 {
@@ -26,12 +31,19 @@ class SellerController extends Controller
 
     public function sellerDashboardToko(Request $request)
     {
-        return view('pemilikSewa.dashboardToko');
-    }
+        $chat_belum_dibaca = ChMessage::where('to_id', Auth::user()->id)->where('seen', 0)->orderByDesc('updated_at')->get()->groupBy('from_id');
+        $topseries = TopSeries::whereMonth('created_at', Carbon::now()->translatedFormat('m'))->whereYear('created_at', Carbon::now()->translatedFormat('Y'))->orderByDesc('banyak_dipesan')->take(5)->get()->groupBy('id_series');
+        $produk = Produk::where('id_toko', auth()->user()->toko->id)->pluck('id');
+        if ($produk->isEmpty()) {
+            $topproduk = "tidak ada produk";
+            return view('pemilikSewa.dashboardToko', compact('chat_belum_dibaca', 'topseries', 'topproduk'));
+        }
+        $order = OrderPenyewaan::whereIn('id_produk', $produk)->whereMonth('created_at', Carbon::now()->translatedFormat('m'))->whereYear('created_at', Carbon::now()->translatedFormat('Y'))->get()->groupBy('id_produk');
+        $topproduk = $order->isNotEmpty() ? $order->sortByDesc(function ($grupProduk) {
+            return $grupProduk->count();
+        }) : collect(); //jadi collection baru yang kosong kalau empty
 
-    public function testView()
-    {
-        return view('tes');
+        return view('pemilikSewa.dashboardToko', compact('chat_belum_dibaca', 'topseries', 'topproduk'));
     }
 
     public function profilTokoView(Request $request)
@@ -192,11 +204,17 @@ class SellerController extends Controller
         $toko = Toko::where('id_user', Auth::id())->first();
         $peraturan = PeraturanSewa::where('id', $id)->first();
         if ($peraturan) {
+            $denda = PengajuanDenda::where('id_peraturan', $peraturan->id)->get();
             if ($toko->id != $peraturan->id_toko) {
                 return redirect()->back()->with('error', 'ID Peraturan Invalid');
             }
             if ($peraturan->nama == "Terlambat Mengembalikan Kostum") {
                 return redirect()->back()->with('error', 'Anda Tidak Menghapus Peraturan Wajib "Terlambat Mengembalikan Kostum"');
+            }
+            if ($denda) {
+                foreach ($denda as $d) {
+                    $d->delete();
+                }
             }
             $peraturan->delete();
             return redirect()->route('seller.profil.viewPeraturanSewaToko')->with("success", "Peraturan Berhasil Dihapus!");
@@ -257,6 +275,9 @@ class SellerController extends Controller
         $toko->nama_toko = $request->namaToko;
         $user->save();
         $toko->save();
+
+        $userChange = User::where('id', $user->id)->first(); //Get model User nya untuk di kirim ke event
+        event(new UserChangeProfile($userChange)); //Trigger event untuk mengubah kolom name, dan avatar chatify sesuai dengan data user
 
         session(['uid' => $user->id]);
         session(['namatoko' => $toko->nama_toko]);
@@ -363,6 +384,70 @@ class SellerController extends Controller
         ]);
 
         return redirect()->route('seller.profil.viewAlamatTambahanToko')->with('success', 'Alamat Berhasil Ditambahkan');
+    }
+
+    public function getTopSeries($periode)
+    {
+        $topseries = TopSeries::whereYear('created_at', Carbon::now()->translatedFormat('Y'))->orderBy('created_at', 'desc')->get();
+
+        // dd($topseries);
+
+        if ($periode === 'bulan_kemarin') {
+            $topseries = TopSeries::whereMonth('created_at', Carbon::now()->subMonth()->translatedFormat('m'))->whereYear('created_at', Carbon::now()->translatedFormat('Y'))->orderByDesc('banyak_dipesan')->get()->groupBy('id_series');
+        } elseif ($periode === 'tahun_ini') {
+            $topseriesGrup = $topseries->groupBy('id_series');
+            $summarized = collect(); // Buat koleksi baru
+
+            foreach ($topseriesGrup as $idSeries => $group) {
+                $firstItem = $group->first();
+                $totalBanyakDipesan = $group->sum('banyak_dipesan');
+
+                // Buat summrizeditem yang akan dimasukkan ke summarized
+                $summarizedItem = new TopSeries([
+                    'id_series' => $idSeries,
+                    'banyak_dipesan' => $totalBanyakDipesan,
+                ]);
+
+                $summarized->push($summarizedItem);
+            }
+
+            $topseries = $summarized->sortByDesc('banyak_dipesan')->groupBy('id_series');
+        } else {
+            //Default ke bulan ini aja
+            $topseries = TopSeries::whereMonth('created_at', Carbon::now()->translatedFormat('m'))->whereYear('created_at', Carbon::now()->translatedFormat('Y'))->orderByDesc('banyak_dipesan')->get()->groupBy('id_series');
+        }
+
+        $topseries = $topseries->take(5);
+
+        return view('pemilikSewa.iterasi3.topseries_tabel', compact('topseries'))->render();
+    }
+
+    public function getTopProduk($periode)
+    {
+        $produk = Produk::where('id_toko', auth()->user()->toko->id)->pluck('id');
+        if ($produk->isEmpty()) {
+            $topproduk = "tidak ada produk";
+            return view('pemilikSewa.iterasi3.topproduk_tabel', compact('topproduk'))->render();
+        }
+
+
+        if ($periode === 'bulan_kemarin') {
+            $order = OrderPenyewaan::whereIn('id_produk', $produk)->whereMonth('created_at', Carbon::now()->subMonth()->translatedFormat('m'))->whereYear('created_at', Carbon::now()->translatedFormat('Y'))->get()->groupBy('id_produk');
+        } elseif ($periode === 'tahun_ini') {
+            $order = OrderPenyewaan::whereIn('id_produk', $produk)->whereYear('created_at', Carbon::now()->translatedFormat('Y'))->get()->groupBy('id_produk');
+        } else {
+            //Default ke bulan ini aja
+            $order = OrderPenyewaan::whereIn('id_produk', $produk)->whereMonth('created_at', Carbon::now()->translatedFormat('m'))->whereYear('created_at', Carbon::now()->translatedFormat('Y'))->get()->groupBy('id_produk');
+        }
+
+
+        $topproduk = $order->isNotEmpty() ? $order->sortByDesc(function ($grupProduk) {
+            return $grupProduk->count();
+        })->take(5) : collect(); //Buat sebagai koleksi baru yang kosong jika empty
+
+        // dd($topproduk);
+
+        return view('pemilikSewa.iterasi3.topproduk_tabel', compact('topproduk'))->render();
     }
 
     public function DeleteAlamatTambahanAction($id)

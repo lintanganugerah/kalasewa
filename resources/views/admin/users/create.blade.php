@@ -18,9 +18,9 @@
         <form action="{{ route('admin.users.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
-                <label for="nama">Nama</label>
+                <label for="nama">Nama<span class="text-danger">*</span></label>
                 <input type="text" class="form-control @error('nama') is-invalid @enderror" id="nama" name="nama"
-                    required>
+                    value="{{ old('nama') }}" required>
                 @error('nama')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
@@ -28,9 +28,9 @@
                 @enderror
             </div>
             <div class="form-group">
-                <label for="email">Email</label>
+                <label for="email">Email<span class="text-danger">*</span></label>
                 <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email"
-                    required>
+                    value="{{ old('email') }}" required>
                 @error('email')
                     <span class="invalid-feedback" role="alert">
                         <strong>{{ $message }}</strong>
@@ -38,26 +38,34 @@
                 @enderror
             </div>
             <div class="form-group">
-                <label for="password">Password</label>
+                <label for="password">Password<span class="text-danger">*</span></label>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="password" name="password" required>
+                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password"
+                        name="password" value="{{ old('password') }}" required>
                     <div class="input-group-append">
                         <button type="button" class="btn btn-outline-secondary" id="toggle-password"
                             onclick="togglePassword()">
                             <i class="fas fa-eye" id="toggle-icon"></i>
                         </button>
                     </div>
+                    @error('password')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
                 </div>
             </div>
             <div class="form-group">
-                <label for="no_telp">No. Telepon</label>
+                <label for="no_telp">Nomor Telepon</label>
                 <input type="text" class="form-control @error('no_telp') is-invalid @enderror" id="no_telp"
                     name="no_telp" pattern="[0-9]{10,}" title="Hanya boleh angka dengan minimal 10 digit">
+                @error('no_telp')
+                    <span class="invalid-feedback" role="alert">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                @enderror
             </div>
-            <div class="form-group">
-                <label for="role" style="margin-right: 16px;">Role :</label>
-                <span class="badge badge-warning badge-pill px-5 py-2">Admin</span>
-            </div>
+            <input type="hidden" name="verifyIdentitas" value="Sudah">
             <button type="submit" class="btn btn-primary btn-block">Tambah User</button>
         </form>
     </div>
@@ -66,16 +74,13 @@
 <script>
     function togglePassword() {
         const passwordInput = document.getElementById('password');
-        const passwordConfirmInput = document.getElementById('password_confirmation');
         const toggleIcon = document.getElementById('toggle-icon');
         if (passwordInput.type === 'password') {
             passwordInput.type = 'text';
-            passwordConfirmInput.type = 'text';
             toggleIcon.classList.remove('fa-eye');
             toggleIcon.classList.add('fa-eye-slash');
         } else {
             passwordInput.type = 'password';
-            passwordConfirmInput.type = 'password';
             toggleIcon.classList.remove('fa-eye-slash');
             toggleIcon.classList.add('fa-eye');
         }

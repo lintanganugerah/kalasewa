@@ -215,10 +215,29 @@
                                     @endif
                                 </td>
                                 <td style="width: 10%;">
-                                    @if (Auth::check() && (Auth::user()->role === 'super_admin' || Auth::user()->id === $user->id))
-                                        <button type="button" class="btn btn-danger delete-btn btn-block mb-2"
-                                            onclick="confirmDelete('{{ $user->id }}')" data-toggle="modal"
-                                            data-target="#confirmDeleteModal">Delete</button>
+                                    @if (Auth::check())
+                                        @if (Auth::user()->role === 'super_admin')
+                                            @if (Auth::user()->id === $user->id)
+                                                <button type="button" class="btn btn-danger delete-btn btn-block mb-2"
+                                                    disabled>Delete</button>
+                                            @else
+                                                <button type="button" class="btn btn-danger delete-btn btn-block mb-2"
+                                                    onclick="confirmDelete('{{ $user->id }}')" data-toggle="modal"
+                                                    data-target="#confirmDeleteModal">Delete</button>
+                                            @endif
+                                        @elseif (Auth::user()->role === 'admin')
+                                            @if (Auth::user()->id === $user->id)
+                                                <button type="button" class="btn btn-danger delete-btn btn-block mb-2"
+                                                    onclick="confirmDelete('{{ $user->id }}')" data-toggle="modal"
+                                                    data-target="#confirmDeleteModal">Delete</button>
+                                            @else
+                                                <button type="button" class="btn btn-danger delete-btn btn-block mb-2"
+                                                    disabled>Delete</button>
+                                            @endif
+                                        @else
+                                            <button type="button" class="btn btn-danger delete-btn btn-block mb-2"
+                                                disabled>Delete</button>
+                                        @endif
                                     @else
                                         <button type="button" class="btn btn-danger delete-btn btn-block mb-2"
                                             disabled>Delete</button>

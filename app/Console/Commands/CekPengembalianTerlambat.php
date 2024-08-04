@@ -42,9 +42,8 @@ class CekPengembalianTerlambat extends Command
 
         if ($orders) {
             foreach ($orders as $order) {
-                $tanggalSelesaiBatasMax = Carbon::parse($order->tanggal_selesai)->addDays()->startOfDay();
-                $tanggalSekarang = Carbon::now()->startOfDay();
-                // dd($tanggalSelesaiBatasMax, $tanggalSekarang);
+                $tanggalSelesaiBatasMax = Carbon::parse($order->tanggal_selesai)->setTimezone('Asia/Jakarta')->addDays()->startOfDay();
+                $tanggalSekarang = Carbon::now()->setTimezone('Asia/Jakarta')->startOfDay();
                 if ($tanggalSekarang->greaterThan($tanggalSelesaiBatasMax)) {
                     $hariKeterlambatan = ((int) round(Carbon::now()->startOfDay()->diffInDays($tanggalSelesaiBatasMax))) * -1;
                     $produk = Produk::where('id', $order->id_produk)->first();

@@ -103,12 +103,14 @@
                                         <select class="form-select select2" id="selectSeries" name="series" required>
                                             <option></option>
                                             @foreach ($series as $sr)
-                                                <option value="{{ $sr->id }}"
-                                                    {{ old('series', $produk->id_series) == $sr->id ? 'selected' : '' }}>
+                                                <option value="{{ $sr->series }}"
+                                                    {{ old('series', $produk->series->series) == $sr->series ? 'selected' : '' }}>
                                                     {{ $sr->series }}</option>
                                             @endforeach
                                         </select>
                                         <label for="selectSeries">Series</label>
+                                        <div id="namaProduk" class="form-text" style="opacity: 50%;">Jika series anda tidak
+                                            ada. Silahkan ketik nama series lalu enter</div>
                                     </div>
                                     <label for="selectGender" class="form-label">Gender<span
                                             class="text-danger">*</span></label>
@@ -256,38 +258,43 @@
                                             required> Tidak
                                         <input type="radio" id="wigYa" name="wig_opsi" value="ya"
                                             onchange="opsiWig()" {{ old('wig_opsi') == 'ya' ? 'checked' : '' }}
-                                            {{ old('wig_opsi') == null && $produk->brand_wig == null && $produk->keterangan_wig != null ? 'checked' : '' }}>
+                                            {{ old('wig_opsi') == null && $produk->brand_wig != null ? 'checked' : '' }}>
                                         Ya
                                     </div>
                                     <div id="optionsWig" class="mb-3">
                                         {{-- Inputan brand, dan styling wig di isi nanti disini --}}
 
                                         @if (old('brand_wig') || old('ket_wig') || $produk->brand_wig)
-                                            <div class="mb-2" id="infoWig">
-                                                <div class="mb-3">
-                                                    <label for="brand_wig" class="form-label">Brand wig<span
-                                                            class="text-danger mb-3">*</span></label>
-                                                    <input type="text" id="brand_wig" class="form-control"
-                                                        name="brand_wig" aria-label="brand_wig"
-                                                        value="{{ old('brand_wig', $produk->brand_wig) }}" required>
-                                                    <small id="helpnominal" class="mb-3" style="opacity: 75%;">Masukan
-                                                        No Brand jika tidak ada brand</small>
-                                                    @error('brand_wig')
-                                                        <div class="text-danger form-text">{{ $message }}</div>
-                                                    @enderror
+                                            @if (old('wig_opsi') == 'tidak')
+                                            @else
+                                                <div class="mb-2" id="infoWig">
+                                                    <div class="mb-3">
+                                                        <label for="brand_wig" class="form-label">Brand wig<span
+                                                                class="text-danger mb-3">*</span></label>
+                                                        <input type="text" id="brand_wig" class="form-control"
+                                                            name="brand_wig" aria-label="brand_wig"
+                                                            value="{{ old('brand_wig', $produk->brand_wig) }}" required>
+                                                        <small id="helpnominal" class="mb-3"
+                                                            style="opacity: 75%;">Masukan
+                                                            No Brand jika tidak ada brand</small>
+                                                        @error('brand_wig')
+                                                            <div class="text-danger form-text">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="mb-3">
+                                                        <label for="ket_wig" class="form-label">Keterangan Styling
+                                                            Wig<span class="text-danger mb-3">*</span></label>
+                                                        <input type="text" id="ket_wig"
+                                                            placeholder="Soft Styling/Hard Styling/No Styling"
+                                                            class="form-control" name="ket_wig" aria-label="ket_wig"
+                                                            value="{{ old('ket_wig', $produk->keterangan_wig) }}"
+                                                            required>
+                                                        @error('ket_wig')
+                                                            <div class="text-danger form-text">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label for="ket_wig" class="form-label">Keterangan Styling Wig<span
-                                                            class="text-danger mb-3">*</span></label>
-                                                    <input type="text" id="ket_wig"
-                                                        placeholder="Soft Styling/Hard Styling/No Styling"
-                                                        class="form-control" name="ket_wig" aria-label="ket_wig"
-                                                        value="{{ old('ket_wig', $produk->keterangan_wig) }}" required>
-                                                    @error('ket_wig')
-                                                        <div class="text-danger form-text">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
+                                            @endif
                                         @endif
                                     </div>
                                     @if ($alamatTambahan)
@@ -319,7 +326,7 @@
                                         tambahan barang misalnya seperti aksesoris tambahan, masukan informasi tersebut
                                         disini beserta harga</div>
                                     <div id="additionalInputs">
-                                        @if ($produk->additional)
+                                        @if ($produk->additional && old('additional') == null)
                                             @foreach ($decodeAdd as $nama => $harga)
                                                 <div class="additional-input mb-3"
                                                     id="additional-{{ $nama }}-{{ $loop->iteration }}">
@@ -344,6 +351,44 @@
                                                     </div>
                                                 </div>
                                             @endforeach
+                                        @endif
+                                        @if (old('additional'))
+                                            @for ($i = 0; $i < count(old('additional')); $i += 2)
+                                                <div class="additional-input mb-3" id="additional-{{ $i }}">
+                                                    <div class="fw-bolder fs-5">Additional <span class="btn"
+                                                            onclick="removeAdditionalInput('additional-{{ $i }}')"><i
+                                                                class="fas fa-trash"></i></span></div>
+                                                    <div class="form-group">
+                                                        <label for="additionalName-{{ $i }}">Nama
+                                                            Additional</label>
+                                                        <input type="text" class="form-control"
+                                                            id="additionalName-{{ $i }}" name="additional[]"
+                                                            value="{{ old('additional')[$i] }}" required
+                                                            @error('add' . $i)
+                                                            style="border-color:#D44E4E"
+                                                        @enderror>
+                                                        @error('add' . $i)
+                                                            <div class="text-danger form-text">{{ $message }}</div>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="additionalHarga_{{ $i + 1 }}">Harga
+                                                            Additional</label>
+                                                        <input type="number" pattern="^[0-9]*$"
+                                                            class="form-control additional-price"
+                                                            id="additionalPrice-{{ $i + 1 }}" name="additional[]"
+                                                            value="{{ old('additional')[$i + 1] }}" required
+                                                            @error('add' . $i + 1)
+                                                            style="border-color:#D44E4E"
+                                                        @enderror>
+                                                        @error('add' . $i + 1)
+                                                            <div class="text-danger form-text">{{ $message }}</div>
+                                                        @enderror
+                                                        <small class="mb-3" style="opacity: 75%;">Masukan Tanpa
+                                                            Titik</small>
+                                                    </div>
+                                                </div>
+                                            @endfor
                                         @endif
                                     </div>
                                     <button type="button" id="addAdditional" class="btn btn-outline"
@@ -408,6 +453,124 @@
                                             Perubahan</button>
                                     </div>
                                 </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- MODAL HELP INFORASI TAMBAHAN --}}
+                    <!-- Modal Grade -->
+                    <div class="modal fade" id="infoModalGrade" tabindex="-1" aria-labelledby="infoModalGradeLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="infoModalGradeLabel">Informasi Grade Kostum</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p class="fw-bold">Apa Itu Grade Kostum ?</p>
+                                    <p>Sistem grade digunakan untuk membedakan kostum-kostum berdasarkan tingkat
+                                        kompleksitas, kualitas, dan harga, serta untuk menentukan siapa yang memenuhi syarat
+                                        untuk menyewa setiap grade kostum tersebut.</p>
+
+                                    <p><span class="fw-bold">Jika penyewa
+                                            tidak memenuhi syarat,
+                                            maka ia tidak akan bisa merental kostum tersebut.</span> Berikut adalah
+                                        penjelasan mengenai
+                                        sistem grade yang kami terapkan:</p>
+
+                                    <p class="fw-bold">Grade 1</p>
+                                    <ul>
+                                        <li><span class="fw-bold">Syarat Penyewa :</span> Dapat disewa oleh siapa saja,
+                                            termasuk penyewa baru atau newbie.
+                                        </li>
+                                        <li>Sebaiknya anda memberikan grade 1 untuk kostum yang memiliki brand
+                                            standar/low-end, dengan aksesoris yang sedikit. Namun, keputusan penuh ada di
+                                            tangan anda untuk menentukan apakah kostum yang anda rental cocok di grade 1
+                                            ini.
+                                        </li>
+                                    </ul>
+                                    <p class="fw-bold">Grade 2</p>
+                                    <ul>
+                                        <li><span class="fw-bold">Syarat Penyewa :</span> Hanya bisa disewa oleh pelanggan
+                                            yang sudah memiliki pengalaman menyewa di kalasewa sebelumnya.
+                                        </li>
+                                        <li>Penyewa baru atau newbie tidak dapat bisa merental kostum dengan grade 2 ini.
+                                        </li>
+                                    </ul>
+
+                                    <p class="fw-bold">Grade 3</p>
+                                    <ul>
+                                        <li><span class="fw-bold">Syarat Penyewa :</span> Hanya bisa disewa oleh pelanggan
+                                            yang sudah memiliki pengalaman menyewa di kalasewa sebelumnya sebanyak 3x, dan
+                                            penyewa memiliki
+                                            rating review setidaknya 4. Setiap toko wajib memberikan rating penyewa setiap
+                                            selesai penyewaan, sehingga pasti akan ada rating untuk penyewa
+                                        </li>
+                                        <li>Penyewa baru atau newbie tidak dapat merental kostum dengan grade 3 ini.
+                                            Penyewa yang belum memiliki pengalaman di kalasewa, dan
+                                            memiliki rating dibawah 4 maka tidak dapat menyewa kostum grade ini.
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal Cuci -->
+                    <div class="modal fade" id="infoModalCuci" tabindex="-1" aria-labelledby="infoModalCuciLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="infoModalCuciLabel">Informasi Cuci Kostum</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Jika kostum anda memiliki biaya cuci, silahkan tekan ya. <span class="fw-bold">Biaya
+                                            cuci akan otomatis
+                                            tertambah pada saat penyewa checkout kostum anda. </span> Sehingga nanti harga
+                                        kostum + biaya laundry akan dikenakan kepada penyewa</p>
+                                    <p>Namun jika anda tidak memiliki biaya ini, maka cukup pilih "Tidak" pada opsi yang
+                                        diberikan</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Tutup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Modal Wig -->
+                    <div class="modal fade" id="infoModalWig" tabindex="-1" aria-labelledby="infoModalWigLabel"
+                        aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="infoModalWigLabel">Informasi Wig</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                        aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><span class="fw-bold">Jika katalog produk ini sudah termasuk wig, silahkan tekan
+                                            "ya" pada opsi.</span> Lalu inputkan informasi brand wig, beserta keterangan
+                                        styling wig anda. </p>
+                                    <p>Informasi wig ini akan terpampang secara jelas kepada penyewa untuk memberikan
+                                        informasi tambahan mengenai apa brand (kualitas) wig yang anda berikan kepada
+                                        pelanggan saat penyewaan, dan tipe styling nya</p>
+                                    <p>Namun jika anda tidak menyertakan wig pada katalog produk ini, maka cukup pilih
+                                        "Tidak" pada opsi yang
+                                        diberikan</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Tutup</button>
+                                </div>
                             </div>
                         </div>
                     </div>

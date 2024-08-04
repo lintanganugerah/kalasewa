@@ -2,13 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PenarikanSaldo;
 use App\Models\User;
+use App\Models\Tiket;
 use App\Models\Review;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
+use App\Events\UserChangeProfile;
+use Illuminate\Support\Facades\Validator;
 
 class UserController extends Controller
 {
@@ -33,17 +37,33 @@ class UserController extends Controller
         return view('admin.users.index', compact('users', 'adminUsers'));
     }
 
-
     public function userCount()
     {
         $totalPenyewaTerdaftar = User::where('role', 'penyewa')->where('verifyIdentitas', 'Sudah')->count();
         $totalPemilikSewaTerdaftar = User::where('role', 'pemilik_sewa')->where('verifyIdentitas', 'Sudah')->count();
         $totalPendingVerifikasi = User::where('role', '<>', 'admin')->where('verifyIdentitas', 'Tidak')->count();
+        $totalPendingTicket = Tiket::where('status', 'Menunggu Konfirmasi')->count();
+        $totalPendingFundPenyewa = PenarikanSaldo::join('users', 'penarikan_saldo.id_user', '=', 'users.id')
+            ->where('penarikan_saldo.status', 'Menunggu Konfirmasi')
+            ->where('users.role', 'penyewa')
+            ->count();
+        $totalPendingFundPemilik = PenarikanSaldo::join('users', 'penarikan_saldo.id_user', '=', 'users.id')
+            ->where('penarikan_saldo.status', 'Menunggu Konfirmasi')
+            ->where('users.role', 'pemilik_sewa')
+            ->count();
+
+        $totalPendapatan = DB::table('order_penyewaan')
+            ->whereIn('status', ['Retur Selesai', 'Penyewaan Selesai', 'Dibatalkan Pemilik Sewa', 'Dibatalkan Penyewa'])
+            ->sum('fee_admin');
 
         return view('admin.dashboard', [
             'totalPenyewaTerdaftar' => $totalPenyewaTerdaftar,
             'totalPemilikSewaTerdaftar' => $totalPemilikSewaTerdaftar,
             'totalPendingVerifikasi' => $totalPendingVerifikasi,
+            'totalPendapatan' => $totalPendapatan,
+            'totalPendingTicket' => $totalPendingTicket,
+            'totalPendingFundPenyewa' => $totalPendingFundPenyewa,
+            'totalPendingFundPemilik' => $totalPendingFundPemilik,
         ]);
     }
     public function index(Request $request)
@@ -89,12 +109,12 @@ class UserController extends Controller
             $user->nik = null;
             $user->no_telp = null;
             $user->no_darurat = null;
+            $user->ket_no_darurat = null;
             $user->alamat = null;
             $user->provinsi = null;
             $user->link_sosial_media = null;
             $user->kota = null;
             $user->kode_pos = null;
-            $user->badge = 'Banned';
 
             // Hapus foto dari storage
             $path = $user->foto_diri;
@@ -146,9 +166,9 @@ class UserController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'nama' => 'required|string|max:255',
-            'password' => 'required|string|min:8',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $id,
+            'nama' => 'string|max:255',
+            'password' => 'string|min:8',
+            'email' => 'string|email|max:255|unique:users,email,' . $id,
             'no_telp' => 'nullable|string|max:15',
         ]);
 
@@ -157,6 +177,8 @@ class UserController extends Controller
         $data = $request->all();
 
         $user->update($data);
+
+        event(new UserChangeProfile($user)); //Trigger event untuk mengubah kolom name, dan avatar chatify sesuai dengan data user
 
         return redirect()->route('admin.users.index')->with('success', 'User berhasil diperbarui.');
     }
@@ -169,42 +191,34 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        // Validasi data yang dikirimkan dari form
-        // dd($request->all());
-        $request->validate([
-            'nama' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+        $validator = Validator::make($request->all(), [
+            'nama' => 'required|string|max:255|unique:users,nama',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/',
+            ],
             'no_telp' => 'nullable|string|max:15',
-            'role' => 'required|in:penyewa,pemilik_sewa,admin,super_admin',
             'verifyIdentitas' => 'required|in:Sudah,Tidak,Ditolak',
+        ], [
+            'password.regex' => 'Field Password harus setidaknya lebih dari 8 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter khusus.',
         ]);
 
-        // Ambil semua data yang dikirimkan dari form
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
         $data = $request->all();
-
-        // Enkripsi password sebelum disimpan
+        $data['verifyIdentitas'] = 'Sudah';
+        $data['role'] = 'admin';
         $data['password'] = Hash::make($request->password);
 
-        // Pastikan verifyIdentitas diatur dengan benar
-        $data['verifyIdentitas'] = 'Sudah'; // atau sesuai kebutuhan aplikasi
-        $data['password'] = Hash::make($request->password);
-
-        // User::create($data);
         $user = User::create($data);
-
-        // Update bagian verifyIdentitas menjadi 'sudah'
-        $user->verifyIdentitas = $request->verifyIdentitas;
         $user->save();
 
-        // Simpan data user baru
-        $user = User::create($data);
-
-        $user->verifyIdentitas = $request->verifyIdentitas;
-        $user->save();
-
-        // Redirect ke halaman index dengan pesan sukses
-        return redirect()->route('admin.users.index')->with('success', 'User berhasil ditambahkan.');
+        return redirect()->route('admin.users.index')->with('success', 'Admin berhasil ditambahkan.');
     }
 
     public function destroy($id)

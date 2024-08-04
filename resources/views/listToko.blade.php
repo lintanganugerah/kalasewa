@@ -50,17 +50,27 @@
                                 alt="fotoproduk" style="object-fit: cover;">
                             <div class="card-body">
                                 <h5 style="margin-bottom: 5px;"><strong>{{ $tk->nama_toko }}</strong></h5>
-                                <div class="rating-toko" style="margin-bottom: 5px;">
-                                    Rating Toko : {{ $tk->rating_toko }} <i class="ri-star-line"></i>
-                                </div>
-                                @if ($tk->rating_toko >= 4)
-                                <h5><span class="badge text-bg-warning">Terpercaya</span></h5>
-                                @elseif ($tk->rating_toko < 2.5) <h5>
-                                    <span class="badge text-bg-primary">
-                                        Pendatang</span>
-                                    </h5>
-                                    @elseif ($tk->rating_toko >= 2.5 && $tk->rating_toko < 4) <h5><span
-                                            class="badge text-bg-secondary">Standar</span></h5>
+                                <p style="margin-bottom: 5px;">Rating Toko:
+                                    @if(isset($averageRatings[$tk->id]))
+                                    {{ number_format($averageRatings[$tk->id], 1) }}
+                                    @else
+                                    0
+                                    @endif
+                                    <i class="ri-star-line"></i>
+                                </p>
+                                @if (isset($averageRatings[$tk->id]) && $averageRatings[$tk->id] >= 4)
+                                <span class="badge text-white"
+                                    style="background: linear-gradient(to right, #EAD946, #D99C00);">Terpercaya</span>
+                                @elseif (
+                                isset($averageRatings[$tk->id]) && $averageRatings[$tk->id] > 0 &&
+                                $averageRatings[$tk->id] < 2.5 ) <span class="badge text-bg-danger">Bermasalah</span>
+                                    @elseif (
+                                    isset($averageRatings[$tk->id]) && $averageRatings[$tk->id] >= 2.5 &&
+                                    $averageRatings[$tk->id] < 4 ) <span class="badge text-white"
+                                        style="background-color: #EB7F01;">Standar</span>
+                                        @else
+                                        <span class="badge text-white" style="background-color: 6DC0D0;">Pendatang
+                                            Baru</span>
                                         @endif
                                         <p class="card-text" style="color: orange;">
                                             <i class="ri-t-shirt-line"></i>

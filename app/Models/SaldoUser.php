@@ -14,6 +14,7 @@ class SaldoUser extends Model
     protected $fillable = [
         'id_user',
         'tujuan_rek',
+        'nama_rekening',
         'nomor_rekening',
         'saldo',
     ];

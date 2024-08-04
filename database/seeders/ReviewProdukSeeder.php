@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use App\Models\Produk;
+use App\Models\Review;
 
 class ReviewProdukSeeder extends Seeder
 {
@@ -109,10 +111,10 @@ class ReviewProdukSeeder extends Seeder
         ];
 
         foreach ($reviews as $review) {
-            DB::table('review')->insert([
+            $reviewProduk = Review::create([
                 'id_penyewa' => mt_rand(1, 3),
                 'id_toko' => mt_rand(1, 2),
-                'id_produk' => mt_rand(1, 2),
+                // 'id_produk' => mt_rand(1, 2),
                 'komentar' => $review['komentar'],
                 'nilai' => $review['nilai'],
                 'foto' => json_encode($review['foto'], JSON_UNESCAPED_SLASHES), // Buat array ke JSON tanpa slashes
@@ -120,6 +122,10 @@ class ReviewProdukSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
+            $produk = Produk::where('id_toko', $reviewProduk->id_toko)->get();
+            $count = $produk->count();
+            $reviewProduk->id_produk = $produk[mt_rand($count - 2, $count - 1)]->id;
+            $reviewProduk->save();
         }
 
         foreach ($reviewsPenyewa as $review) {

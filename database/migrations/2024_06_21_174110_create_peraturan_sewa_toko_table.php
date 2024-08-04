@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('denda_pasti')->nullable();
             $table->string('denda_kondisional')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->foreign('id_toko')->references('id')->on('tokos')->onUpdate('cascade')->onDelete('cascade');
         });
