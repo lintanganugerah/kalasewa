@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class SeriesController extends Controller
 {
-    // Metode untuk melakukan pencarian
     public function search(Request $request)
     {
         if ($request->has('search')) {
@@ -20,12 +19,20 @@ class SeriesController extends Controller
         return view('admin.series.index', compact('series'));
     }
 
-
-    public function index()
+    public function index(Request $request)
     {
-        $series = Series::orderBy('updated_at', 'desc')->paginate(10);
-        return view('admin.series.index', compact('series'));
+        $search = $request->input('search');
+        $query = Series::query();
+
+        if ($search) {
+            $query->where('series', 'like', '%' . $search . '%');
+        }
+
+        $series = $query->orderByRaw('GREATEST(created_at, updated_at) DESC')->paginate(10)->appends(['search' => $search]);
+
+        return view('admin.series.index', compact('series', 'search'));
     }
+
 
     public function create()
     {

@@ -19,11 +19,11 @@
                     <!-- NAVTABS -->
                     <ul class="nav nav-tabs" id="myTab" role="tablist">
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link" id="penyewa-tab" href="{{ route('registerViewPenyewa') }}" role="tab"
+                            <a class="nav-link text-secondary" id="penyewa-tab" href="{{ route('registerViewPenyewa') }}" role="tab"
                                 aria-controls="penyewa" aria-selected="false">Penyewa</a>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <a class="nav-link active" id="pemilik-sewa-tab"
+                            <a class="nav-link fw-bold active" id="pemilik-sewa-tab"
                                 href="{{ route('registerViewPemilikSewa') }}" role="tab" aria-controls="pemilik-sewa"
                                 aria-selected="true">Pemilik Sewa</a>
                         </li>

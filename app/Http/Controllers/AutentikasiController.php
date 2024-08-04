@@ -492,6 +492,8 @@ class AutentikasiController extends Controller
                 return redirect()->route('seller.dashboardtoko');
             } else if ($user->role === "penyewa") {
                 return redirect()->route('viewHomepage');
+            } else if ($user->role === "admin" || $user->role === "super_admin") {
+                return redirect()->route('admin.dashboard');
             }
         }
         return view('authentication.login');
@@ -653,8 +655,23 @@ class AutentikasiController extends Controller
     public function updateSandi(Request $request)
     {
         $request->validate([
-            'password' => 'required|min:8|confirmed',
+            'current_password' => 'required|current_password',
+            'password' => [
+                'required',
+                'string',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/',
+                'confirmed',
+            ],
+            'password_confirmation' => 'required',
+        ], [
+            'password.regex' => 'Field Password harus setidaknya lebih dari 8 karakter, mengandung huruf besar, huruf kecil, angka, dan karakter khusus.',
+
         ]);
+
+        if (!Hash::check($request->current_password, Auth::user()->password)) {
+            return back()->withErrors(['current_password' => 'Kata sandi lama tidak sesuai.']);
+        }
 
         $user = Auth::user();
         $user->password = Hash::make($request->password);

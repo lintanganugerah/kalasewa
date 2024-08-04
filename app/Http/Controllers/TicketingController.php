@@ -77,9 +77,96 @@ class TicketingController extends Controller
         $ticketing->deskripsi = $request->deskripsi_ticketing;
         $ticketing->status = "Menunggu Konfirmasi";
         $ticketing->user_id = Auth()->User()->id;
-        $ticketing->bukti_tiket = json_encode($uploadedImages);
+        $ticketing->bukti_tiket = ($uploadedImages);
         $ticketing->save();
 
         return redirect()->route('viewTicketing')->with('success', 'Berhasil Mengajukan Ticketing');
+    }
+
+    // admin
+    public function index()
+    {
+        $tickets = Tiket::with(['user', 'kategori'])
+            ->whereIn('status', ['Menunggu Konfirmasi', 'Sedang Diproses'])
+            ->get();
+
+        $completedOrRejectedTickets = Tiket::with(['user', 'kategori'])
+            ->whereIn('status', ['Selesai', 'Ditolak'])
+            ->get();
+
+        return view('admin.ticket.index', compact('tickets', 'completedOrRejectedTickets'));
+    }
+
+    public function show($id)
+    {
+        $ticket = Tiket::with(['user', 'kategori'])->findOrFail($id);
+        return view('admin.ticket.show', compact('ticket'));
+    }
+
+    public function reject(Request $request, $id)
+    {
+        $request->validate([
+            'alasan_penolakan' => 'required|string|max:255',
+        ]);
+
+        $ticket = Tiket::findOrFail($id);
+        $ticket->status = 'Ditolak';
+        $ticket->alasan_penolakan = $request->alasan_penolakan;
+        $ticket->save();
+
+        return redirect()->route('admin.ticket.index')->with('success', 'Ticket telah ditolak.');
+    }
+
+    public function process($id)
+    {
+        $ticket = Tiket::findOrFail($id);
+        $ticket->status = 'Sedang Diproses';
+        $ticket->save();
+
+        return redirect()->route('admin.ticket.index')->with('success', 'Ticket sedang diproses.');
+    }
+
+    public function complete($id)
+    {
+        $ticket = Tiket::findOrFail($id);
+        $ticket->status = 'Selesai';
+        $ticket->save();
+
+        return redirect()->route('admin.ticket.index')->with('success', 'Tiket berhasil diselesaikan.');
+    }
+
+    // Pengajuan Retur
+
+    public function indexRetur()
+    {
+        $returs = OrderPenyewaan::with(['penyewa', 'produk'])
+            ->where('status', 'Retur')
+            ->get();
+
+        return view('admin.retur.index', compact('returs'));
+    }
+
+    public function showRetur($nomor_order)
+    {
+        $retur = OrderPenyewaan::with(['penyewa', 'produk'])->where('nomor_order', $nomor_order)->firstOrFail();
+        return view('admin.retur.show', compact('retur'));
+    }
+
+    public function completeRetur($id)
+    {
+        $retur = OrderPenyewaan::findOrFail($id);
+        $retur->status = 'Retur Dikonfirmasi';
+        $retur->save();
+
+        return redirect()->route('admin.retur.index')->with('success', 'Retur telah dikonfirmasi.');
+    }
+
+    public function rejectRetur(Request $request, $id)
+    {
+        $retur = OrderPenyewaan::findOrFail($id);
+        $retur->status = 'Sedang Berlangsung';
+        $retur->save();
+
+        return redirect()->route('admin.retur.index')->with('success', 'Retur telah ditolak.');
     }
 }

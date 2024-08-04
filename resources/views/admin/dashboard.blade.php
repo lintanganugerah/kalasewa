@@ -65,7 +65,7 @@
         <div class="row no-gutters align-items-center">
           <div class="col mr-2">
             <div class="text-xs font-weight-bold text-uppercase mb-1">Pending Ticket</div>
-            <div class="h2 mt-2 mr-3 font-weight-bold text-gray-800">12</div>
+            <div class="h2 mt-2 mr-3 font-weight-bold text-gray-800">{{ $totalPendingTicket }}</div>
           </div>
           <div class="col-auto">
             <i class="fas fa-comments fa-2x text-success"></i>
@@ -79,8 +79,8 @@
       <div class="card-body">
         <div class="row no-gutters align-items-center">
           <div class="col mr-2">
-            <div class="text-xs font-weight-bold text-uppercase mb-1">Pending Refund</div>
-            <div class="h2 mt-2 mr-3 font-weight-bold text-gray-800">12</div>
+            <div class="text-xs font-weight-bold text-uppercase mb-1">Pending Refund (Penyewa)</div>
+            <div class="h2 mt-2 mr-3 font-weight-bold text-gray-800">{{ $totalPendingFundPenyewa }}</div>
           </div>
           <div class="col-auto">
             <i class="fas fa-comment-dollar fa-2x text-danger"></i>
@@ -94,8 +94,8 @@
       <div class="card-body">
         <div class="row no-gutters align-items-center">
           <div class="col mr-2">
-            <div class="text-xs font-weight-bold text-uppercase mb-1">Pending Withdraw</div>
-            <div class="h2 mt-2 mr-3 font-weight-bold text-gray-800">12</div>
+            <div class="text-xs font-weight-bold text-uppercase mb-1">Pending Withdraw (Toko)</div>
+            <div class="h2 mt-2 mr-3 font-weight-bold text-gray-800">{{ $totalPendingFundPemilik }}</div>
           </div>
           <div class="col-auto">
             <i class="fas fa-credit-card fa-2x text-danger"></i>

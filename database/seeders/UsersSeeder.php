@@ -88,7 +88,7 @@ class UsersSeeder extends Seeder
         // Admin
         $admin = User::create([
             'nama' => 'admin',
-            'email' => 'admin@kalasewa.com',
+            'email' => 'green.project28@gmail.com',
             'password' => Hash::make('admin1234'),
             'no_telp' => '085161252804',
             'foto_profil' => 'storage/profiles/profil_default.jpg',

@@ -22,6 +22,7 @@ use App\Models\Review;
 use App\Models\PeraturanSewa;
 use App\Models\Peraturan;
 use App\Models\TopSeries;
+use App\Models\AboutUs;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -31,6 +32,15 @@ class PublicController extends Controller
     // MARKETPLACE HOMEPAGE
     public function viewHomepage(Request $request)
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->role === "pemilik_sewa") {
+                return redirect()->route('seller.dashboardtoko');
+            } else if ($user->role === "admin" || $user->role === "super_admin") {
+                return redirect()->route('admin.dashboard');
+            }
+        }
+
         // Ambil semua nilai unik brand, tanpa memandang status produk
         $brand = Produk::select('brand')->distinct()->orderBy('brand', 'asc')->pluck('brand');
 
@@ -242,7 +252,8 @@ class PublicController extends Controller
 
     public function viewAbout()
     {
-        return view('aboutus');
+        $aboutUs = AboutUs::first();
+        return view('aboutus', compact('aboutUs'));
     }
 
     public function viewPencarian(Request $request)

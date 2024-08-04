@@ -36,64 +36,64 @@
                     <div class="table-ticketing mt-3">
                         <table class="table w-100" id="table-ticketing">
                             @if ($ticketing)
-                            <thead>
-                                <tr>
-                                    <td class="text-center fw-bold">Nomor Tiket</td>
-                                    <td class="text-center fw-bold">Dibuat Tanggal</td>
-                                    <td class="text-center fw-bold">Permasalahan</td>
-                                    <td class="text-center fw-bold">Deskripsi</td>
-                                    <td class="text-center fw-bold">Gambar</td>
-                                    <td class="text-center fw-bold">Status</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach ($ticketing as $ticket)
-                                <tr>
-                                    <td class="text-center">{{ $ticket->id }}</td>
-                                    <td class="text-center">{{ $ticket->created_at }}</td>
-                                    <td class="text-center">{{ $ticket->kategori->nama }}</td>
-                                    <td class="text-center">{{ $ticket->deskripsi }}</td>
-                                    <td>
-                                        <a class="btn btn-danger w-100" href="#" role="button" data-bs-toggle="modal"
-                                            data-bs-target="#buktiModal-{{ $loop->iteration }}">Lihat Bukti</a>
-                                    </td>
-                                    <td class="text-center">{{ $ticket->status }}</td>
-                                </tr>
+                                <thead>
+                                    <tr>
+                                        <td class="text-center fw-bold">Nomor Tiket</td>
+                                        <td class="text-center fw-bold">Dibuat Tanggal</td>
+                                        <td class="text-center fw-bold">Permasalahan</td>
+                                        <td class="text-center fw-bold">Deskripsi</td>
+                                        <td class="text-center fw-bold">Gambar</td>
+                                        <td class="text-center fw-bold">Status</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($ticketing as $ticket)
+                                        <tr>
+                                            <td class="text-center">{{ $ticket->id }}</td>
+                                            <td class="text-center">{{ $ticket->created_at }}</td>
+                                            <td class="text-center">{{ $ticket->kategori->nama }}</td>
+                                            <td class="text-center">{{ $ticket->deskripsi }}</td>
+                                            <td>
+                                                <a class="btn btn-danger w-100" href="#" role="button" data-bs-toggle="modal"
+                                                    data-bs-target="#buktiModal-{{ $loop->iteration }}">Lihat Bukti</a>
+                                            </td>
+                                            <td class="text-center">{{ $ticket->status }}</td>
+                                        </tr>
 
-                                <!-- MODAL FOTO BUKTI -->
-                                <div class="modal fade" id="buktiModal-{{ $loop->iteration }}" tabindex="-1"
-                                    aria-labelledby="examplebuktiModal-{{ $loop->iteration }}" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h1 class="modal-title fs-5" id="exampleModalLabel">Bukti Foto</h1>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                    aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body">
+                                        <!-- MODAL FOTO BUKTI -->
+                                        <div class="modal fade" id="buktiModal-{{ $loop->iteration }}" tabindex="-1"
+                                            aria-labelledby="examplebuktiModal-{{ $loop->iteration }}" aria-hidden="true">
+                                            <div class="modal-dialog">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h1 class="modal-title fs-5" id="exampleModalLabel">Bukti Foto</h1>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
 
-                                                @if ($ticket->bukti_tiket)
-                                                @foreach (json_decode($ticket->bukti_tiket) as $foto)
-                                                <img class="rounded img-fluid mb-3" src="{{ asset($foto) }}"
-                                                    alt="Bukti Foto Tiket">
-                                                @endforeach
-                                                @else
-                                                <p> Tidak ada Foto Bukti </p>
-                                                @endif
+                                                        @if ($ticket->bukti_tiket)
+                                                            @foreach ($ticket->bukti_tiket as $foto)
+                                                                <img class="rounded img-fluid mb-3" src="{{ asset($foto) }}"
+                                                                    alt="Bukti Foto Tiket">
+                                                            @endforeach
+                                                        @else
+                                                            <p> Tidak ada Foto Bukti </p>
+                                                        @endif
 
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-danger"
-                                                    data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-danger"
+                                                            data-bs-dismiss="modal">Close</button>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
 
-                                @endforeach
-                            </tbody>
+                                    @endforeach
+                                </tbody>
                             @else
-                            Kamu belum ada mengajukan ticketing!
+                                Kamu belum ada mengajukan ticketing!
                             @endif
                         </table>
                     </div>

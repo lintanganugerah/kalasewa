@@ -31,6 +31,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\PenilaianSisiSellerController;
+use App\Http\Controllers\BanksController;
+use App\Http\Controllers\FundsController;
 use App\Http\Controllers\Pemilik\PengajuanDendaController;
 use App\Http\Controllers\Pemilik\PenarikanSaldoController;
 use App\Http\Controllers\Pemilik\RekeningController;
@@ -156,6 +158,14 @@ Route::group(['middleware' => 'penyewa'], function () {
     Route::post('/order/denda-lain/createSnap/updatePenghasilan/{orderId}', [OrderController::class, 'updatePenghasilanDendaLain'])->name('updatePenghasilanDendaLain');
     Route::post('/order/denda-retur/createSnap/{orderId}', [OrderController::class, 'createSnapTokenDendaRetur'])->name('createSnapTokenDendaRetur');
     Route::post('/order/denda-retur/createSnap/updatePenghasilan/{orderId}', [OrderController::class, 'updatePenghasilanDendaRetur'])->name('updatePenghasilanDendaRetur');
+    //Ticketing
+    Route::get('/kalasewa/ticketing', [TicketingController::class, 'viewTicketing'])->name('viewTicketing');
+    Route::get('/kalasewa/ticketing/create', [TicketingController::class, 'viewNewTicketing'])->name('viewNewTicketing');
+    Route::post('/kalasewa/ticketing/create/act', [TicketingController::class, 'createTicket'])->name('createTicket');
+
+
+    // Tes route getTransaction midtrans
+    // Route::post('/order/checkout/cekTransaksi', [OrderController::class, 'getTransaction'])->name('tesCekCheckout');
 });
 
 //Pemilik Sewa SEMUA ROUTE
@@ -271,16 +281,15 @@ Route::group(['middleware' => 'admin'], function () {
     Route::get('/admin/dashboard', [UserController::class, 'userCount'])->name('admin.dashboard');
 
     // Series Routes
-    // Route::resource('admin/series', SeriesController::class);
+    Route::get('/admin/series', [SeriesController::class, 'index'])->name('admin.series.index');
+    Route::get('/admin/series/search', [SeriesController::class, 'search'])->name('admin.series.search');
     Route::get('/admin/series/{series}/edit', [SeriesController::class, 'edit'])->name('admin.series.edit');
     Route::put('/admin/series/{series}', [SeriesController::class, 'update'])->name('admin.series.update');
     Route::delete('/admin/series/{series}', [SeriesController::class, 'destroy'])->name('admin.series.destroy');
     Route::get('/admin/series/create', [SeriesController::class, 'create'])->name('admin.series.create');
-    Route::get('/admin/series', [SeriesController::class, 'index'])->name('admin.series.index');
     Route::post('/admin/series', [SeriesController::class, 'store'])->name('admin.series.store');
-    Route::get('/admin/series/search', [SeriesController::class, 'search'])->name('admin.series.search');
 
-    // Role Routes
+    // Users Routes
     Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');
     Route::get('/admin/users/create', [UserController::class, 'create'])->name('admin.users.create');
     Route::post('/admin/users', [UserController::class, 'store'])->name('admin.users.store');
@@ -297,9 +306,44 @@ Route::group(['middleware' => 'admin'], function () {
     Route::post('/admin/users/{user}/reject', [UserController::class, 'reject'])->name('admin.users.reject');
 
     // Peraturan Platform
+    // About Us
+    Route::get('/admin/aboutus', [AdminController::class, 'indexAboutUs'])->name('admin.aboutus.index');
+    Route::get('/admin/aboutus/edit', [AdminController::class, 'editAboutUs'])->name('admin.aboutus.edit');
+    Route::post('/admin/aboutus/update', [AdminController::class, 'updateAboutUs'])->name('admin.aboutus.update');
+
+    // Regulations Platform
     Route::get('/admin/regulations', [AdminController::class, 'indexRegulations'])->name('admin.regulations.index');
     Route::post('/admin/regulations/update', [AdminController::class, 'updateRegulations'])->name('admin.regulations.update');
     Route::get('/admin/regulations/{id}/edit', [AdminController::class, 'editRegulations'])->name('admin.regulations.edit');
+
+    // Banks Routes
+    Route::get('/admin/banks/{id}/edit', [BanksController::class, 'edit'])->name('admin.banks.edit');
+    Route::put('/admin/banks/{id}', [BanksController::class, 'update'])->name('admin.banks.update');
+    Route::delete('/admin/banks/{id}', [BanksController::class, 'destroy'])->name('admin.banks.destroy');
+    Route::get('/admin/banks/create', [BanksController::class, 'create'])->name('admin.banks.create');
+    Route::post('/admin/banks', [BanksController::class, 'store'])->name('admin.banks.store');
+    Route::get('/admin/banks', [BanksController::class, 'index'])->name('admin.banks.index');
+    Route::get('/admin/banks/search', [BanksController::class, 'search'])->name('admin.banks.search');
+
+    // Refunds Routes
+    Route::get('/admin/refund', [FundsController::class, 'index'])->name('admin.refunds.index');
+    Route::post('/admin/refunds/transfer/{id}', [FundsController::class, 'transfer'])->name('admin.refunds.transfer');
+    Route::get('/admin/refunds/{id}', [FundsController::class, 'show'])->name('admin.refunds.show');
+    Route::post('/admin/refunds/process', [FundsController::class, 'process'])->name('admin.refunds.process');
+    Route::post('/admin/refunds/reject', [FundsController::class, 'reject'])->name('admin.refunds.reject');
+
+    // Ticket Routes
+    Route::get('/admin/ticket', [TicketingController::class, 'index'])->name('admin.ticket.index');
+    Route::get('/admin/ticket/{id}', [TicketingController::class, 'show'])->name('admin.ticket.show');
+    Route::post('/admin/ticket/{id}/reject', [TicketingController::class, 'reject'])->name('admin.ticket.reject');
+    Route::post('/admin/ticket/{id}/process', [TicketingController::class, 'process'])->name('admin.ticket.process');
+    Route::post('/ticket/{id}/complete', [TicketingController::class, 'complete'])->name('admin.ticket.complete');
+
+    // Retur Routes
+    Route::get('/admin/retur', [TicketingController::class, 'indexRetur'])->name('admin.retur.index');
+    Route::get('/admin/retur/{nomor_order}', [TicketingController::class, 'showRetur'])->name('admin.retur.show');
+    Route::post('/admin/retur/{nomor_order}/complete', [TicketingController::class, 'completeRetur'])->name('admin.retur.complete');
+    Route::get('/admin/retur/{nomor_order}/reject', [TicketingController::class, 'rejectRetur'])->name('admin.retur.reject');
 
     // Logout
     Route::get('/logout/admin', [AutentikasiController::class, 'logout'])->name('admin.logout');

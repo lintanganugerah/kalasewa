@@ -1,5 +1,3 @@
-<!-- resources/views/admin/ubahSandi.blade.php -->
-
 @extends('admin.layout.app')
 
 @section('title', 'Ubah Sandi')
@@ -21,35 +19,52 @@
                 {{ session('success') }}
             </div>
         @endif
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                @foreach ($errors->all() as $error)
-                    {{ $error }}
-                @endforeach
-            </div>
-        @endif
 
         <form action="{{ route('admin.updateSandi') }}" method="POST">
             @csrf
             <div class="form-group">
-                <label for="password">Kata Sandi Baru</label>
+                <label for="current_password">Kata Sandi Lama<span class="text-danger">*</span></label>
                 <div class="input-group">
-                    <input type="password" class="form-control" id="password" name="password"
-                        placeholder="Masukkan Kata Sandi Baru">
-                    <div class="input-group-append">
-                        <button type="button" class="btn btn-outline-secondary" id="toggle-password"
-                            onclick="togglePassword()">
-                            <i class="fas fa-eye" id="toggle-icon"></i>
-                        </button>
-                    </div>
+                    <input type="password" class="form-control @error('current_password') is-invalid @enderror"
+                        id="current_password" name="current_password" placeholder="Masukkan Kata Sandi Lama"
+                        value="{{ old('current_password') }}" required>
+                    @error('current_password')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
                 </div>
             </div>
             <div class="form-group">
-                <label for="password_confirmation">Konfirmasi Kata Sandi Baru</label>
-                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation"
-                    placeholder="Konfirmasi Kata Sandi Baru">
+                <label for="password">Kata Sandi Baru<span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="password" class="form-control @error('password') is-invalid @enderror" id="password"
+                        name="password" placeholder="Masukkan Kata Sandi Baru" value="{{ old('password') }}" required>
+                    @error('password')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary">Ubah</button>
+            <div class="form-group">
+                <label for="password_confirmation">Konfirmasi Kata Sandi Baru<span class="text-danger">*</span></label>
+                <div class="input-group">
+                    <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror"
+                        id="password_confirmation" name="password_confirmation" placeholder="Konfirmasi Kata Sandi Baru"
+                        required>
+                    @error('password_confirmation')
+                        <span class="invalid-feedback" role="alert">
+                            <strong>{{ $message }}</strong>
+                        </span>
+                    @enderror
+                </div>
+            </div>
+            <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input" id="show-passwords" onclick="togglePassword()">
+                <label class="form-check-label" for="show-passwords">Tampilkan kata sandi</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Simpan</button>
             <a href="{{ route('admin.dashboard') }}" class="btn btn-secondary">Batal</a>
         </form>
     </div>
@@ -57,20 +72,15 @@
 
 <script>
     function togglePassword() {
-        const passwordInput = document.getElementById('password');
-        const passwordConfirmInput = document.getElementById('password_confirmation');
-        const toggleIcon = document.getElementById('toggle-icon');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            passwordConfirmInput.type = 'text';
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
-        } else {
-            passwordInput.type = 'password';
-            passwordConfirmInput.type = 'password';
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
-        }
+        const passwordInputs = [
+            document.getElementById('current_password'),
+            document.getElementById('password'),
+            document.getElementById('password_confirmation')
+        ];
+        const showPasswords = document.getElementById('show-passwords');
+        passwordInputs.forEach(input => {
+            input.type = showPasswords.checked ? 'text' : 'password';
+        });
     }
 </script>
 

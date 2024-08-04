@@ -11,6 +11,7 @@
         <li class="breadcrumb-item active" aria-current="page">Manajemen Series</li>
     </ol>
 </div>
+
 @if (session('success'))
     <div class="alert alert-success">
         {{ session('success') }}
@@ -29,8 +30,9 @@
         </a>
     </div>
     <div class="col-md-6 mb-3 d-flex justify-content-end">
-        <form action="{{ route('admin.series.search') }}" class="form-inline" method="GET">
-            <input type="search" name="search" class="form-control mr-2" placeholder="Search">
+        <form action="{{ route('admin.series.index') }}" class="form-inline" method="GET">
+            <input type="search" name="search" class="form-control mr-2" placeholder="Search"
+                value="{{ request('search') }}">
             <button type="submit" class="btn btn-default">
                 <i class="fas fa-search"></i>
             </button>
@@ -51,7 +53,7 @@
                     <th colspan="2" style="text-align: center;">Aksi</th>
                 </tr>
             </thead>
-            <tbody id="series-table">
+            <tbody>
                 @foreach ($series as $seriesItem)
                     <tr>
                         <td>{{ $seriesItem->series }}</td>
@@ -67,11 +69,11 @@
 
                     <!-- Modal Konfirmasi Delete -->
                     <div class="modal fade" id="confirmDeleteModal{{ $seriesItem->id }}" tabindex="-1" role="dialog"
-                        aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+                        aria-labelledby="confirmDeleteModalLabel{{ $seriesItem->id }}" aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="confirmDeleteModalLabel">Konfirmasi Delete
+                                    <h5 class="modal-title" id="confirmDeleteModalLabel{{ $seriesItem->id }}">Konfirmasi Delete
                                         Series</h5>
                                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
@@ -99,7 +101,7 @@
     @endif
 
     <div style="display: flex; justify-content: center; margin: 20px 0;">
-        {{ $series->onEachSide(1)->links() }}
+        {{ $series->appends(request()->query())->links() }}
     </div>
 </div>
 
@@ -108,7 +110,6 @@
 @section('scripts')
 <script>
     $(document).ready(function () {
-        // Set action form delete saat tombol delete di modal diklik
         $('.btn-danger').on('click', function () {
             var seriesId = $(this).closest('tr').find('.series-id').text();
             var action = $('#deleteForm' + seriesId).attr('action');

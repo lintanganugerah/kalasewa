@@ -29,8 +29,8 @@
         <div class="card-body">
             <h5 class="card-title">{{ $peraturan->Judul }}</h5>
             <div class="form-group">
-                <textarea class="form-control" name="Peraturan[{{ $peraturan->id }}]"
-                    rows="10">{{ old('Peraturan.' . $peraturan->id, $peraturan->Peraturan) }}</textarea>
+                <textarea class="form-control" name="Peraturan[{{ $peraturan->id }}]" rows="10"
+                    id="editor">{{ old('Peraturan.' . $peraturan->id, $peraturan->Peraturan) }}</textarea>
             </div>
             <button type="submit" class="btn btn-primary">Update</button>
         </div>

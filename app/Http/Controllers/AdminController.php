@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Series;
 use Illuminate\Http\Request;
 use App\Models\Peraturan;
+use App\Models\AboutUs;
 use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
@@ -19,6 +20,36 @@ class AdminController extends Controller
         $series = Series::all(); // Ambil semua data series dari tabel 'series'
 
         return view('admin.series', compact('series'));
+    }
+
+    public function indexAboutUs()
+    {
+        $aboutUs = AboutUs::first();
+
+        return view('admin.aboutUs.index', compact('aboutUs'));
+    }
+
+    public function editAboutUs()
+    {
+        $aboutUs = AboutUs::first();
+
+        return view('admin.aboutUs.edit', compact('aboutUs'));
+    }
+
+    public function updateAboutUs(Request $request)
+    {
+        $request->validate([
+            'content' => 'required|string',
+        ]);
+
+        $aboutUs = AboutUs::first();
+        if (!$aboutUs) {
+            $aboutUs = new AboutUs();
+        }
+        $aboutUs->content = $request->content;
+        $aboutUs->save();
+
+        return redirect()->route('admin.aboutus.index')->with('success', 'Tentang Kalasewa berhasil diperbarui.');
     }
 
     public function indexRegulations()
@@ -36,7 +67,6 @@ class AdminController extends Controller
         $peraturan = Peraturan::find($id);
         return view('admin.regulations.edit', compact('peraturan'));
     }
-
 
     public function updateRegulations(Request $request)
     {

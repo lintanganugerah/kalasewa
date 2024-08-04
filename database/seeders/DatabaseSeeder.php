@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             TujuanRekeningSeeder::class,
             PeraturanSeeder::class,
             KategoriTiketSeeder::class,
+            AboutUsSeeder::class,
         ]);
 
     }

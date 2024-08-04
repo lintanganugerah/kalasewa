@@ -167,6 +167,51 @@
         });
     </script>
 
+    <script>
+        new DataTable('#table-ticketing', {
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, 'All']
+            ],
+            search: {
+                return: true
+            }
+        });
+    </script>
+
+    <script type="importmap">
+                {
+                    "imports": {
+                        "ckeditor5": "https://cdn.ckeditor.com/ckeditor5/42.0.2/ckeditor5.js",
+                        "ckeditor5/": "https://cdn.ckeditor.com/ckeditor5/42.0.2/"
+                    }
+                }
+            </script>
+
+    <script type="module">
+        import {
+            ClassicEditor,
+            Essentials,
+            Bold,
+            Italic,
+            Font,
+            Paragraph
+        } from 'ckeditor5';
+
+        ClassicEditor
+            .create(document.querySelector('#editor'), {
+                plugins: [Essentials, Bold, Italic, Font, Paragraph],
+                toolbar: {
+                    items: [
+                        'undo', 'redo', '|', 'bold', 'italic', '|',
+                        'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor'
+                    ]
+                }
+            })
+            .then( /* ... */)
+            .catch( /* ... */);
+    </script>
+
     @yield('scripts')
 
 </body>

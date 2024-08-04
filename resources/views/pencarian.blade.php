@@ -30,7 +30,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
     <div class="filter-select">
         <div class="container-fluid">
@@ -220,9 +219,46 @@
                 @endforeach
             </div>
         </div>
-    </div>
 
-    @include('layout.footer')
+        <div class="show-produk mt-5">
+            <div class="container-fluid">
+                <div class="container">
+                    @foreach ($produk->chunk(5) as $chunk)
+                        <div class="row-kartu d-flex mb-3">
+                            @foreach ($chunk as $prod)
+                                <div class="col-2" style="margin-right: 43px;">
+                                    <a href="{{ route('viewDetail', ['id' => $prod->id]) }}" class="card-link">
+                                        <div class="card custom-card text-bg-dark border-secondary"
+                                            style="width: 250px; height: 100%;">
+                                            @foreach ($fotoproduk->where('id_produk', $prod->id)->take(1) as $foto)
+                                                <img src="{{ asset($foto->path) }}" class="card-img-top img-fluid h-50"
+                                                    alt="fotoproduk" style="object-fit: cover;">
+                                            @endforeach
+                                            <div class=" card-body">
+                                                <div class="d-flex">
+                                                    <div class="avatar avatar-card me-2">
+                                                        @foreach ($toko->where('id', $prod->id_toko) as $tk)
+                                                            @foreach ($user->where('id', $tk->id_user) as $usr)
+                                                                <img class="avatar-img"
+                                                                    src="{{ asset($usr->foto_profil) }}" alt="User" />
+                                                            @endforeach
+                                                        @endforeach
+                                                    </div>
+                                                    <div class="fs-08-rem user-card">
+                                                        @foreach ($toko->where('id', $prod->id_toko)->take(1) as $tk)
+                                                            <div class="fw-bold text-truncate">
+                                                                {{ $tk->nama_toko }}
+                                                            </div>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                                <h5 class="card-title" style="margin-bottom: 2px;">
+                                                    {{ $prod->nama_produk }}</h5>
+                                                <p class="card-text" style="color: orange;">
+                                                    <strong>Rp{{ number_format($prod->harga) }}
+                                                        /
+                                                        3 Hari</strong>
+                                                </p>
 
 </section>
 @endsection
