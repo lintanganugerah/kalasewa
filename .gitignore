@@ -18,3 +18,8 @@ yarn-error.log
 /.idea
 /.vscode
 resources/views/homepage.blade.txt
+database/seeders/*
+!database/seeders/.gitkeep
+storage/profiles
+storage/app/public/*
+!storage/app/public/.gitkeep
